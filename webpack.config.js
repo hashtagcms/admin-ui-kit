@@ -2,10 +2,10 @@ const path = require('path');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { VueLoaderPlugin } = require('vue-loader');
+const packageJson = require('./package.json');
 
 // Define specific aliases for monorepo packages
 const ALIASES = {
-    vue: 'vue/dist/vue.esm-bundler.js',
     '@hashtagcms/helpers': path.resolve(__dirname, 'packages/helpers/src'),
     '@hashtagcms/styles': path.resolve(__dirname, 'packages/styles'),
     '@hashtagcms/components': path.resolve(__dirname, 'packages/components/src')
@@ -71,8 +71,11 @@ module.exports = (env, argv) => {
             new MiniCssExtractPlugin({
                 filename: isProduction ? '[name].min.css' : '[name].css',
             }),
+            new webpack.DefinePlugin({
+                '__VERSION__': JSON.stringify(packageJson.version)
+            }),
             new webpack.BannerPlugin({
-                banner: `HashtagCMS JS Kit\nCopyright (c) ${new Date().getFullYear()} Marghoob Suleman\nLink: https://hashtagcms.org\nLicensed under MIT`,
+                banner: `HashtagCMS JS Kit v${packageJson.version}\nCopyright (c) ${new Date().getFullYear()} Marghoob Suleman\nLink: https://hashtagcms.org\nLicensed under MIT`,
                 entryOnly: true
             })
         ],

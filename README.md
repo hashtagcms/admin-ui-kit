@@ -2,50 +2,41 @@
 
 Welcome to the official **HashtagCMS Professional** monorepo. This repository houses the core modular logic, UI components, and utility libraries that power the HashtagCMS ecosystem.
 
-## 📦 Packages
+## 📦 Package
 
-This monorepo is organized into the following scoped packages:
+Everything is bundled into a single NPM package for easier consumption.
 
 | Package | Description | Version |
 | :--- | :--- | :--- |
-| **[`@hashtagcms/components`](./packages/components)** | A cohesive collection of Vue.js components for building HashtagCMS admin interfaces. [Read Guide](./docs/COMPONENTS_GUIDE.md) | `1.0.0` |
-| **[`@hashtagcms/helpers`](./packages/helpers)** | Essential JavaScript utilities, form handlers, and API wrappers used across the system. [Read Guide](./docs/HELPERS_GUIDE.md) | `1.0.0` |
-| **[`@hashtagcms/styles`](./packages/styles)** | The core SASS/CSS design system, including variables, mixins, and theme definitions. [Read Guide](./docs/STYLES_GUIDE.md) | `1.0.0` |
+| **[`@hashtagcms/jskit`](./packages)** | Unified Library containing Components, Helpers, and Styles. | `1.0.4` |
+
+*Note: The internals are still modular (`packages/components`, `packages/helpers`), but consumers should import from the main package.*
 
 ## 🚀 Getting Started
 
-These packages are designed to be consumed within the HashtagCMS ecosystem or other Vue.js based projects.
-
 ### Installation
 
-For development, you can clone this repository and use `npm` workspaces.
-
 ```bash
-git clone https://github.com/marghoobsuleman/cms-js-kit.git
-cd cms-js-kit
-npm install
+npm install @hashtagcms/jskit
 ```
 
 ### Usage
 
-Each package can be imported individually.
-
-**Components:**
+**Components & Helpers:**
 ```javascript
-import ActionBar from "@hashtagcms/components/action-bar";
-import { ToastBox } from "@hashtagcms/components/library";
-```
-
-**Helpers:**
-```javascript
-import { Toast } from "@hashtagcms/helpers/common";
-import AdminConfig from "@hashtagcms/helpers/admin-config";
+import { 
+    ActionBar,          // Components
+    AdminConfig, Toast  // Helpers
+} from "@hashtagcms/jskit";
 ```
 
 **Styles:**
 ```scss
-// In your main SCSS file
-@import "@hashtagcms/styles/app";
+// In your app.scss (Recommended: Use Source for overrides)
+@import "~@hashtagcms/jskit/packages/styles/src/app";
+
+// Or Pre-compiled CSS
+@import "~@hashtagcms/jskit/dist/hashtagcms.min.css";
 ```
 
 ## 🛠️ Development

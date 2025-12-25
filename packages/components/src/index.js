@@ -38,3 +38,14 @@ export { default as ModalBox } from './library/modal-box.vue';
 export { default as SplitButton } from './library/split-button.vue';
 export { default as TimerButton } from './library/timer-button.vue';
 export { default as ToastBox } from './library/toast-box.vue';
+
+// Helpers
+export { AdminConfig } from '@hashtagcms/helpers/admin-config';
+export * from '@hashtagcms/helpers/common'; // Exports Toast, Storage, Fetcher, etc.
+export { Dashboard } from '@hashtagcms/helpers/dashboard';
+export { EditorHelper, PageManager } from '@hashtagcms/helpers/editor';
+export { ErrorMessage } from '@hashtagcms/helpers/error-message-handler';
+export { default as MapAPI } from '@hashtagcms/helpers/map';
+
+// Package Version
+export const VERSION = __VERSION__;

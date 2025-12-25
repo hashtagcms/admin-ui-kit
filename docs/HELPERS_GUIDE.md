@@ -47,3 +47,67 @@ A simplified wrapper around `mitt` for cross-component communication.
 *   **`Toast`**: `Toast.show(vm, message, timeout)`
 *   **`Loader`**: `Loader.show(vm, msg)` / `Loader.hide(vm)`
 *   **`Modal`**: `Modal.open(vm, id)` / `Modal.close(vm, id)`
+
+## 🛠 `Dashboard`
+**File:** `packages/helpers/src/dashboard.js`
+
+Manages the admin dashboard charts (Bar charts for categories and content).
+
+```javascript
+import { Dashboard } from "@hashtagcms/jskit";
+
+// Initialize with chart data
+Dashboard.init({
+    categories: [...],
+    ...
+});
+```
+
+## 🛠 `EditorHelper`
+**File:** `packages/helpers/src/editor.js`
+
+Wrapper around TinyMCE to initialize rich text editors with HashtagCMS configurations.
+
+```javascript
+import { EditorHelper } from "@hashtagcms/jskit";
+
+EditorHelper.makeRichEditor("#my-editor-id", {
+    height: 400
+});
+```
+
+## 🛠 `PageManager`
+**File:** `packages/helpers/src/editor.js`
+
+Handles logic for Page Module forms (auto-generating aliases, link rewrites, handling parent categories).
+
+```javascript
+import { PageManager } from "@hashtagcms/jskit";
+
+// Initialize on page load for Add/Edit actions
+PageManager.init("add", "page", 1);
+```
+
+## 🛠 `MapAPI`
+**File:** `packages/helpers/src/map.js`
+
+Wrapper for MapQuest API interactions (Geocoding).
+
+```javascript
+import { MapAPI } from "@hashtagcms/jskit";
+const mapApi = new MapAPI();
+
+mapApi.getLatLong("New York", (res) => {
+    console.log(res);
+});
+```
+
+## 🛠 `ErrorMessage`
+**File:** `packages/helpers/src/error-message-handler.js`
+
+Automatically highlights form fields with validation errors based on a global `error_messages` variable (injected by Laravel).
+
+```javascript
+import { ErrorMessage } from "@hashtagcms/jskit";
+new ErrorMessage();
+```

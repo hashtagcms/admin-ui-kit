@@ -9,32 +9,58 @@ This guide explains how to integrate `@hashtagcms/components` into your project.
 
 ## Method 1: Source Imports (Recommended)
 
-If you have a modern build step (Laravel Vite, Laravel Mix, or a Vue CLI project), it is best to import only the components you need. This ensures your final bundle is as small as possible (Tree Shaking).
+If you have a modern build step (Laravel Vite, Laravel Mix, or a Vue CLI project), it is best to import only the components you need.
 
 ### 1. Installation
-Currently, the package is part of the HashtagCMS monorepo. Ensure it is linked or installed in your project.
 
 ```bash
-npm install @hashtagcms/components
+npm install @hashtagcms/jskit
 ```
 
-### 2. Usage in Vue Components
+### 2. Configuration (CRITICAL)
 
-You can import components individually in your `.vue` files or entry point (`app.js`).
+The package expects `vue` and `axios` to be provided by the host application. It does **not** bundle them.
+
+**Webpack Config (for Linked/Local Development):**
+If you are `npm link`-ing the package locally, you **must** alias `vue` to a single absolute path to avoid duplicate Vue instances (which causes `null reading 'ce'` errors).
+
+```javascript
+// webpack.config.js
+module.exports = {
+   // ...
+   resolve: {
+       alias: {
+           // Force all vue imports to resolve to your app's node_modules
+           vue: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm-bundler.js'),
+       },
+       symlinks: false // Prevent webpack from looking inside the linked package's node_modules
+   }
+}
+```
+
+### 3. Usage in Vue Components
+
+You can import components and helpers from the unified package.
 
 ```javascript
 /* src/app.js */
 import { createApp } from 'vue';
-import { ActionBar, TabularView } from '@hashtagcms/components';
+import { 
+    ActionBar, TabularView,     // Components
+    AdminConfig, Toast          // Helpers
+} from '@hashtagcms/jskit';
 
-// Import the core variables/mixins if you compile SASS
-// @import "@hashtagcms/styles/app";
+// 1. Import Styles (SCSS Source is recommended for variables)
+// @import "~@hashtagcms/jskit/packages/styles/src/app";
 
 const app = createApp({});
 
 // Register globally
 app.component('action-bar', ActionBar);
 app.component('tabular-view', TabularView);
+
+// Initialize Helpers
+window.AdminConfig = new AdminConfig();
 
 app.mount("#app");
 ```
