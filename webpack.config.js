@@ -29,6 +29,10 @@ module.exports = (env, argv) => {
             globalObject: 'this',
             clean: true,
         },
+        externals: {
+            vue: 'vue',
+            'axios': 'axios'
+        },
         module: {
             rules: [
                 {
