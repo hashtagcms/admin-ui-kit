@@ -1,0 +1,34 @@
+// Custom Badge Colors (BS4 compatibility)
+.badge-primary {
+    background-color: $badge-primary;
+}
+
+.badge-secondary {
+    background-color: $badge-secondary;
+}
+
+.badge-success {
+    background-color: $badge-success;
+}
+
+.badge-danger {
+    background-color: $badge-danger;
+}
+
+.badge-warning {
+    background-color: $badge-warning;
+    color: #212529;
+}
+
+.badge-info {
+    background-color: $badge-info;
+}
+
+.badge-light {
+    background-color: $badge-light;
+    color: #212529;
+}
+
+.badge-dark {
+    background-color: $badge-dark;
+}

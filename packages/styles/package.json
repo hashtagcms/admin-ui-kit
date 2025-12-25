@@ -1,0 +1,15 @@
+{
+    "name": "@hashtagcms/styles",
+    "version": "1.0.0",
+    "description": "Design system and styles for HashtagCMS",
+    "author": "Marghoob Suleman",
+    "license": "MIT",
+    "homepage": "https://hashtagcms.org",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marghoobsuleman/cms-js-kit.git"
+    },
+    "exports": {
+        "./*": "./src/*"
+    }
+}

@@ -1,0 +1,16 @@
+/* 
+   Example: SCSS Integration
+   Use this if your project uses SASS/SCSS. This gives you more control (variables, mixins).
+*/
+
+// 1. Override variables (Optional)
+// $primary-color: #e74c3c;
+// $font-family-base: 'Helvetica Neue', sans-serif;
+
+// 2. Import the main stylesheet from the styles package
+@import "@hashtagcms/styles/app";
+
+// 3. Add your own custom styles below
+.my-custom-dashboard {
+    background-color: #f8f9fa;
+}

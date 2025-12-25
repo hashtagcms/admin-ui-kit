@@ -1,0 +1,7 @@
+/*!
+ * HashtagCMS JS Kit
+ * Copyright (c) 2025 Marghoob Suleman
+ * Link: https://hashtagcms.org
+ * Licensed under MIT
+ */
+.sortElem{margin-top:15px}.sortElem .parent{list-style:none;border:1px solid #cacaca;background:#fff}.sortElem .parent h3{font-size:16px;margin:0}.sortElem ul{padding:0}.sortElem .parent a{padding:10px;color:#666;display:block}.sortElem .parent ul{display:none}.sortElem .parent.active ul{display:block;background:#fff;border-top:1px solid #cacaca}.sortElem .parent.active ul li{list-style:none;margin-left:15px;line-height:normal}.sortElem .parent.active ul li a span{color:#000;font-weight:bold}.sortElem .parent.sortable-chosen{background:#f4f4f4}
