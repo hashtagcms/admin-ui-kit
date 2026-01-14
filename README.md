@@ -77,4 +77,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-_Built with ❤️ by [Marghoob Suleman](https://github.com/marghoobsuleman)._
+_Built with ❤️ by [HashtagCMS](https://github.com/hashtagcms)._

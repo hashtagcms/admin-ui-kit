@@ -92,8 +92,8 @@ npm run dev
 
 This generates:
 
-- `packages-pro/dist/hashtagcms.min.js`
-- `packages-pro/dist/hashtagcms.min.css`
+- `cms-js-kit/dist/hashtagcms.min.js`
+- `cms-js-kit/dist/hashtagcms.min.css`
 
 ### 2. Include in HTML / Blade Template
 

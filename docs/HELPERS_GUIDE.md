@@ -1,7 +1,7 @@
 # Helper Library Guide
 
 **Package:** `@hashtagcms/helpers`
-**Doc Location:** `packages-pro/docs/helpers` (for future expansion)
+**Doc Location:** `cms-js-kit/docs/helpers` (for future expansion)
 
 The helper library provides essential utilities that power the components.
 
