@@ -17,7 +17,7 @@ module.exports = (env, argv) => {
   return {
     mode: argv.mode || "development",
     entry: {
-      hashtagcms: "./packages/components/src/index.js",
+      'admin-ui-kit': "./packages/components/src/index.js",
     },
     output: {
       path: path.resolve(__dirname, "dist"),
@@ -71,7 +71,7 @@ module.exports = (env, argv) => {
         __VERSION__: JSON.stringify(packageJson.version),
       }),
       new webpack.BannerPlugin({
-        banner: `HashtagCMS JS Kit v${packageJson.version}\nCopyright (c) ${new Date().getFullYear()} Marghoob Suleman\nLink: https://hashtagcms.org\nLicensed under MIT`,
+        banner: `HashtagCMS Admin UI Kit v${packageJson.version}\nCopyright (c) ${new Date().getFullYear()} Marghoob Suleman\nLink: https://hashtagcms.org\nLicensed under MIT`,
         entryOnly: true,
       }),
     ],

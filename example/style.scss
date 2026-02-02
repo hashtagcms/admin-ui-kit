@@ -8,7 +8,7 @@
 // $font-family-base: 'Helvetica Neue', sans-serif;
 
 // 2. Import the main stylesheet from the styles package
-@import "@hashtagcms/styles/app";
+@import "@hashtagcms/admin-ui-kit/packages/styles/src/app";
 
 // 3. Add your own custom styles below
 .my-custom-dashboard {

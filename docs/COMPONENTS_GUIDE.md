@@ -1,6 +1,6 @@
 # Component Documentation
 
-Welcome to the component reference for `@hashtagcms/components`. Below is a comprehensive list of all UI components available for building the HashtagCMS admin interface.
+Welcome to the component reference for `@hashtagcms/admin-ui-kit`. Below is a comprehensive list of all UI components available for building the HashtagCMS admin interface.
 
 Click on a component to view its full documentation, API reference, and usage examples.
 
@@ -30,7 +30,9 @@ Click on a component to view its full documentation, API reference, and usage ex
 - **[SiteButton](./components/site-button.md)**: Simple site selector.
 - **[SiteCloner](./components/site-cloner.md)**: Site replication tool.
 - **[SitewiseData](./components/sitewise-data.md)**: Resource distributor across sites.
+- **[SitewiseCopier](./components/sitewise-copier.md)**: Copy site settings and data.
 - **[LanguageButton](./components/language-button.md)**: Content language toggler.
+- **[LanguageCopier](./components/language-copier.md)**: Translations manager.
 
 ## 🖼️ Media & Inputs
 
@@ -48,4 +50,4 @@ Click on a component to view its full documentation, API reference, and usage ex
 
 ---
 
-_Generated for HashtagCMS JS Kit v1.0.0_
+_Generated for @hashtagcms/admin-ui-kit v1.0.7_

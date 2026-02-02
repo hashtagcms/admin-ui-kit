@@ -1,3 +1,4 @@
+import "@hashtagcms/styles/src/app.scss";
 export { default as ActionBar } from "./action-bar.vue";
 export { default as CategoryPlatform } from "./category-platform.vue";
 export { default as CategorySettings } from "./category-settings.vue";
@@ -46,6 +47,7 @@ export { Dashboard } from "@hashtagcms/helpers/dashboard";
 export { EditorHelper, PageManager } from "@hashtagcms/helpers/editor";
 export { ErrorMessage } from "@hashtagcms/helpers/error-message-handler";
 export { default as MapAPI } from "@hashtagcms/helpers/map";
+export { default as Form } from "@hashtagcms/helpers/form";
 
 // Package Version
 export const VERSION = __VERSION__;

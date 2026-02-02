@@ -1,6 +1,6 @@
 # Integration Guide
 
-This guide explains how to integrate `@hashtagcms/components` into your project. There are two primary ways to use this library:
+This guide explains how to integrate `@hashtagcms/admin-ui-kit` into your project. There are two primary ways to use this library:
 
 1.  **Source Imports**: Import individual components into your own Vue build (Webpack/Vite).
 2.  **Standalone Bundle**: Use the pre-compiled JS/CSS files directly in the browser (e.g., in Laravel Blade templates).
@@ -14,7 +14,7 @@ If you have a modern build step (Laravel Vite, Laravel Mix, or a Vue CLI project
 ### 1. Installation
 
 ```bash
-npm install @hashtagcms/jskit
+npm install @hashtagcms/admin-ui-kit
 ```
 
 ### 2. Configuration (CRITICAL)
@@ -50,10 +50,10 @@ import {
   TabularView, // Components
   AdminConfig,
   Toast, // Helpers
-} from "@hashtagcms/jskit";
+} from "@hashtagcms/admin-ui-kit";
 
 // 1. Import Styles (SCSS Source is recommended for variables)
-// @import "~@hashtagcms/jskit/packages/styles/src/app";
+// @import "~@hashtagcms/admin-ui-kit/packages/styles/src/app";
 
 const app = createApp({});
 
@@ -92,8 +92,8 @@ npm run dev
 
 This generates:
 
-- `cms-js-kit/dist/hashtagcms.min.js`
-- `cms-js-kit/dist/hashtagcms.min.css`
+- `admin-ui-kit/dist/admin-ui-kit.min.js`
+- `admin-ui-kit/dist/admin-ui-kit.min.css`
 
 ### 2. Include in HTML / Blade Template
 
@@ -108,7 +108,7 @@ Copy the `dist` files to your public directory (e.g., `public/assets/vendor/hash
     <!-- 1. Load Styles -->
     <link
       rel="stylesheet"
-      href="/assets/vendor/hashtagcms/hashtagcms.min.css"
+      href="/assets/vendor/hashtagcms/admin-ui-kit.min.css"
     />
   </head>
   <body>
@@ -126,7 +126,7 @@ Copy the `dist` files to your public directory (e.g., `public/assets/vendor/hash
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
 
     <!-- HashtagCMS Bundle (UMD) -->
-    <script src="/assets/vendor/hashtagcms/hashtagcms.min.js"></script>
+    <script src="/assets/vendor/hashtagcms/admin-ui-kit.min.js"></script>
 
     <!-- 4. Initialize Vue -->
     <script>

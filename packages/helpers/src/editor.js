@@ -1,4 +1,4 @@
-import { AdminConfig } from "./admin-config";
+import { AdminConfig, CleanForUrl } from "@hashtagcms/admin-sdk";
 
 // Global AdminConfig instance wrapper if needed, or valid assuming window.AdminConfig is set.
 // But better to use the class to be safe if window.AdminConfig isn't ready.
@@ -74,20 +74,18 @@ export const PageManager = {
   isBlank: function (elem) {
     return document.getElementById(elem).value.replace(/\s/g, "") === "";
   },
-  cleanForUrl: function (str, replaceWith = "-") {
-    return str.replace(/\s|'/g, replaceWith);
-  },
+
   autoUpdateFields: function () {
     let value = this.value;
     try {
       if (PageManager.isBlank("lang_title")) {
         document.getElementById("lang_title").value =
           value[0].toUpperCase() + value.slice(1);
-        document.getElementById("alias").value = PageManager.cleanForUrl(
+        document.getElementById("alias").value = CleanForUrl(
           value.toUpperCase(),
           "_",
         );
-        let active_key = PageManager.cleanForUrl(value.toLowerCase(), "-");
+        let active_key = CleanForUrl(value.toLowerCase(), "-");
         document.getElementById("lang_active_key").value = active_key;
         document.getElementById("link_rewrite").value = active_key;
       }
@@ -98,11 +96,11 @@ export const PageManager = {
   autoUpdateUrls: function () {
     let value = this.value;
     if (document.getElementById("link_rewrite").edited !== true) {
-      value = PageManager.cleanForUrl(value.toUpperCase(), "_");
+      value = CleanForUrl(value.toUpperCase(), "_");
       value = value.substr(0, 60); //it's limit
       document.getElementById("alias").value = value;
 
-      let active_key = PageManager.cleanForUrl(value.toLowerCase(), "-");
+      let active_key = CleanForUrl(value.toLowerCase(), "-");
       active_key = value.substr(0, 128); //it's limit
       document.getElementById("lang_active_key").value = active_key;
       document.getElementById("link_rewrite").value = active_key;

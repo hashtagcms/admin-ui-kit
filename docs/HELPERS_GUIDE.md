@@ -1,7 +1,7 @@
 # Helper Library Guide
 
-**Package:** `@hashtagcms/helpers`
-**Doc Location:** `cms-js-kit/docs/helpers` (for future expansion)
+**Package:** `@hashtagcms/admin-ui-kit`
+**Doc Location:** `admin-ui-kit/docs/helpers` (for future expansion)
 
 The helper library provides essential utilities that power the components.
 
@@ -60,7 +60,7 @@ A simplified wrapper around `mitt` for cross-component communication.
 Manages the admin dashboard charts (Bar charts for categories and content).
 
 ```javascript
-import { Dashboard } from "@hashtagcms/jskit";
+import { Dashboard } from "@hashtagcms/admin-ui-kit";
 
 // Initialize with chart data
 Dashboard.init({
@@ -76,7 +76,7 @@ Dashboard.init({
 Wrapper around TinyMCE to initialize rich text editors with HashtagCMS configurations.
 
 ```javascript
-import { EditorHelper } from "@hashtagcms/jskit";
+import { EditorHelper } from "@hashtagcms/admin-ui-kit";
 
 EditorHelper.makeRichEditor("#my-editor-id", {
   height: 400,
@@ -90,7 +90,7 @@ EditorHelper.makeRichEditor("#my-editor-id", {
 Handles logic for Page Module forms (auto-generating aliases, link rewrites, handling parent categories).
 
 ```javascript
-import { PageManager } from "@hashtagcms/jskit";
+import { PageManager } from "@hashtagcms/admin-ui-kit";
 
 // Initialize on page load for Add/Edit actions
 PageManager.init("add", "page", 1);
@@ -103,7 +103,7 @@ PageManager.init("add", "page", 1);
 Wrapper for MapQuest API interactions (Geocoding).
 
 ```javascript
-import { MapAPI } from "@hashtagcms/jskit";
+import { MapAPI } from "@hashtagcms/admin-ui-kit";
 const mapApi = new MapAPI();
 
 mapApi.getLatLong("New York", (res) => {
@@ -118,6 +118,6 @@ mapApi.getLatLong("New York", (res) => {
 Automatically highlights form fields with validation errors based on a global `error_messages` variable (injected by Laravel).
 
 ```javascript
-import { ErrorMessage } from "@hashtagcms/jskit";
+import { ErrorMessage } from "@hashtagcms/admin-ui-kit";
 new ErrorMessage();
 ```

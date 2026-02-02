@@ -1,0 +1,5 @@
+
+    isSaved="true"
+    back-url="http://localhost:8000/admin/country?id=244"
+    module-info="{"id":3,"name":"Countries","controller_name":"country","sub_title":"Manage countries","display_name":null,"parent_id":2,"icon_css":"fa fa-map-o","package":null,"list_view_name":null,"edit_view_name":null,"position":4,"created_at":"2026-01-25T05:17:58.000000Z","updated_at":"2026-01-25T05:17:58.000000Z","deleted_at":null,"child":[]}"
+    

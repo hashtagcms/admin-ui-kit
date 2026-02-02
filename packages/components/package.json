@@ -2,12 +2,12 @@
   "name": "@hashtagcms/components",
   "version": "1.0.0",
   "description": "Vue.js components for HashtagCMS",
-  "author": "Marghoob Suleman",
+  "author": "HashtagCMS",
   "license": "MIT",
   "homepage": "https://hashtagcms.org",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/marghoobsuleman/cms-js-kit.git"
+    "url": "git+https://github.com/hashtagcms/admin-ui-kit.git"
   },
   "main": "src/index.js",
   "exports": {

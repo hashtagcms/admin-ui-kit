@@ -18,6 +18,9 @@
 </template>
 
 <script>
+import { Storage } from "@hashtagcms/admin-sdk";
+const Store = new Storage();
+
 export default {
   mounted() {},
   props: [

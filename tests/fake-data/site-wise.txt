@@ -1,0 +1,7 @@
+
+        data-site-data="[{"id":1,"name":"Desktop","pivot":{"site_id":1,"platform_id":1}}]"
+        data-all-data="{"label":"Platforms","data":[{"id":1,"name":"Desktop"},{"id":2,"name":"Android"},{"id":3,"name":"iOS"},{"id":4,"name":"PWA"}]}"
+        data-message=""
+        data-current-key="platforms"
+        data-site-id="1"
+       

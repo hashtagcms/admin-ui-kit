@@ -1,10 +1,13 @@
 {
-  "name": "@hashtagcms/jskit",
-  "version": "1.0.5",
-  "description": "The official JavaScript Kit for HashtagCMS, bundled with essential UI components, utility helpers, and design system styles.",
+  "name": "@hashtagcms/admin-ui-kit",
+  "version": "1.0.6",
+  "description": "The official Admin UI Kit for HashtagCMS, bundled with essential UI components, utility helpers, and design system styles.",
   "author": "HashtagCMS",
   "license": "MIT",
-  "main": "dist/hashtagcms.min.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "dist/admin-ui-kit.min.js",
   "files": [
     "dist",
     "packages"
@@ -12,31 +15,38 @@
   "homepage": "https://hashtagcms.org",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hashtagcms/cms-js-kit.git"
+    "url": "git+https://github.com/hashtagcms/admin-ui-kit.git"
   },
   "workspaces": [
     "packages/*"
   ],
   "scripts": {
-    "dev": "webpack --mode development --progress --color",
-    "prod": "webpack --mode production --progress --color",
-    "build": "npm run prod",
-    "watch": "webpack --mode development --watch --progress --color"
+    "test": "vitest run",
+    "dev": "webpack --mode development --progress --color",    
+    "build": "webpack --mode production --progress --color",
+    "watch": "webpack --mode development --watch --progress --color",
+    "playground": "vite --config vite.playground.config.js"
   },
   "devDependencies": {
     "@babel/core": "^7.23.0",
     "@babel/preset-env": "^7.23.0",
+    "@vitejs/plugin-vue": "^6.0.3",
+    "@vue/test-utils": "^2.4.6",
     "babel-loader": "^9.1.0",
     "css-loader": "^6.8.0",
+    "jsdom": "^27.0.1",
     "mini-css-extract-plugin": "^2.7.0",
     "sass": "^1.69.0",
     "sass-loader": "^13.3.0",
+    "vitest": "^3.2.4",
     "vue-loader": "^17.3.0",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.0"
   },
   "dependencies": {
+    "@hashtagcms/admin-sdk": "^1.0.2",
     "axios": "^1.6.0",
+    "mitt": "^3.0.1",
     "motion": "^10.16.4",
     "secure-ls": "^2.0.0"
   }
