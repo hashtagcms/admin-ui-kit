@@ -1,6 +1,6 @@
 {
   "name": "@hashtagcms/admin-ui-kit",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "The official Admin UI Kit for HashtagCms, bundled with essential UI components, utility helpers, and design system styles.",
   "author": "HashtagCms",
   "license": "MIT",
@@ -44,7 +44,7 @@
     "webpack-cli": "^5.1.0"
   },
   "dependencies": {
-    "@hashtagcms/admin-sdk": "file:../admin-sdk",
+    "@hashtagcms/admin-sdk": "^1.0.3",
     "axios": "^1.6.0",
     "mitt": "^3.0.1",
     "motion": "^10.16.4",
