@@ -127,7 +127,7 @@ export default {
       };
       let onError = (error) => {
         let dm = "There is some error while uploading. Please try again.";
-        this.showMsg(error.response.statusText || dm, true);
+        this.showMsg(error.response?.statusText || error.message || dm, true);
         this.resetForm();
       };
 
@@ -162,7 +162,7 @@ export default {
         this.acceptFileType.replace(/[^a-zA-Z,]/g, ""),
       );
 
-      formData.append("_csrf", window.Laravel.csrfToken);
+      formData.append("_csrf", window.HashtagCms?.csrfToken || window.Laravel?.csrfToken);
 
       axios
         .post(url, formData, {

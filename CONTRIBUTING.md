@@ -1,6 +1,6 @@
-# Contributing to HashtagCMS Professional Packages
+# Contributing to HashtagCms Professional Packages
 
-Thank you for your interest in contributing to **HashtagCMS Professional Packages**! We welcome contributions from the community to help improve this project.
+Thank you for your interest in contributing to **HashtagCms Professional Packages**! We welcome contributions from the community to help improve this project.
 
 ## 📋 Code of Conduct
 

@@ -1,8 +1,8 @@
 {
   "name": "@hashtagcms/helpers",
   "version": "1.0.0",
-  "description": "Helper utilities for HashtagCMS",
-  "author": "HashtagCMS",
+  "description": "Helper utilities for HashtagCms",
+  "author": "HashtagCms",
   "license": "MIT",
   "homepage": "https://hashtagcms.org",
   "repository": {

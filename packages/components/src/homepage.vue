@@ -332,7 +332,7 @@
 <script>
 import AdminConfig from "@hashtagcms/helpers/admin-config";
 
-import { Toast, Modal, Loader } from "@hashtagcms/helpers/common";
+import { Toast, Modal, Loader, safeErrorData } from "@hashtagcms/helpers/common";
 import Sortable from "sortablejs";
 import InfoPopup from "./info-popup.vue";
 import ModalBox from "./library/modal-box.vue";
@@ -581,7 +581,7 @@ export default {
             resolve(response);
           })
           .catch((error) => {
-            reject(error.response);
+            reject(safeErrorData(error));
           })
           .finally(() => {
             Loader.hide(this);

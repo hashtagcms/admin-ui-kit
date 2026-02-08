@@ -203,7 +203,7 @@ export default {
       );
     },
     csrfToken() {
-      return window.Laravel.csrfToken;
+      return window.HashtagCms?.csrfToken || window.Laravel?.csrfToken;
     },
   },
   methods: {

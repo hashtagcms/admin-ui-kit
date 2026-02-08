@@ -56,7 +56,7 @@
 import AdminConfig from "@hashtagcms/helpers/admin-config";
 
 import Sortable from "sortablejs";
-import { Toast, Loader } from "@hashtagcms/helpers/common";
+import { Toast, Loader, safeErrorData } from "@hashtagcms/helpers/common";
 
 import SplitButton from "./library/split-button.vue";
 
@@ -191,7 +191,7 @@ export default {
             this.onSuccess(response, controllerName);
           })
           .catch((error) => {
-            this.onFailure(error.response);
+            this.onFailure(safeErrorData(error));
           })
           .finally(() => {
             Loader.hide(this);

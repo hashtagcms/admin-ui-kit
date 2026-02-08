@@ -32,7 +32,7 @@
 <script>
 import AdminConfig from "@hashtagcms/helpers/admin-config";
 
-import { Toast, Loader } from "@hashtagcms/helpers/common";
+import { Toast, Loader, safeErrorData } from "@hashtagcms/helpers/common";
 import SiteWiseData from "./sitewise-data.vue";
 
 export default {
@@ -99,7 +99,7 @@ export default {
             resolve(response);
           })
           .catch((error) => {
-            reject(error.response);
+            reject(safeErrorData(error));
           });
       });
     },
@@ -129,8 +129,8 @@ export default {
           .then((response) => {
             this.populateData(response.data);
           })
-          .catch((response) => {
-            console.log(response);
+          .catch((error) => {
+            console.error('getBySite error:', safeErrorData(error));
           })
           .finally(() => {
             this.showHdeLoader(false);
@@ -160,8 +160,8 @@ export default {
           console.log(response);
           feedback(response);
         })
-        .catch((response) => {
-          console.log(response);
+        .catch((error) => {
+          console.error('actionAdd error:', safeErrorData(error));
         })
         .finally(() => {
           this.showHdeLoader(false);
@@ -206,8 +206,8 @@ export default {
         .then((response) => {
           feedback(response);
         })
-        .catch((response) => {
-          console.log(response);
+        .catch((error) => {
+          console.error('actionRemove error:', safeErrorData(error));
         })
         .finally(() => {
           this.showHdeLoader(false);

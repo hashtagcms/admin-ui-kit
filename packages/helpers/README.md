@@ -1,6 +1,6 @@
 # @hashtagcms/helpers
 
-A utility toolbelt for HashtagCMS development. This package provides essential classes for API communication, form handling, configuration management, and event management.
+A utility toolbelt for HashtagCms development. This package provides essential classes for API communication, form handling, configuration management, and event management.
 
 ## 📦 Installation
 

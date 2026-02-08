@@ -11,7 +11,9 @@ import {
   PasteFromClipboard,
   IsJson,
   LeftMenu,
-  TitleCase
+  TitleCase,
+  parseProp,
+  safeErrorData
 } from "@hashtagcms/admin-sdk";
 
 // Initialize SDK LeftMenu with EventBus
@@ -28,7 +30,9 @@ export {
   PasteFromClipboard,
   IsJson,
   LeftMenu,
-  TitleCase
+  TitleCase,
+  parseProp,
+  safeErrorData
 };
 
 /**

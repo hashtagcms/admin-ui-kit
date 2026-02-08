@@ -1,8 +1,8 @@
 {
   "name": "@hashtagcms/admin-ui-kit",
-  "version": "1.0.6",
-  "description": "The official Admin UI Kit for HashtagCMS, bundled with essential UI components, utility helpers, and design system styles.",
-  "author": "HashtagCMS",
+  "version": "1.0.7",
+  "description": "The official Admin UI Kit for HashtagCms, bundled with essential UI components, utility helpers, and design system styles.",
+  "author": "HashtagCms",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -22,7 +22,7 @@
   ],
   "scripts": {
     "test": "vitest run",
-    "dev": "webpack --mode development --progress --color",    
+    "dev": "webpack --mode development --progress --color",
     "build": "webpack --mode production --progress --color",
     "watch": "webpack --mode development --watch --progress --color",
     "playground": "vite --config vite.playground.config.js"
@@ -44,7 +44,7 @@
     "webpack-cli": "^5.1.0"
   },
   "dependencies": {
-    "@hashtagcms/admin-sdk": "^1.0.2",
+    "@hashtagcms/admin-sdk": "file:../admin-sdk",
     "axios": "^1.6.0",
     "mitt": "^3.0.1",
     "motion": "^10.16.4",

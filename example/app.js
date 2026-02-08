@@ -1,7 +1,7 @@
 // Import Vue 3 (Assuming you are using a bundler like Webpack or Vite)
 import { createApp } from "vue";
 
-// Import components and styles from HashtagCMS Kit
+// Import components and styles from HashtagCms Kit
 // Make sure you have installed the package: npm install @hashtagcms/admin-ui-kit
 import { ActionBar, TabularView, Pagination } from "@hashtagcms/admin-ui-kit";
 
@@ -14,7 +14,7 @@ import "@hashtagcms/admin-ui-kit/packages/styles/src/app.scss";
 const app = createApp({
   data() {
     return {
-      message: "Hello HashtagCMS!",
+      message: "Hello HashtagCms!",
     };
   },
   methods: {

@@ -49,7 +49,7 @@
     <hr />
     <div class="dropdown">
       <a
-        title="Open HashtagCMS.org"
+        title="Open HashtagCms.org"
         :href="linkForHashtag"
         target="_blank"
         class="d-flex align-items-center text-light text-decoration-none"

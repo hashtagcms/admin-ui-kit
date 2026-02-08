@@ -1,24 +1,22 @@
-# Component Documentation
+# Components
 
-Welcome to the component reference for `@hashtagcms/admin-ui-kit`. Below is a comprehensive list of all UI components available for building the HashtagCMS admin interface.
+Below is a comprehensive list of all UI components available in `@hashtagcms/admin-ui-kit`.
 
-Click on a component to view its full documentation, API reference, and usage examples.
-
-👉 **[Read the Integration Guide](./INTEGRATION_GUIDE.md)** to learn how to install and use these components in your project.
+---
 
 ## 🏁 Core Layout & UI
 
-- **[ActionBar](./components/action-bar.md)**: The primary toolbar for module pages (add, search, layout).
-- **[TitleBar](./components/title-bar.md)**: Page header with breadcrumbs and back navigation.
+- **[ActionBar](./components/action-bar.md)**: The primary toolbar for module pages.
+- **[TitleBar](./components/title-bar.md)**: Page header with breadcrumbs.
 - **[TopNav](./components/top-nav.md)**: Global header navigation.
 - **[LeftNav](./components/left-nav.md)**: Sidebar menu navigation.
-- **[TabularView](./components/tabular-view.md)**: Powerful data grid with sorting, actions, and inline editing.
+- **[TabularView](./components/tabular-view.md)**: Powerful data grid.
 - **[Pagination](./components/pagination.md)**: Pagination controls.
 
 ## ⚙️ Module & CMS Management
 
 - **[Homepage](./components/homepage.md)**: The drag-and-drop Dashboard editor.
-- **[ModuleCreator](./components/module-creator.md)**: Backend module generator wizard.
+- **[ModuleCreator](./components/module-creator.md)**: Backend module generator.
 - **[FrontendModuleCreator](./components/frontend-module-creator.md)**: Frontend module configuration.
 - **[ModulePermission](./components/module-permission.md)**: User/Role permission matrix.
 - **[Sorter](./components/sorter.md)**: Drag-and-drop item sorter.
@@ -29,8 +27,8 @@ Click on a component to view its full documentation, API reference, and usage ex
 - **[GlobalSiteButton](./components/global-site-button.md)**: Global site context switcher.
 - **[SiteButton](./components/site-button.md)**: Simple site selector.
 - **[SiteCloner](./components/site-cloner.md)**: Site replication tool.
-- **[SitewiseData](./components/sitewise-data.md)**: Resource distributor across sites.
-- **[SitewiseCopier](./components/sitewise-copier.md)**: Copy site settings and data.
+- **[SitewiseData](./components/sitewise-data.md)**: Resource distributor.
+- **[SitewiseCopier](./components/sitewise-copier.md)**: Copy site settings.
 - **[LanguageButton](./components/language-button.md)**: Content language toggler.
 - **[LanguageCopier](./components/language-copier.md)**: Translations manager.
 
@@ -47,7 +45,3 @@ Click on a component to view its full documentation, API reference, and usage ex
 - **[Loader](./components/loader.md)**: Loading spinner.
 - **[ToastBox](./components/toast-box.md)**: Notification service.
 - **[ModalBox](./components/modal-box.md)**: Generic modal wrapper.
-
----
-
-_Generated for @hashtagcms/admin-ui-kit v1.0.7_

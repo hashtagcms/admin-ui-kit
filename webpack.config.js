@@ -23,7 +23,7 @@ module.exports = (env, argv) => {
       path: path.resolve(__dirname, "dist"),
       filename: isProduction ? "[name].min.js" : "[name].js",
       library: {
-        name: "HashtagCMS",
+        name: "HashtagCmsAdminUI",
         type: "umd",
       },
       globalObject: "this",
@@ -71,7 +71,7 @@ module.exports = (env, argv) => {
         __VERSION__: JSON.stringify(packageJson.version),
       }),
       new webpack.BannerPlugin({
-        banner: `HashtagCMS Admin UI Kit v${packageJson.version}\nCopyright (c) ${new Date().getFullYear()} Marghoob Suleman\nLink: https://hashtagcms.org\nLicensed under MIT`,
+        banner: `HashtagCms Admin UI Kit v${packageJson.version}\nCopyright (c) ${new Date().getFullYear()} Marghoob Suleman\nLink: https://hashtagcms.org\nLicensed under MIT`,
         entryOnly: true,
       }),
     ],

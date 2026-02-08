@@ -1,6 +1,6 @@
 # @hashtagcms/components
 
-A collection of robust, reusable Vue.js components designed for building HashtagCMS admin interfaces. These components are optimized for server-side rendering integration (using `data-` attributes) and modern SPA capabilities.
+A collection of robust, reusable Vue.js components designed for building HashtagCms admin interfaces. These components are optimized for server-side rendering integration (using `data-` attributes) and modern SPA capabilities.
 
 ## 📦 Installation
 

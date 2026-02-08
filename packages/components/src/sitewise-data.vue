@@ -96,7 +96,7 @@
 <script>
 import AdminConfig from "@hashtagcms/helpers/admin-config";
 
-import { Loader, Toast } from "@hashtagcms/helpers/common";
+import { Loader, Toast, safeErrorData, parseProp } from "@hashtagcms/helpers/common";
 
 export default {
   mounted() {
@@ -172,7 +172,7 @@ export default {
             resolve(response);
           })
           .catch((error) => {
-            reject(error.response);
+            reject(safeErrorData(error));
           })
           .finally(() => {
             Loader.hide(this);

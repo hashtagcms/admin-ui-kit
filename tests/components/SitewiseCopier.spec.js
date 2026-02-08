@@ -12,7 +12,8 @@ vi.mock('@hashtagcms/helpers/admin-config', () => ({
 
 vi.mock('@hashtagcms/helpers/common', () => ({
   Loader: { show: vi.fn(), hide: vi.fn() },
-  Toast: { show: vi.fn() }
+  Toast: { show: vi.fn() },
+  safeErrorData: vi.fn((error) => error)
 }));
 
 const mockAxios = {
@@ -46,7 +47,20 @@ describe('SitewiseCopier.vue', () => {
   });
 
   it('fetches data when site selected', async () => {
-    const wrapper = shallowMount(SitewiseCopier, { props });
+    const wrapper = shallowMount(SitewiseCopier, { 
+        props,
+        global: {
+            stubs: {
+                'site-wise': {
+                    template: '<div />',
+                    methods: {
+                        setData: vi.fn(),
+                        setSiteData: vi.fn()
+                    }
+                }
+            }
+        }
+    });
     const select = wrapper.find('select');
     
     // Select a site (id: 1)
@@ -57,16 +71,26 @@ describe('SitewiseCopier.vue', () => {
   });
   
   it('handles copy action', async () => {
-      const wrapper = shallowMount(SitewiseCopier, { props });
-      
-      // Mock references
-      wrapper.vm.$refs.siteWiseComponent = {
-          setSiteData: vi.fn()
-      };
+      const mockSetSiteData = vi.fn();
+      const wrapper = shallowMount(SitewiseCopier, { 
+          props,
+          global: {
+              stubs: {
+                  'site-wise': {
+                      template: '<div />',
+                      methods: {
+                          setData: vi.fn(),
+                          setSiteData: mockSetSiteData
+                      }
+                  }
+              }
+          }
+      });
       
       // Trigger actionAdd
-      wrapper.vm.doAction('add', [], [{id:1, selected:true}], [1]);
+      await wrapper.vm.doAction('add', [], [{id:1, selected:true}], [1]);
       
       expect(mockAxios.post).toHaveBeenCalled();
+      expect(mockSetSiteData).toHaveBeenCalled();
   });
 });

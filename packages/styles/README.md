@@ -1,6 +1,6 @@
 # @hashtagcms/styles
 
-The core design system for HashtagCMS. This package contains the SASS/SCSS source files used to style the admin interface, compatible with the compiled CSS structure.
+The core design system for HashtagCms. This package contains the SASS/SCSS source files used to style the admin interface, compatible with the compiled CSS structure.
 
 ## 📦 Installation
 
@@ -32,6 +32,6 @@ To override variables, import your custom variables _before_ importing this pack
 // Your overrides
 $primary-color: #3498db;
 
-// Import HashtagCMS styles
+// Import HashtagCms styles
 @import "~@hashtagcms/styles/app";
 ```

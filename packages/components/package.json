@@ -1,8 +1,8 @@
 {
   "name": "@hashtagcms/components",
   "version": "1.0.0",
-  "description": "Vue.js components for HashtagCMS",
-  "author": "HashtagCMS",
+  "description": "Vue.js components for HashtagCms",
+  "author": "HashtagCms",
   "license": "MIT",
   "homepage": "https://hashtagcms.org",
   "repository": {

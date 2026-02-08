@@ -1,53 +1,152 @@
 import "@hashtagcms/styles/src/app.scss";
-export { default as ActionBar } from "./action-bar.vue";
-export { default as CategoryPlatform } from "./category-platform.vue";
-export { default as CategorySettings } from "./category-settings.vue";
-export { default as CmsModuleDropdown } from "./cms-module-dropdown.vue";
-export { default as DownloadButton } from "./downlods.vue";
-export { default as FileUploader } from "./file-uploader.vue";
-export { default as FrontendModuleCreator } from "./frontend-module-creator.vue";
-export { default as GlobalSiteButton } from "./global-site-button.vue";
-export { default as Homepage } from "./homepage.vue";
-export { default as HtmlSlot } from "./html-slot.vue";
-export { default as ImageGallery } from "./image-gallery.vue";
-export { default as InfoBoxes } from "./info-boxes.vue";
-export { default as InfoPopup } from "./info-popup.vue";
-export { default as LanguageButton } from "./language-button.vue";
-export { default as LanguageCopier } from "./language-copier.vue";
-export { default as LeftNav } from "./left-nav.vue";
-export { default as MenuSorter } from "./menu-sorter.vue";
-export { default as ModuleCreator } from "./module-creator.vue";
-export { default as ModulePermission } from "./module-permission.vue";
-export { default as Pagination } from "./pagination.vue";
-export { default as PlatformButton } from "./platform-button.vue";
-export { default as SearchBar } from "./search-bar.vue";
-export { default as SiteButton } from "./site-button.vue";
-export { default as SiteCloner } from "./site-cloner.vue";
-export { default as SitewiseCopier } from "./sitewise-copier.vue";
-export { default as SitewiseData } from "./sitewise-data.vue";
-export { default as Sorter } from "./sorter.vue";
-export { default as TabularView } from "./tabular-view.vue";
-export { default as TitleBar } from "./title-bar.vue";
-export { default as TopNav } from "./top-nav.vue";
 
-// Library exports
-export { default as CopyPaste } from "./library/copy-paste.vue";
-export { default as InfoBox } from "./library/info-box.vue";
-export { default as LeftMenuShowHide } from "./library/left-menu-show-hide.vue";
-export { default as Loader } from "./library/loader.vue";
-export { default as ModalBox } from "./library/modal-box.vue";
-export { default as SplitButton } from "./library/split-button.vue";
-export { default as TimerButton } from "./library/timer-button.vue";
-export { default as ToastBox } from "./library/toast-box.vue";
+import ActionBar from "./action-bar.vue";
+import CategoryPlatform from "./category-platform.vue";
+import CategorySettings from "./category-settings.vue";
+import CmsModuleDropdown from "./cms-module-dropdown.vue";
+import DownloadButton from "./downlods.vue";
+import FileUploader from "./file-uploader.vue";
+import FrontendModuleCreator from "./frontend-module-creator.vue";
+import GlobalSiteButton from "./global-site-button.vue";
+import Homepage from "./homepage.vue";
+import HtmlSlot from "./html-slot.vue";
+import ImageGallery from "./image-gallery.vue";
+import InfoBoxes from "./info-boxes.vue";
+import InfoPopup from "./info-popup.vue";
+import LanguageButton from "./language-button.vue";
+import LanguageCopier from "./language-copier.vue";
+import LeftNav from "./left-nav.vue";
+import MenuSorter from "./menu-sorter.vue";
+import ModuleCreator from "./module-creator.vue";
+import ModulePermission from "./module-permission.vue";
+import Pagination from "./pagination.vue";
+import PlatformButton from "./platform-button.vue";
+import SearchBar from "./search-bar.vue";
+import SiteButton from "./site-button.vue";
+import SiteCloner from "./site-cloner.vue";
+import SitewiseCopier from "./sitewise-copier.vue";
+import SitewiseData from "./sitewise-data.vue";
+import Sorter from "./sorter.vue";
+import TabularView from "./tabular-view.vue";
+import TitleBar from "./title-bar.vue";
+import TopNav from "./top-nav.vue";
+
+// Library imports
+import CopyPaste from "./library/copy-paste.vue";
+import InfoBox from "./library/info-box.vue";
+import LeftMenuShowHide from "./library/left-menu-show-hide.vue";
+import Loader from "./library/loader.vue";
+import ModalBox from "./library/modal-box.vue";
+import SplitButton from "./library/split-button.vue";
+import TimerButton from "./library/timer-button.vue";
+import ToastBox from "./library/toast-box.vue";
+
+export {
+    ActionBar,
+    CategoryPlatform,
+    CategorySettings,
+    CmsModuleDropdown,
+    DownloadButton,
+    FileUploader,
+    FrontendModuleCreator,
+    GlobalSiteButton,
+    Homepage,
+    HtmlSlot,
+    ImageGallery,
+    InfoBoxes,
+    InfoPopup,
+    LanguageButton,
+    LanguageCopier,
+    LeftNav,
+    MenuSorter,
+    ModuleCreator,
+    ModulePermission,
+    Pagination,
+    PlatformButton,
+    SearchBar,
+    SiteButton,
+    SiteCloner,
+    SitewiseCopier,
+    SitewiseData,
+    Sorter,
+    TabularView,
+    TitleBar,
+    TopNav,
+    CopyPaste,
+    InfoBox,
+    LeftMenuShowHide,
+    Loader,
+    ModalBox,
+    SplitButton,
+    TimerButton,
+    ToastBox
+};
 
 // Helpers
-export { AdminConfig } from "@hashtagcms/helpers/admin-config";
-export * from "@hashtagcms/helpers/common"; // Exports Toast, Storage, Fetcher, etc.
-export { Dashboard } from "@hashtagcms/helpers/dashboard";
-export { EditorHelper, PageManager } from "@hashtagcms/helpers/editor";
-export { ErrorMessage } from "@hashtagcms/helpers/error-message-handler";
-export { default as MapAPI } from "@hashtagcms/helpers/map";
-export { default as Form } from "@hashtagcms/helpers/form";
+import { AdminConfig } from "@hashtagcms/helpers/admin-config";
+import * as common from "@hashtagcms/helpers/common";
+import { Dashboard } from "@hashtagcms/helpers/dashboard";
+import { EditorHelper, PageManager } from "@hashtagcms/helpers/editor";
+import { ErrorMessage } from "@hashtagcms/helpers/error-message-handler";
+import MapAPI from "@hashtagcms/helpers/map";
+import Form from "@hashtagcms/helpers/form";
 
-// Package Version
-export const VERSION = __VERSION__;
+export { AdminConfig, Dashboard, EditorHelper, PageManager, ErrorMessage, MapAPI, Form };
+export * from "@hashtagcms/helpers/common";
+
+const HashtagCmsAdminUI = {
+    VERSION: __VERSION__,
+    ActionBar,
+    CategoryPlatform,
+    CategorySettings,
+    CmsModuleDropdown,
+    DownloadButton,
+    FileUploader,
+    FrontendModuleCreator,
+    GlobalSiteButton,
+    Homepage,
+    HtmlSlot,
+    ImageGallery,
+    InfoBoxes,
+    InfoPopup,
+    LanguageButton,
+    LanguageCopier,
+    LeftNav,
+    MenuSorter,
+    ModuleCreator,
+    ModulePermission,
+    Pagination,
+    PlatformButton,
+    SearchBar,
+    SiteButton,
+    SiteCloner,
+    SitewiseCopier,
+    SitewiseData,
+    Sorter,
+    TabularView,
+    TitleBar,
+    TopNav,
+    CopyPaste,
+    InfoBox,
+    LeftMenuShowHide,
+    Loader,
+    ModalBox,
+    SplitButton,
+    TimerButton,
+    ToastBox,
+    AdminConfig,
+    ...common,
+    Dashboard,
+    EditorHelper,
+    PageManager,
+    ErrorMessage,
+    MapAPI,
+    Form
+};
+
+// Global exposure
+if (typeof window !== 'undefined') {
+    window.HashtagCmsAdminUI = HashtagCmsAdminUI;
+}
+
+export default HashtagCmsAdminUI;

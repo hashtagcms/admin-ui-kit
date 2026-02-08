@@ -133,7 +133,7 @@ export default {
         })
         .catch((error) => {
           console.log("Error: ", error.response);
-          $this.errorMsg = error.response.data.message;
+          $this.errorMsg = error.response ? error.response.data.message : error.message;
           this.loading(0);
         });
 

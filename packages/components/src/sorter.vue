@@ -31,7 +31,7 @@
 import AdminConfig from "@hashtagcms/helpers/admin-config";
 
 import Sortable from "sortablejs";
-import { Toast } from "@hashtagcms/helpers/common";
+import { Toast, safeErrorData } from "@hashtagcms/helpers/common";
 import Form from "@hashtagcms/helpers/form";
 
 export default {
@@ -167,7 +167,7 @@ export default {
             this.onSuccess(response);
           })
           .catch((error) => {
-            this.onFailure(error.response);
+            this.onFailure(safeErrorData(error));
           });
       });
     },

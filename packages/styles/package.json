@@ -1,8 +1,8 @@
 {
   "name": "@hashtagcms/styles",
   "version": "1.0.0",
-  "description": "Design system and styles for HashtagCMS",
-  "author": "HashtagCMS",
+  "description": "Design system and styles for HashtagCms",
+  "author": "HashtagCms",
   "license": "MIT",
   "homepage": "https://hashtagcms.org",
   "repository": {
