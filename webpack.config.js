@@ -1,14 +1,25 @@
 const path = require("path");
+const fs = require("fs");
 const webpack = require("webpack");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const { VueLoaderPlugin } = require("vue-loader");
 const packageJson = require("./package.json");
 
-// Define specific aliases for monorepo packages
+// Dynamic Theme Discovery
+const themesDir = path.resolve(__dirname, "packages/themes");
+const discoveredThemes = fs.readdirSync(themesDir).filter(f => 
+    fs.statSync(path.join(themesDir, f)).isDirectory()
+);
+
+const THEME_ALIASES = {};
+discoveredThemes.forEach(theme => {
+    THEME_ALIASES[`@hashtagcms/theme/${theme}`] = path.resolve(themesDir, theme, 'src');
+});
+
+// Core package aliases
 const ALIASES = {
+  ...THEME_ALIASES,
   "@hashtagcms/helpers": path.resolve(__dirname, "packages/helpers/src"),
-  "@hashtagcms/styles": path.resolve(__dirname, "packages/styles"),
-  "@hashtagcms/components": path.resolve(__dirname, "packages/components/src"),
 };
 
 module.exports = (env, argv) => {
@@ -17,7 +28,9 @@ module.exports = (env, argv) => {
   return {
     mode: argv.mode || "development",
     entry: {
-      'admin-ui-kit': "./packages/components/src/index.js",
+      'admin-ui-kit': "./packages/themes/neo/src/components/index.js", // Main legacy entry
+      'neo/admin-ui-kit': "./packages/themes/neo/src/components/index.js",
+      'modern/admin-ui-kit': "./packages/themes/modern/src/components/index.js",
     },
     output: {
       path: path.resolve(__dirname, "dist"),
@@ -51,7 +64,27 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(scss|css)$/,
-          use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
+          use: [
+            MiniCssExtractPlugin.loader, 
+            "css-loader", 
+            {
+              loader: "postcss-loader",
+              options: {
+                postcssOptions: {
+                  plugins: [
+                    require("@tailwindcss/postcss")({
+                      content: [
+                        "./packages/themes/neo/src/**/*.{vue,js,scss,blade.php}",
+                        "./packages/themes/modern/src/**/*.{vue,js,scss,blade.php}"
+                      ]
+                    }),
+                    require("autoprefixer")
+                  ]
+                }
+              }
+            },
+            "sass-loader"
+          ],
         },
         {
           test: /\.(png|jpe?g|gif|svg)$/i,

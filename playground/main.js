@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import '../dist/admin-ui-kit.min.css';
+// Style will be handled dynamically in App.vue
 
 // Mock window.Laravel
 window.Laravel = {

@@ -1,0 +1,9 @@
+// Variables
+@import "variables";
+
+// Bootstrap
+@import "bootstrap/scss/bootstrap";
+
+// Local Admin Styles (was @hashtagcms/admin-ui-kit/packages/styles/src/app)
+@import "admin";
+@import "animate";

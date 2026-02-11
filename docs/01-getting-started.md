@@ -3,7 +3,7 @@
 This guide explains how to integrate `@hashtagcms/admin-ui-kit` into your project. There are two primary ways to use this library:
 
 1.  **Source Imports**: Import individual components into your own Vue build (Webpack/Vite).
-2.  **Standalone Bundle**: Use the pre-compiled JS/CSS files directly in the browser (e.g., in Laravel Blade templates).
+2.  **Standalone Bundle**: Use the pre-compiled JS/CSS files directly in the browser. The library now provides specialized builds for **Modern** and **Neo** themes.
 
 ---
 
@@ -67,11 +67,14 @@ app.mount("#app");
 
 ---
 
-## 🌐 Method 2: Standalone Bundle (Direct Script / CDN)
+If you want to use the components without a build step, use the pre-built files found in the `dist/` folder. The library is distributed in a hierarchical structure to support multiple themes:
 
-If you want to use the components without a build step, use the pre-built files found in the `dist/` folder.
+### 1. Build Options
+- **Legacy Root**: `dist/admin-ui-kit.min.js` (Defaults to Neo theme for compatibility).
+- **Modern Theme**: `dist/modern/admin-ui-kit.min.js` (Tailwind v4 based).
+- **Neo Theme**: `dist/neo/admin-ui-kit.min.js` (Bootstrap 5 based).
 
-### 1. Include in HTML / Blade Template
+### 2. Include in HTML / Blade Template
 
 **Requirement**: You must load **Vue 3** and **Axios** before loading HashtagCmsAdminUI.
 
@@ -79,20 +82,13 @@ If you want to use the components without a build step, use the pre-built files 
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="/assets/vendor/hashtagcms/admin-ui-kit.min.css" />
+    <link rel="stylesheet" href="/assets/vendor/modern/admin-ui-kit.min.css" />
   </head>
   <body>
-    <div id="app">
-      <action-bar
-        data-controller-name="users"
-        data-action-fields='["edit", "delete"]'
-      >
-      </action-bar>
-    </div>
-
+    <!-- ... -->
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-    <script src="/assets/vendor/hashtagcms/admin-ui-kit.min.js"></script>
+    <script src="/assets/vendor/modern/admin-ui-kit.min.js"></script>
 
     <script>
       const { createApp } = Vue;

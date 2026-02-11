@@ -8,9 +8,9 @@ Everything is bundled into a single NPM package for easier consumption.
 
 | Package                                     | Description                                                 | Version |
 | :------------------------------------------ | :---------------------------------------------------------- | :------ |
-| **[`@hashtagcms/admin-ui-kit`](./packages)** | Unified Library containing Components, Helpers, and Styles. | `1.0.7` |
+| **[`@hashtagcms/admin-ui-kit`](./packages)** | Unified Library containing Themes (Neo/Modern) and Helpers. | `1.0.9` |
 
-_Note: The internals are still modular (`packages/components`, `packages/helpers`), but consumers should import from the main package._
+_Note: The package is structured as a monorepo with specialized themes in `packages/themes` and shared logic in `packages/helpers`._
 
 ## 🚀 Getting Started
 
@@ -35,21 +35,14 @@ import {
 **Styles:**
 
 ```scss
-// In your app.scss (Recommended: Use Source for overrides)
-// Your own variables for themes
-@import "./variables"; 
+// Option 1: Modern Theme (Tailwind v4 based - Lean)
+@import "~@hashtagcms/admin-ui-kit/dist/modern/admin-ui-kit.min.css";
 
-// Bootstrap (if needed by your local overrides, otherwise package might include it or expect it)
-@import "~bootstrap/scss/bootstrap";
+// Option 2: Neo Theme (Bootstrap 5 based - Legacy)
+@import "~@hashtagcms/admin-ui-kit/dist/neo/admin-ui-kit.min.css";
 
-// Import HashtagCms Admin UI Kit Styles (Source)
-// Note: Requires Sass loader configuration
-@import "~@hashtagcms/styles/src/app";
-
-
-// Or Pre-compiled CSS (Easiest)
-// Must be imported if you are not using the source SCSS
-@import "~@hashtagcms/admin-ui-kit/dist/admin-ui-kit.min.css";
+// Option 3: Source SCSS (For deep customization)
+@import "~@hashtagcms/theme-modern/src/scss/app";
 ```
 
 ##  Documentation
@@ -60,6 +53,7 @@ Detailed guides for every part of the library:
 - [**Components Guide**](./docs/02-components.md): Component API and examples.
 - [**Helpers Guide**](./docs/03-helpers.md): Utilities and helpers documentation.
 - [**API Reference**](./docs/04-api-reference.md): Technical overview of exports and architecture.
+- [**Theme Development**](./docs/05-theme-guide.md): Guide for contributing to themes or creating new ones.
 
 ## 🛠️ Development
 

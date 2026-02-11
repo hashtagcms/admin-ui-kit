@@ -1,0 +1,26 @@
+{
+  "name": "@hashtagcms/theme-neo",
+  "version": "1.0.0",
+  "description": "Legacy Neo Theme for HashtagCms",
+  "author": "HashtagCms",
+  "license": "MIT",
+  "homepage": "https://hashtagcms.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hashtagcms/admin-ui-kit.git"
+  },
+  "main": "src/js/app.js",
+  "files": [
+    "src",
+    "views"
+  ],
+  "dependencies": {
+    "@hashtagcms/helpers": "*",
+    "axios": "^1.6.0",
+    "pluralize": "^8.0.0",
+    "sortablejs": "^1.15.2"
+  },
+  "devDependencies": {
+     "vue-loader": "^17.4.2"
+  }
+}

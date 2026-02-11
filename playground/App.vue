@@ -1,156 +1,201 @@
 <template>
-  <div class="container-fluid">
-    <TopNav v-bind="topNavProps" />
-    <div class="container mt-4">
-      <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
-          <h1>Admin UI Kit Playground</h1>
-          <div>
-              <span class="me-2 fw-bold">Quick Jump:</span>
-              <a href="#" class="btn btn-sm btn-link text-decoration-none" :class="{'fw-bold text-dark': currentView === ''}">Home</a>
-              <span class="text-muted mx-1">|</span>
-              <template v-for="(view, index) in availableViews" :key="view.id">
-                  <a :href="'#' + view.id" class="btn btn-sm btn-link text-decoration-none" :class="{'fw-bold text-dark': currentView === view.id}">{{ view.shortLabel || view.label }}</a>
-                  <span v-if="index < availableViews.length - 1" class="text-muted mx-1">|</span>
-              </template>
-          </div>
-      </div>
-      
-      <!-- Homepage / Table of Contents -->
-      <div v-if="currentView === ''" class="mb-5">
-          <div class="card bg-light">
-              <div class="card-body">
-                  <h4 class="card-title">Available Component Tests</h4>
-                  <p class="card-text">Select a component to view its rendered state with fake data.</p>
-                  <div class="list-group list-group-flush">
-                      <a v-for="view in availableViews" :key="view.id" :href="'#' + view.id" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
-                          {{ view.label }}
-                          <span class="badge bg-primary rounded-pill">View</span>
-                      </a>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <!-- Component Views -->
-      <div v-if="isVisible('action-bar')" class="mb-4">
-        <h3>Action Bar</h3>
-        <ActionBar v-bind="actionBarProps" />
-      </div>
-
-      <div v-if="isVisible('info-boxes')" class="mb-4">
-        <h3>Info Boxes</h3>
-        <div class="row">
-             <InfoBoxes v-bind="infoBoxesProps" />
+  <div :class="themeClass" class="min-h-screen">
+    <!-- Theme Selector Header -->
+    <div class="bg-gray-900 text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-2xl">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black">H</div>
+            <h1 class="text-lg font-black tracking-tight uppercase">HashtagCms <span class="text-blue-400">Playground</span></h1>
         </div>
-      </div>
-
-      <div v-if="isVisible('left-nav')" class="row mb-4">
-         <h3>Left Nav</h3>
-         <div class="col-md-3">
-            <LeftNav v-bind="leftNavProps" />
-         </div>
-      </div>
-
-      <div v-if="isVisible('tabular-view')" class="row mb-4">
-          <h3>Tabular View & Pagination</h3>
-          <div class="col-md-12">
-             <TabularView v-bind="tabularViewProps" />
-             <div class="mt-3">
-                <Pagination v-bind="paginationProps" />
-             </div>
-          </div>
-      </div>
-
-      <div v-if="isVisible('title-bar')" class="mb-4">
-          <h3>Title Bar</h3>
-          <TitleBar v-bind="titleBarProps" />
-      </div>
-
-      <div v-if="isVisible('sitewise-data')" class="mb-4">
-          <h3>Sitewise Data</h3>
-          <div class="row">
-              <SitewiseData v-bind="sitewiseDataProps" />
-          </div>
-      </div>
-
-      <div v-if="isVisible('sitewise-copier')" class="mb-4">
-          <h3>Sitewise Copier</h3>
-          <SitewiseCopier v-bind="sitewiseCopierProps" />
-      </div>
-
-      <div v-if="isVisible('site-cloner')" class="mb-4">
-          <h3>Site Cloner</h3>
-          <SiteCloner v-bind="siteClonerProps" />
-      </div>
-
+        
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Active Theme:</span>
+                <select v-model="currentTheme" @change="switchTheme" class="bg-gray-800 border border-gray-700 text-xs font-bold rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all">
+                    <option value="modern">Modern (Tailwind v4)</option>
+                    <option value="neo">Neo (Bootstrap 5)</option>
+                </select>
+            </div>
+            
+            <div class="h-4 w-[1px] bg-gray-700"></div>
+            
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Quick Jump:</span>
+                <nav class="flex gap-4">
+                    <a v-for="view in availableViews" :key="view.id" :href="'#' + view.id" 
+                       class="text-[10px] font-black uppercase tracking-widest hover:text-blue-400 transition-colors"
+                       :class="currentView === view.id ? 'text-blue-500' : 'text-gray-400'">
+                        {{ view.shortLabel }}
+                    </a>
+                </nav>
+            </div>
+        </div>
     </div>
 
-    <!-- Global Mocks for Helpers -->
-    <div ref="globalToaster" style="display:none;"></div>
-    <div ref="globalLoader" style="display:none;"></div>
-    <div ref="globalModalBox" style="display:none;"></div>
+    <!-- Content Area -->
+    <div :class="[currentTheme === 'neo' ? 'container py-5' : 'p-8 max-w-[1600px] mx-auto shadow-sm']">
 
+        <!-- Theme Info Card -->
+        <div v-if="currentView === ''" class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="p-8 rounded-2xl bg-white border border-gray-100 shadow-xl shadow-blue-500/5 relative overflow-hidden group">
+                <div class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                    <i class="fa fa-paint-brush text-8xl"></i>
+                </div>
+                <h2 class="text-3xl font-black text-gray-900 mb-4 tracking-tight">Component Suite</h2>
+                <p class="text-gray-500 font-medium leading-relaxed mb-6">Explore our library of premium Vue 3 components. Switch between the <b>Modern</b> (Tailwind v4) and <b>Neo</b> (Bootstrap 5) themes to see the visual transformation.</p>
+                <div class="flex flex-wrap gap-2">
+                    <span v-for="view in availableViews" :key="view.id" class="px-3 py-1 bg-gray-50 text-gray-400 text-[10px] font-black uppercase tracking-widest rounded-full border border-gray-100 italic">#{{ view.id }}</span>
+                </div>
+            </div>
+            
+            <div class="p-8 rounded-2xl bg-blue-600 text-white shadow-xl shadow-blue-500/20 flex flex-col justify-center">
+                <h3 class="text-xl font-black mb-2 uppercase tracking-wide">Environment: Playground</h3>
+                <p class="text-blue-100 font-medium text-sm">Testing components with real-world hydrated data patterns. All components use the latest @hashtagcms/admin-sdk logic.</p>
+                <div class="mt-6 flex items-center gap-4">
+                    <div class="flex -space-x-2">
+                        <div class="w-8 h-8 rounded-full border-2 border-blue-600 bg-blue-400 flex items-center justify-center text-[10px] font-bold">V</div>
+                        <div class="w-8 h-8 rounded-full border-2 border-blue-600 bg-blue-500 flex items-center justify-center text-[10px] font-bold">T</div>
+                        <div class="w-8 h-8 rounded-full border-2 border-blue-600 bg-blue-700 flex items-center justify-center text-[10px] font-bold">B</div>
+                    </div>
+                    <span class="text-xs font-bold text-blue-200 uppercase tracking-widest">Vue 3 + Tailwind + Bootstrap</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Rendered Components -->
+        <div :class="currentTheme === 'neo' ? 'row g-5' : 'space-y-24'">
+            <div v-if="isVisible('title-bar')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl font-black text-gray-200">01.</span>
+                    <h3 class="text-lg font-black uppercase tracking-widest text-gray-400">Title Bar</h3>
+                </div>
+                <component :is="activeComponents.TitleBar" v-bind="titleBarProps" />
+            </div>
+
+            <div v-if="isVisible('action-bar')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl font-black text-gray-200">02.</span>
+                    <h3 class="text-lg font-black uppercase tracking-widest text-gray-400">Action Bar</h3>
+                </div>
+                <component :is="activeComponents.ActionBar" v-bind="actionBarProps" />
+            </div>
+
+            <div v-if="isVisible('info-boxes')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl font-black text-gray-200">03.</span>
+                    <h3 class="text-lg font-black uppercase tracking-widest text-gray-400">Info Boxes</h3>
+                </div>
+                <component :is="activeComponents.InfoBoxes" v-bind="infoBoxesProps" />
+            </div>
+
+            <div v-if="isVisible('tabular-view')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl font-black text-gray-200">04.</span>
+                    <h3 class="text-lg font-black uppercase tracking-widest text-gray-400">Data Grid & Pagination</h3>
+                </div>
+                <div :class="currentTheme === 'modern' ? 'bg-white p-1 rounded-2xl border border-gray-100 shadow-2xl shadow-gray-200/50' : 'card shadow-sm'">
+                    <component :is="activeComponents.TabularView" v-bind="tabularViewProps" />
+                    <div :class="currentTheme === 'modern' ? 'p-6 border-t border-gray-50 flex justify-center' : 'card-footer d-flex justify-content-center'">
+                        <component :is="activeComponents.Pagination" v-bind="paginationProps" />
+                    </div>
+                </div>
+            </div>
+
+            <div v-if="isVisible('left-nav')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
+                <div class="flex items-center gap-3 mb-6">
+                    <span class="text-3xl font-black text-gray-200">05.</span>
+                    <h3 class="text-lg font-black uppercase tracking-widest text-gray-400">Sidebar Navigation</h3>
+                </div>
+                <div :class="currentTheme === 'modern' ? 'grid grid-cols-1 lg:grid-cols-4 gap-8' : 'row'">
+                     <div :class="currentTheme === 'modern' ? 'lg:col-span-1 h-[600px] border border-gray-100 rounded-2xl overflow-hidden shadow-2xl' : 'col-md-3'">
+                         <div :class="currentTheme === 'neo' ? 'border rounded overflow-hidden shadow-sm' : ''">
+                            <component :is="activeComponents.LeftNav" v-bind="leftNavProps" />
+                         </div>
+                     </div>
+                     <div v-if="currentTheme === 'modern'" class="lg:col-span-3 bg-gray-50 rounded-2xl border-2 border-dashed border-gray-200 flex items-center justify-center p-12">
+                         <div class="text-center">
+                             <i class="fa fa-columns text-4xl text-gray-300 mb-4"></i>
+                             <p class="text-gray-400 font-bold uppercase text-xs tracking-widest">Main Layout Preview Area</p>
+                         </div>
+                     </div>
+                </div>
+            </div>
+
+            <div v-if="isVisible('sitewise-data')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
+              <div class="flex items-center gap-3 mb-6">
+                  <span class="text-3xl font-black text-gray-200">06.</span>
+                  <h3 class="text-lg font-black uppercase tracking-widest text-gray-400">Contextual Data (SiteWise)</h3>
+              </div>
+              <component :is="activeComponents.SitewiseData" v-bind="sitewiseDataProps" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Mocks for Global Elements -->
+    <div id="htcms_toaster"></div>
+    <div id="htcms_loader"></div>
   </div>
 </template>
 
 <script setup>
-import { computed, ref, onMounted } from 'vue';
-import LeftNav from '@hashtagcms/components/left-nav.vue';
-import TabularView from '@hashtagcms/components/tabular-view.vue';
-import TopNav from '@hashtagcms/components/top-nav.vue';
-import ActionBar from '@hashtagcms/components/action-bar.vue';
-import InfoBoxes from '@hashtagcms/components/info-boxes.vue';
-import Pagination from '@hashtagcms/components/pagination.vue';
-import TitleBar from '@hashtagcms/components/title-bar.vue';
-import SitewiseData from '@hashtagcms/components/sitewise-data.vue';
-import SitewiseCopier from '@hashtagcms/components/sitewise-copier.vue';
-import SiteCloner from '@hashtagcms/components/site-cloner.vue';
-
+import { computed, ref, onMounted, shallowRef } from 'vue';
 import { parseAttributes } from './utils';
-import leftNavData from '../tests/fake-data/admin-modules.txt?raw';
-import tabularViewData from '../tests/fake-data/table-view.txt?raw';
-import topNavData from '../tests/fake-data/top-nav.txt?raw';
-import actionBarData from '../tests/fake-data/action-bar.txt?raw';
-import infoBoxesData from '../tests/fake-data/info-boxes.txt?raw';
-import paginationData from '../tests/fake-data/pagination-view.txt?raw';
-import titleBarData from '../tests/fake-data/title-bar.txt?raw';
-import sitewiseDataRaw from '../tests/fake-data/site-wise.txt?raw';
-import sitewiseCopierData from '../tests/fake-data/site-wise-copier.txt?raw';
-import siteClonerData from '../tests/fake-data/site-cloner.txt?raw';
 
+// State
+import leftNavData from '../tests/shared/fake-data/admin-modules.txt?raw';
+import tabularViewData from '../tests/shared/fake-data/table-view.txt?raw';
+import topNavData from '../tests/shared/fake-data/top-nav.txt?raw';
+import actionBarData from '../tests/shared/fake-data/action-bar.txt?raw';
+import infoBoxesData from '../tests/shared/fake-data/info-boxes.txt?raw';
+import paginationData from '../tests/shared/fake-data/pagination-view.txt?raw';
+import titleBarData from '../tests/shared/fake-data/title-bar.txt?raw';
+import sitewiseDataRaw from '../tests/shared/fake-data/site-wise.txt?raw';
 
+const currentTheme = ref(new URLSearchParams(window.location.search).get('theme') || 'modern');
 const currentView = ref('');
+const activeComponents = shallowRef({});
 
+// View Definitions
 const availableViews = [
     { id: 'title-bar', label: 'Title Bar', shortLabel: 'TitleBar' },
     { id: 'action-bar', label: 'Action Bar', shortLabel: 'ActionBar' },
     { id: 'info-boxes', label: 'Info Boxes', shortLabel: 'InfoBoxes' },
-    { id: 'left-nav', label: 'Left Navigation', shortLabel: 'LeftNav' },
-    { id: 'tabular-view', label: 'Tabular View & Pagination', shortLabel: 'Tabular' },
-    { id: 'sitewise-data', label: 'Sitewise Data Component', shortLabel: 'SiteWise' },
-    { id: 'sitewise-copier', label: 'Sitewise Copier', shortLabel: 'Copier' },
-    { id: 'site-cloner', label: 'Site Cloner', shortLabel: 'Cloner' }
+    { id: 'tabular-view', label: 'Data Grid', shortLabel: 'Grid' },
+    { id: 'left-nav', label: 'Left Navigation', shortLabel: 'Nav' },
+    { id: 'sitewise-data', label: 'Contextual Data', shortLabel: 'SiteWise' }
 ];
 
-const globalToaster = ref(null);
-const globalLoader = ref(null);
-const globalModalBox = ref(null);
+// Classes
+const themeClass = computed(() => `theme-${currentTheme.value}`);
 
-onMounted(() => {
-    // Setup Mock Methods for Global Helpers
-    if (globalToaster.value) {
-        globalToaster.value.show = (msg) => console.log('[Toast Show]', msg);
-        globalToaster.value.hide = () => console.log('[Toast Hide]');
-    }
-    if (globalLoader.value) {
-        globalLoader.value.show = () => console.log('[Loader Show]');
-        globalLoader.value.hide = () => console.log('[Loader Hide]');
-    }
-    if (globalModalBox.value) {
-        globalModalBox.value.show = () => console.log('[Modal Show]');
-        globalModalBox.value.hide = () => console.log('[Modal Hide]');
-    }
+// Methods
+const switchTheme = () => {
+    const url = new URL(window.location);
+    url.searchParams.set('theme', currentTheme.value);
+    window.location.href = url.toString();
+};
 
+const isVisible = (viewId) => {
+    return currentView.value === '' || currentView.value === viewId;
+};
+
+// Theme styles and Component Resolution
+const loadThemeAssets = async () => {
+    // Dynamically load CSS to avoid conflicts
+    if (currentTheme.value === 'modern') {
+        await import('@hashtagcms/theme-modern/scss/app.css');
+        const modern = await import('@hashtagcms/theme-modern/components/index.js');
+        activeComponents.value = modern.default || modern;
+    } else {
+        await import('@hashtagcms/theme-neo/scss/app.scss');
+        const neo = await import('@hashtagcms/theme-neo/components/index.js');
+        activeComponents.value = neo.default || neo;
+    }
+};
+
+onMounted(async () => {
+    await loadThemeAssets();
+    
+    // Hash routing
     const updateView = () => {
         const hash = window.location.hash.replace('#', '');
         currentView.value = hash;
@@ -159,35 +204,15 @@ onMounted(() => {
     updateView();
 });
 
-const isVisible = (viewId) => {
-    return currentView.value === '' || currentView.value === viewId;
-};
-
-// Use safe parse from updated utils.js
-const leftNavProps = computed(() => stringifyProps(transformProps(parseAttributes(leftNavData))));
-const topNavProps = computed(() => stringifyProps(transformProps(parseAttributes(topNavData))));
-const actionBarProps = computed(() => stringifyProps(transformProps(parseAttributes(actionBarData))));
-const infoBoxesProps = computed(() => stringifyProps(transformProps(parseAttributes(infoBoxesData))));
-const paginationProps = computed(() => stringifyProps(transformProps(parseAttributes(paginationData))));
-
-const tabularViewProps = computed(() => {
-    let props = transformProps(parseAttributes(tabularViewData));
-    return stringifyProps(props);
-});
-
-const titleBarProps = computed(() => stringifyProps(transformProps(parseAttributes(titleBarData))));
-const sitewiseDataProps = computed(() => stringifyProps(transformProps(parseAttributes(sitewiseDataRaw))));
-const sitewiseCopierProps = computed(() => stringifyProps(transformProps(parseAttributes(sitewiseCopierData))));
-const siteClonerProps = computed(() => stringifyProps(transformProps(parseAttributes(siteClonerData))));
-
-
-function transformProps(props) {
-    const newProps = {};
-    for (const key in props) {
-        newProps[key] = props[key];
-    }
-    return newProps;
-}
+// Props Computation (Hydrated from raw txt files)
+const leftNavProps = computed(() => stringifyProps(parseAttributes(leftNavData)));
+const topNavProps = computed(() => stringifyProps(parseAttributes(topNavData)));
+const actionBarProps = computed(() => stringifyProps(parseAttributes(actionBarData)));
+const infoBoxesProps = computed(() => stringifyProps(parseAttributes(infoBoxesData)));
+const paginationProps = computed(() => stringifyProps(parseAttributes(paginationData)));
+const tabularViewProps = computed(() => stringifyProps(parseAttributes(tabularViewData)));
+const titleBarProps = computed(() => stringifyProps(parseAttributes(titleBarData)));
+const sitewiseDataProps = computed(() => stringifyProps(parseAttributes(sitewiseDataRaw)));
 
 function stringifyProps(props) {
     const newProps = {};
@@ -203,5 +228,39 @@ function stringifyProps(props) {
 </script>
 
 <style>
-/* Add local custom styles if needed */
+/* Playground Layout Extras */
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background-color: #f8fafc;
+}
+
+.scroll-mt-24 {
+    scroll-margin-top: 6rem;
+}
+
+/* Custom Scrollbar for Playground */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.scroll-mt-24 {
+    animation: fadeIn 0.5s ease-out forwards;
+}
 </style>

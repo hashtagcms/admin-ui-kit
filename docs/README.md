@@ -10,6 +10,7 @@ Welcome to the documentation for `@hashtagcms/admin-ui-kit`. This package provid
 2.  **[Component Reference](./02-components.md)**: Detailed list of all UI components.
 3.  **[Helper Library](./03-helpers.md)**: Guides for using Form, Toast, Modal, and other helpers.
 4.  **[API Reference](./04-api-reference.md)**: Technical overview of exports and architecture.
+5.  **[Theme Development Guide](./05-theme-guide.md)**: contributing to themes, folder structures, and testing.
 
 ---
 
@@ -20,6 +21,7 @@ Welcome to the documentation for `@hashtagcms/admin-ui-kit`. This package provid
 - **Use form validation**: Read about the [Form Helper](./03-helpers.md#form-class).
 - **Show a notification**: View the [Toast Helper](./03-helpers.md#toast).
 - **Integrate into Laravel**: Follow the [Method 2 (Standalone)](./01-getting-started.md#method-2-standalone-bundle-direct-script--cdn) guide.
+- **Create a new theme**: Read the [Theme Contribution Guide](./05-theme-guide.md).
 
 ---
 

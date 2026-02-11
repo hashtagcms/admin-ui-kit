@@ -1,44 +1,71 @@
-# Contributing to HashtagCms Professional Packages
+# Contributing to HashtagCms Admin UI Kit
 
-Thank you for your interest in contributing to **HashtagCms Professional Packages**! We welcome contributions from the community to help improve this project.
+Thank you for your interest in contributing to the **HashtagCms Admin UI Kit**! We want to make it as easy as possible to contribute to this project.
 
-## 📋 Code of Conduct
+## 🏗️ Monorepo Architecture
 
-By participating in this project, you agree to abide by our Code of Conduct. Please treat everyone with respect and kindness.
+This project is a monorepo organized by **themes** and **shared helpers**. 
+
+- `packages/themes/neo`: The legacy Bootstrap 5 theme.
+- `packages/themes/modern`: The premium Tailwind v4 theme.
+- `packages/helpers`: Shared business logic and utilities used by all themes.
+- `tests/shared`: Centralized mock data and testing utilities.
+
+---
 
 ## 🛠️ How to Contribute
 
-### 1. Fork the Repository
-Fork the repository to your GitHub account and clone it locally.
+### 1. Preparation
+- Ensure you have **Node.js 18+** installed.
+- Initialize the project:
+  ```bash
+  npm install
+  ```
 
-### 2. Create a Branch
-Create a new branch for your feature or bug fix:
+### 2. Developing Themes
+If you are adding components or fixing styles:
+- **Neo (Bootstrap)**: Changes go into `packages/themes/neo/src/`.
+- **Modern (Tailwind)**: Changes go into `packages/themes/modern/src/`.
+- **Shared Logic**: If a logic fix applies to BOTH themes, edit `packages/helpers/`.
+
+### 3. Visual Verification (Playground)
+We use an interactive playground for real-time development.
 ```bash
-git checkout -b feature/your-feature-name
+npm run playground
 ```
+Use the theme switcher in the playground to verify your changes across both Neo and Modern.
 
-### 3. Make Changes
-- Ensure your code follows the project's coding standards.
-- Write clear and concise commit messages.
+### 4. Testing Your Changes
+We use **Vitest Projects** to run independent tests for each theme.
+```bash
+# Run everything
+npm run test
 
-### 4. Test Your Changes
-Run any existing tests and verify that your changes do not break existing functionality.
+# Run a specific theme's tests
+npx vitest --project neo
+npx vitest --project modern
+```
+**Important**: All new components MUST have a `.spec.js` file and utilize the shared mock data in `tests/shared/fake-data/`.
 
-### 5. Submit a Pull Request
-Push your changes to your fork and submit a Pull Request (PR) to the `main` branch of the original repository.
-- Provide a clear description of your changes.
-- Link to any relevant issues.
+---
 
-## 🐞 Reporting Issues
+## 📜 Coding Standards
 
-If you find a bug or have a feature request, please open an issue in the repository. Provide as much detail as possible, including:
-- Steps to reproduce the issue.
-- Expected vs. actual behavior.
-- Screenshots or logs (if applicable).
+- **Component Naming**: Use PascalCase for Vue components (e.g., `ActionBar.vue`).
+- **Styling**: 
+  - Do not use inline styles.
+  - In `modern`, strictly use Tailwind v4 utility classes.
+  - In `neo`, use standard Bootstrap 5 utility classes.
+- **Documentation**: If you create a new theme or a significant helper, update the corresponding file in the `docs/` folder.
 
-## 📄 License
+## 🚀 Submission Process
 
-By contributing to this project, you agree that your contributions will be licensed under the [MIT License](LICENSE).
+1. **Create a Branch**: `git checkout -b feat/your-feature-name`.
+2. **Commit Changes**: Use clear, descriptive commit messages.
+3. **Verify Integrity**: Run `npm run test` and `npm run build` to ensure no regressions.
+4. **Pull Request**: Open a PR against the `main` branch.
+
+Detailed instructions for theme development can be found in our **[Theme Development Guide](./docs/05-theme-guide.md)**.
 
 ---
 
