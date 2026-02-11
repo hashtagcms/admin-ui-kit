@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SiteCloner from '@hashtagcms/components/site-cloner.vue';
+import SiteCloner from '@hashtagcms/theme/modern/components/site-cloner.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 vi.mock('axios');

@@ -1,40 +1,30 @@
 <template>
   <div :class="themeClass" class="min-h-screen">
     <!-- Theme Selector Header -->
-    <div style="background-color: #111827 !important; color: white !important; padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1050; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
-        <div style="display: flex; align-items: center; gap: 0.75rem;">
-            <div style="width: 2rem; height: 2rem; background-color: #2563eb; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; font-weight: 900; color: white;">H</div>
-            <h1 style="font-size: 1.125rem; font-weight: 900; letter-spacing: -0.025em; text-transform: uppercase; margin: 0; color: white !important;">
-                HASHTAGCMS <span style="color: #60a5fa;">PLAYGROUND</span>
-            </h1>
+    <div class="bg-gray-900 text-white px-6 py-3 flex justify-between items-center sticky top-0 z-50 shadow-2xl">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black">H</div>
+            <h1 class="text-lg font-black tracking-tight uppercase">HashtagCms <span class="text-blue-400">Playground</span></h1>
         </div>
         
-        <div style="display: flex; align-items: center; gap: 1.5rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: white; background-color: #d10000; padding: 0.25rem 0.5rem; margin-right: 0.5rem; border-radius: 0.25rem;">ACTIVE THEME:</span>
-                <select v-model="currentTheme" @change="switchTheme" style="background-color: #1f2937; border: 1px solid #374151; color: white; font-size: 0.75rem; font-weight: 700; border-radius: 0.5rem; padding: 0.375rem 0.75rem; outline: none; cursor: pointer;">
+        <div class="flex items-center gap-6">
+            <div class="flex items-center gap-2">
+                <span class="text-[10px] font-black uppercase tracking-widest text-white bg-red-900 px-2 py-1 mr-2 rounded" style="background-color: #d10000;">Active Theme:</span>
+                <select v-model="currentTheme" @change="switchTheme" class="bg-gray-800 border border-gray-700 text-xs font-bold rounded-lg px-3 py-1.5 outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer transition-all">
                     <option value="modern">Modern (Tailwind v4)</option>
                     <option value="neo">Neo (Bootstrap 5)</option>
                 </select>
             </div>
             
-            <div style="height: 1rem; width: 1px; background-color: #374151;"></div>
+            <div class="h-4 w-[1px] bg-gray-700"></div>
             
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <span style="font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280;">QUICK JUMP:</span>
-                <nav style="display: flex; gap: 1rem;">
+            <div class="flex items-center gap-4">
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Quick Jump:</span>
+                <nav class="flex gap-4">
                     <a v-for="view in availableViews" :key="view.id" :href="'#' + view.id" 
-                       :style="{
-                         fontSize: '10px',
-                         fontWeight: '900',
-                         textTransform: 'uppercase',
-                         letterSpacing: '0.1em',
-                         color: currentView === view.id ? '#3b82f6' : '#9ca3af',
-                         textDecoration: 'none',
-                         transition: 'color 0.2s'
-                       }"
-                       @mouseover="$event.target.style.color = '#60a5fa'"
-                       @mouseout="$event.target.style.color = currentView === view.id ? '#3b82f6' : '#9ca3af'">
+                       class="text-[10px] font-black uppercase tracking-widest hover:text-blue-400 transition-colors"
+                       :class="currentView === view.id ? 'text-blue-500' : 'text-gray-400'"
+                       style="margin-right: 1rem;">
                         {{ view.shortLabel }}
                     </a>
                 </nav>
@@ -127,43 +117,9 @@
                 </div>
             </div>
 
-            <div v-if="isVisible('tab-view')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
-                <div :class="currentTheme === 'neo' ? 'd-flex align-items-center gap-3 mb-3' : 'flex items-center gap-3 mb-6'">
-                    <span :class="currentTheme === 'neo' ? 'display-6 fw-black text-muted' : 'text-3xl font-black text-gray-200'">05.</span>
-                    <h3 :class="currentTheme === 'neo' ? 'h5 text-uppercase fw-bold text-secondary mb-0' : 'text-lg font-black uppercase tracking-widest text-gray-400'">Tab Navigation</h3>
-                </div>
-                
-                <!-- Real Site Settings Tabs (from tab-view.txt) -->
-                <div :class="currentTheme === 'modern' ? 'bg-white p-6 rounded-2xl border border-gray-100 shadow-2xl shadow-gray-200/50 mb-6' : 'card shadow-sm mb-4'">
-                    <div :class="currentTheme === 'modern' ? 'mb-4' : 'card-body'">
-                        <div class="flex justify-between items-center mb-4">
-                            <h5 :class="currentTheme === 'modern' ? 'text-sm font-black uppercase tracking-widest text-gray-400' : 'card-title h6 text-uppercase fw-bold text-muted mb-0'">Loaded from tab-view.txt</h5>
-                            <span class="text-[10px] font-bold bg-blue-100 text-blue-600 px-2 py-1 rounded-full uppercase tracking-tighter">Recommended</span>
-                        </div>
-                        <component :is="activeComponents.TabView" v-bind="tabViewRealProps" />
-                    </div>
-                </div>
-
-                <!-- Simple String Tabs -->
-                <div :class="currentTheme === 'modern' ? 'bg-white p-6 rounded-2xl border border-gray-100 shadow-2xl shadow-gray-200/50 mb-6' : 'card shadow-sm mb-4'">
-                    <div :class="currentTheme === 'modern' ? 'mb-4' : 'card-body'">
-                        <h5 :class="currentTheme === 'modern' ? 'text-sm font-black uppercase tracking-widest text-gray-400 mb-4' : 'card-title h6 text-uppercase fw-bold text-muted'">Simple String Tabs</h5>
-                        <component :is="activeComponents.TabView" v-bind="tabViewSimpleProps" />
-                    </div>
-                </div>
-
-                <!-- Object-Based Tabs -->
-                <div :class="currentTheme === 'modern' ? 'bg-white p-6 rounded-2xl border border-gray-100 shadow-2xl shadow-gray-200/50' : 'card shadow-sm'">
-                    <div :class="currentTheme === 'modern' ? 'mb-4' : 'card-body'">
-                        <h5 :class="currentTheme === 'modern' ? 'text-sm font-black uppercase tracking-widest text-gray-400 mb-4' : 'card-title h6 text-uppercase fw-bold text-muted'">Object-Based Tabs with Href</h5>
-                        <component :is="activeComponents.TabView" v-bind="tabViewObjectProps" />
-                    </div>
-                </div>
-            </div>
-
             <div v-if="isVisible('left-nav')" :class="currentTheme === 'neo' ? 'col-12 mb-4' : 'scroll-mt-24'">
                 <div :class="currentTheme === 'neo' ? 'd-flex align-items-center gap-3 mb-3' : 'flex items-center gap-3 mb-6'">
-                    <span :class="currentTheme === 'neo' ? 'display-6 fw-black text-muted' : 'text-3xl font-black text-gray-200'">06.</span>
+                    <span :class="currentTheme === 'neo' ? 'display-6 fw-black text-muted' : 'text-3xl font-black text-gray-200'">05.</span>
                     <h3 :class="currentTheme === 'neo' ? 'h5 text-uppercase fw-bold text-secondary mb-0' : 'text-lg font-black uppercase tracking-widest text-gray-400'">Sidebar Navigation</h3>
                 </div>
                 <div :class="currentTheme === 'modern' ? 'grid grid-cols-1 lg:grid-cols-4 gap-8' : 'row'">
@@ -218,7 +174,6 @@ import topNavData from '../tests/shared/fake-data/top-nav.txt?raw';
 import actionBarData from '../tests/shared/fake-data/action-bar.txt?raw';
 import infoBoxesData from '../tests/shared/fake-data/info-boxes.txt?raw';
 import paginationData from '../tests/shared/fake-data/pagination-view.txt?raw';
-import tabViewData from '../tests/shared/fake-data/tab-view.txt?raw';
 import titleBarData from '../tests/shared/fake-data/title-bar.txt?raw';
 import sitewiseDataRaw from '../tests/shared/fake-data/site-wise.txt?raw';
 
@@ -232,7 +187,6 @@ const availableViews = [
     { id: 'action-bar', label: 'Action Bar', shortLabel: 'ActionBar' },
     { id: 'info-boxes', label: 'Info Boxes', shortLabel: 'InfoBoxes' },
     { id: 'tabular-view', label: 'Data Grid', shortLabel: 'Grid' },
-    { id: 'tab-view', label: 'Tab Navigation', shortLabel: 'Tabs' },
     { id: 'left-nav', label: 'Left Navigation', shortLabel: 'Nav' },
     { id: 'sitewise-data', label: 'Contextual Data', shortLabel: 'SiteWise' }
 ];
@@ -284,20 +238,6 @@ const actionBarProps = computed(() => stringifyProps(parseAttributes(actionBarDa
 const infoBoxesProps = computed(() => stringifyProps(parseAttributes(infoBoxesData)));
 const paginationProps = computed(() => stringifyProps(parseAttributes(paginationData)));
 const tabularViewProps = computed(() => stringifyProps(parseAttributes(tabularViewData)));
-const tabViewSimpleProps = computed(() => ({
-    dataTabs: JSON.stringify(['General', 'Advanced', 'Security', 'Notifications']),
-    dataActiveTab: 'General'
-}));
-const tabViewObjectProps = computed(() => ({
-    dataTabs: JSON.stringify([
-        { label: 'Dashboard', href: '/admin/dashboard' },
-        { label: 'User Settings', href: '/admin/settings' },
-        { label: 'Analytics & Reports', href: '/admin/analytics' },
-        { label: 'System Logs', href: '/admin/logs' }
-    ]),
-    dataActiveTab: 'User Settings'
-}));
-const tabViewRealProps = computed(() => stringifyProps(parseAttributes(tabViewData)));
 const titleBarProps = computed(() => stringifyProps(parseAttributes(titleBarData)));
 const sitewiseDataProps = computed(() => stringifyProps(parseAttributes(sitewiseDataRaw)));
 

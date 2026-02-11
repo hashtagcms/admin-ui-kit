@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import InfoBoxes from '@hashtagcms/components/info-boxes.vue';
+import InfoBoxes from '@hashtagcms/theme/modern/components/info-boxes.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 describe('Modern: InfoBoxes.vue', () => {

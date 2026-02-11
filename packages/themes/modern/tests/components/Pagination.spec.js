@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import Pagination from '@hashtagcms/components/pagination.vue';
+import Pagination from '@hashtagcms/theme/modern/components/pagination.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 describe('Modern: Pagination.vue', () => {

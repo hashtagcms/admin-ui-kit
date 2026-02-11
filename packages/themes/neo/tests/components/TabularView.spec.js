@@ -1,6 +1,6 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import TabularView from '@hashtagcms/components/tabular-view.vue';
+import TabularView from '@hashtagcms/theme/neo/components/tabular-view.vue';
 import axios from 'axios';
 import { EventBus } from '@hashtagcms/helpers/event-bus';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';

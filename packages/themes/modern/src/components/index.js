@@ -28,6 +28,7 @@ import SitewiseCopier from "./sitewise-copier.vue";
 import SitewiseData from "./sitewise-data.vue";
 import Sorter from "./sorter.vue";
 import TabularView from "./tabular-view.vue";
+import TabView from "./tab-view.vue";
 import TitleBar from "./title-bar.vue";
 import TopNav from "./top-nav.vue";
 
@@ -70,6 +71,7 @@ export {
     SitewiseData,
     Sorter,
     TabularView,
+    TabView,
     TitleBar,
     TopNav,
     CopyPaste,
@@ -124,6 +126,7 @@ const HashtagCmsAdminUI = {
     SitewiseData,
     Sorter,
     TabularView,
+    TabView,
     TitleBar,
     TopNav,
     CopyPaste,

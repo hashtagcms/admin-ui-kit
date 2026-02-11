@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import TitleBar from '@hashtagcms/components/title-bar.vue';
+import TitleBar from '@hashtagcms/theme/modern/components/title-bar.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 describe('Modern: TitleBar.vue', () => {

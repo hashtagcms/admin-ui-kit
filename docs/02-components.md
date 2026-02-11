@@ -11,6 +11,7 @@ Below is a comprehensive list of all UI components available in `@hashtagcms/adm
 - **[TopNav](./components/top-nav.md)**: Global header navigation.
 - **[LeftNav](./components/left-nav.md)**: Sidebar menu navigation.
 - **[TabularView](./components/tabular-view.md)**: Powerful data grid.
+- **[TabView](./components/tab-view.md)**: Flexible tabbed navigation.
 - **[Pagination](./components/pagination.md)**: Pagination controls.
 
 ## ⚙️ Module & CMS Management

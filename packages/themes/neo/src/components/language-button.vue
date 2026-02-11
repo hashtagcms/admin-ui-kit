@@ -24,10 +24,7 @@ export default {
   },
   data() {
     return {
-      languages:
-        typeof this.dataLanguages == "undefined"
-          ? null
-          : JSON.parse(this.dataLanguages),
+      languages: this.safeJsonParse(this.dataLanguages, null),
       currentLang:
         typeof this.dataSelectedLanguage == "undefined"
           ? 1
@@ -50,6 +47,21 @@ export default {
     },
   },
   methods: {
+    safeJsonParse(value, defaultValue = null) {
+      if (typeof value === 'undefined' || value === '' || value === null) {
+        return defaultValue;
+      }
+      // If it's already an object/array, return it
+      if (typeof value === 'object') {
+        return value;
+      }
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        console.warn('Failed to parse JSON in language-button:', value, e);
+        return defaultValue;
+      }
+    },
     hasLanguage() {
       //has language greate than one
       return this.languages != null && this.languages.length > 1;

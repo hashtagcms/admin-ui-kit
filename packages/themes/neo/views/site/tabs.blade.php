@@ -19,4 +19,3 @@
         <li role="presentation" class="nav-item"><a class="{{$css}}" href="{{$href}}">{{$tab}}</a></li>
     @endforeach
 </ul>
-

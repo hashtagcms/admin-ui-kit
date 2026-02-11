@@ -25,7 +25,7 @@
               title="Add New"
               @click="addNew"
               type="button"
-              class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 active:scale-95 group"
+              class="inline-flex items-center h-10 px-6 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-0.5 active:scale-95 group"
               aria-label="Add New"
             >
               <i class="fa fa-plus mr-2 group-hover:rotate-90 transition-transform" aria-hidden="true"></i> Add New
@@ -33,14 +33,14 @@
 
             <a
               v-for="actionButton in moreActionButtons"
-              class="inline-flex items-center px-6 py-3 bg-white border border-gray-200 hover:border-blue-500 text-gray-400 hover:text-blue-600 text-xs font-black uppercase tracking-widest rounded-lg shadow-sm transition-all hover:-translate-y-0.5 active:scale-95 group"
+              class="inline-flex items-center h-10 px-3 bg-white border border-gray-200 hover:border-blue-500 text-gray-400 hover:text-blue-600 text-xs font-black uppercase tracking-widest rounded-lg shadow-sm transition-all hover:-translate-y-0.5 active:scale-95 group"
               :href="getAction(actionButton.action)"
               :title="actionButton.label"
             >
               <i
                 v-if="actionButton.icon_css"
                 :class="actionButton.icon_css"
-                class="mr-2 group-hover:scale-110 transition-transform"
+                class="group-hover:scale-110 transition-transform"
                 aria-hidden="true"
               ></i>
               <span v-if="getButtonType(actionButton) == 'button'">{{
@@ -53,7 +53,7 @@
               title="Search"
               @click="showHideSearch"
               type="button"
-              :class="[isActive, 'w-12 h-12 flex items-center justify-center rounded-lg transition-all active:scale-90 border']"
+              :class="[isActive, 'w-10 h-10 flex items-center justify-center rounded-lg transition-all active:scale-90 border']"
               aria-label="Search"
             >
               <i class="fa fa-search text-sm" aria-hidden="true"></i>
@@ -64,13 +64,13 @@
               title="Change Layout"
               @click="changeLayout()"
               type="button"
-              class="w-12 h-12 flex items-center justify-center bg-white border border-gray-200 hover:border-blue-500 text-gray-400 hover:text-blue-600 rounded-lg shadow-sm transition-all active:scale-90"
+              class="w-10 h-10 flex items-center justify-center bg-white border border-gray-200 hover:border-blue-500 text-gray-400 hover:text-blue-600 rounded-lg shadow-sm transition-all active:scale-90"
               aria-label="Layout"
             >
               <i :class="layoutIcon" aria-hidden="true"></i>
             </button>
 
-            <a v-if="showBack" class="inline-flex items-center px-6 py-3 bg-gray-900 hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-lg shadow-md transition-all active:scale-95" :href="backURL"
+            <a v-if="showBack" class="inline-flex items-center h-10 px-6 bg-gray-900 hover:bg-black text-white text-xs font-black uppercase tracking-widest rounded-lg shadow-md transition-all active:scale-95" :href="backURL"
               >Back</a
             >
         </div>
@@ -147,21 +147,14 @@ export default {
       showSearchPanel: false,
       isActive: "btn btn-outline-secondary",
       searchAnim: "",
-      moreActionButtons:
-        typeof this.dataMoreActions === "undefined" ||
-        this.dataMoreActions === ""
-          ? []
-          : JSON.parse(this.dataMoreActions),
+      moreActionButtons: this.safeJsonParse(this.dataMoreActions, []),
       showAdd:
         typeof this.dataShowAdd === "undefined" || this.dataShowAdd === "true",
       hasLangMethod: !(
         typeof this.dataHasLangMethod === "undefined" ||
         this.dataHasLangMethod === "false"
       ),
-      cmsModules:
-        typeof this.dataCmsModules === "undefined" || this.dataCmsModules === ""
-          ? []
-          : JSON.parse(this.dataCmsModules),
+      cmsModules: this.safeJsonParse(this.dataCmsModules, {}),
       selectedParams:
         typeof this.dataSelectedParams === "undefined"
           ? ""
@@ -191,6 +184,17 @@ export default {
     };
   },
   methods: {
+    safeJsonParse(value, defaultValue = []) {
+      if (typeof value === 'undefined' || value === '' || value === null) {
+        return defaultValue;
+      }
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        console.warn('Failed to parse JSON:', value, e);
+        return defaultValue;
+      }
+    },
     changeLayout() {
       Toast.show(this, "Please wait. Changing listing style for you...", 5000);
       this.layoutType = this.layoutType === "table" ? "grid" : "table";

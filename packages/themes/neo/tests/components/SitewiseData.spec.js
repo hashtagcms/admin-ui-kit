@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import SitewiseData from '@hashtagcms/components/sitewise-data.vue';
+import SitewiseData from '@hashtagcms/theme/neo/components/sitewise-data.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 // Mock dependencies

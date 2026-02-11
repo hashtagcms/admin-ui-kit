@@ -13,6 +13,7 @@
         $resource_dir = htcms_admin_config('resource_dir');
     @endphp
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" type="text/css">
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
         type="text/css">
     <link rel="stylesheet" type="text/css" href="{{ htcms_admin_asset('css/app.css') }}" />

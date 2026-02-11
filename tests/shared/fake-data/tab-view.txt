@@ -1,0 +1,5 @@
+
+    data-tabs='[{"label":"Platforms","href":"/admin/site/settings/1/platforms"},{"label":"Hooks","href":"/admin/site/settings/1/hooks"},{"label":"Languages","href":"/admin/site/settings/1/languages"},{"label":"Zones","href":"/admin/site/settings/1/zones"},{"label":"Countries","href":"/admin/site/settings/1/countries"},{"label":"Currencies","href":"/admin/site/settings/1/currencies"},{"label":"Modules","href":"/admin/site/settings/1/modules"},{"label":"Static Modules","href":"/admin/site/settings/1/staticmodules"},{"label":"Themes","href":"/admin/site/settings/1/themes"},{"label":"Categories","href":"/admin/site/settings/1/categories"},{"label":"Site Properties","href":"/admin/site/settings/1/siteproperties"},{"label":"Module Properties","href":"/admin/site/settings/1/moduleproperties"}]'
+    data-active-tab="Languages"
+
+    

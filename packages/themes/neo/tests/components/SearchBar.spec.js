@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SearchBar from '@hashtagcms/components/search-bar.vue';
+import SearchBar from '@hashtagcms/theme/neo/components/search-bar.vue';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 
 vi.mock('@hashtagcms/helpers/admin-config', () => ({

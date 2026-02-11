@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SitewiseCopier from '@hashtagcms/components/sitewise-copier.vue';
+import SitewiseCopier from '@hashtagcms/theme/modern/components/sitewise-copier.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 vi.mock('axios');

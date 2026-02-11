@@ -139,21 +139,14 @@ export default {
       showSearchPanel: false,
       isActive: "btn btn-outline-secondary",
       searchAnim: "",
-      moreActionButtons:
-        typeof this.dataMoreActions === "undefined" ||
-        this.dataMoreActions === ""
-          ? []
-          : JSON.parse(this.dataMoreActions),
+      moreActionButtons: this.safeJsonParse(this.dataMoreActions, []),
       showAdd:
         typeof this.dataShowAdd === "undefined" || this.dataShowAdd === "true",
       hasLangMethod: !(
         typeof this.dataHasLangMethod === "undefined" ||
         this.dataHasLangMethod === "false"
       ),
-      cmsModules:
-        typeof this.dataCmsModules === "undefined" || this.dataCmsModules === ""
-          ? []
-          : JSON.parse(this.dataCmsModules),
+      cmsModules: this.safeJsonParse(this.dataCmsModules, {}),
       selectedParams:
         typeof this.dataSelectedParams === "undefined"
           ? ""
@@ -183,6 +176,17 @@ export default {
     };
   },
   methods: {
+    safeJsonParse(value, defaultValue = []) {
+      if (typeof value === 'undefined' || value === '' || value === null) {
+        return defaultValue;
+      }
+      try {
+        return JSON.parse(value);
+      } catch (e) {
+        console.warn('Failed to parse JSON:', value, e);
+        return defaultValue;
+      }
+    },
     changeLayout() {
       Toast.show(this, "Please wait. Changing listing style for you...", 5000);
       this.layoutType = this.layoutType === "table" ? "grid" : "table";
@@ -214,7 +218,8 @@ export default {
     },
     shouldShowSearchPanel() {
       if (this.selectedParams !== "") {
-        if (JSON.parse(this.selectedParams).q) {
+        const params = this.safeJsonParse(this.selectedParams, {});
+        if (params.q) {
           this.showSearchPanel = true;
         }
         this.maintainActiveSearch(false);

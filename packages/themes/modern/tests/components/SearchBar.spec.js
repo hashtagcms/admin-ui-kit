@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SearchBar from '@hashtagcms/components/search-bar.vue';
+import SearchBar from '@hashtagcms/theme/modern/components/search-bar.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 describe('Modern: SearchBar.vue', () => {

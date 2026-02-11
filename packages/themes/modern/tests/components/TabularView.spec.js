@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import TabularView from '@hashtagcms/components/tabular-view.vue';
+import TabularView from '@hashtagcms/theme/modern/components/tabular-view.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 vi.mock('axios');

@@ -29,7 +29,7 @@ import { createApp } from 'vue';
 import {
     TopNav, LeftNav, TitleBar, ToastBox, Loader, CopyPaste, TimerButton, LeftMenuShowHide,
     Homepage, InfoBoxes, InfoBox, ModalBox,
-    TabularView, ActionBar, SearchBar,
+    TabularView, TabView, ActionBar, SearchBar,
     Pagination,
     ModulePermission, ModuleCreator, FrontendModuleCreator,
     MenuSorter,
@@ -52,6 +52,7 @@ const app = createApp({
         'info-box': InfoBox,
         'info-boxes': InfoBoxes,
         'table-view': TabularView,
+        'tab-view': TabView,
         'search-bar': SearchBar,
         'action-bar': ActionBar,
         'pagination-view': PaginationView,

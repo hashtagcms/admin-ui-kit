@@ -1,6 +1,6 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import InfoBoxes from '@hashtagcms/components/info-boxes.vue';
+import InfoBoxes from '@hashtagcms/theme/neo/components/info-boxes.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 

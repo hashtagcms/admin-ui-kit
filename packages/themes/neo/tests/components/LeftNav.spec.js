@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import LeftNav from '@hashtagcms/components/left-nav.vue';
+import LeftNav from '@hashtagcms/theme/neo/components/left-nav.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 vi.mock('@hashtagcms/helpers/admin-config', () => ({

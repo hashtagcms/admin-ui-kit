@@ -1,6 +1,6 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import ActionBar from '@hashtagcms/components/action-bar.vue';
+import ActionBar from '@hashtagcms/theme/neo/components/action-bar.vue';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 import { Toast } from '@hashtagcms/helpers/common';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';

@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import TopNav from '@hashtagcms/components/top-nav.vue';
+import TopNav from '@hashtagcms/theme/neo/components/top-nav.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 

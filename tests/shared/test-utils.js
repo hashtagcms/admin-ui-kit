@@ -22,14 +22,17 @@ const parseAttributes = (content) => {
     // Previous logic for value
     let valuePart = chunk.substring(equalSignIndex + 1).trim();
     
-    if (valuePart.startsWith('"')) {
-        const lastQuoteIndex = valuePart.lastIndexOf('"');
+    if (valuePart.startsWith('"') || valuePart.startsWith("'")) {
+        const quoteChar = valuePart[0];
+        const lastQuoteIndex = valuePart.lastIndexOf(quoteChar);
         if (lastQuoteIndex > 0) {
             let value = valuePart.substring(1, lastQuoteIndex);
             
             if ((value.startsWith('[') && value.endsWith(']')) || (value.startsWith('{') && value.endsWith('}'))) {
                 try {
-                    value = JSON.parse(value);
+                    // Replace escaped quotes if necessary (basic support)
+                    const jsonValue = value.replace(/\\"/g, '"').replace(/\\'/g, "'");
+                    value = JSON.parse(jsonValue);
                 } catch (e) {
                 }
             } else {
