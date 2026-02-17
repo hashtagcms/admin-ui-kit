@@ -16,6 +16,7 @@ packages/themes/{theme_name}/
 │   ├── components/       # Vue 3 components
 │   ├── scss/             # Theme styles (Sass)
 │   └── js/               # Theme entry point (app.js)
+├── static/               # Static assets (images, third-party libs)
 ├── views/                # Blade templates for Laravel integration
 └── tests/                # Vitest spec files
     └── components/       # Component-level tests (logic only)
@@ -25,6 +26,30 @@ packages/themes/{theme_name}/
 To ensure consistency, shared assets are located at the project root:
 - **`tests/shared/fake-data/`**: Central repository for component attributes.
 - **`tests/shared/test-utils.js`**: Shared logic for hydrating components.
+
+---
+
+## 📦 Static Assets
+
+The build system automatically manages static assets, distributing them to the final `dist/{theme}/` folder.
+
+### 1. Common Assets (Global)
+Assets placed in `packages/common/` are automatically copied to **every** theme's output directory.
+- `packages/common/js/`  → `dist/{theme}/js/` (e.g. vendors like TinyMCE)
+- `packages/common/css/` → `dist/{theme}/css/`
+- `packages/common/img/` → `dist/{theme}/img/`
+- `packages/common/fonts/` → `dist/{theme}/fonts/`
+
+**Example:**
+Files in `packages/common/js/vendors/tinymce` will be available at imports/URLs like:
+`/assets/hashtagcms/be/{theme}/js/vendors/tinymce/tinymce.min.js`
+
+### 2. Theme-Specific Assets
+For assets unique to a single theme, place them in `packages/themes/{theme_name}/static/`.
+These contents are copied directly to the theme's root output `dist/{theme}/`.
+
+**Example:**
+`packages/themes/modern/static/img/hero.png` will be output to `dist/modern/img/hero.png`.
 
 ---
 
@@ -96,12 +121,17 @@ This launches a Vite server at `http://localhost:3000`.
 
 ## 🚀 Creating a New Theme
 
-If you are creating a brand new theme (e.g., "dark-mode"):
-1. **Copy** the `neo` or `modern` folder as a template.
-2. **Update** `package.json` name to `@hashtagcms/theme-{name}`.
-3. **Register** the new theme in the root `webpack.config.js` entry points.
-4. **Add** a new project block to `vitest.workspace.js`.
-5. **Update** `playground/App.vue` to include the new theme in the dropdown.
+The UI Kit uses **Dynamic Discovery**, meaning the build system and test runner automatically detect new subdirectories in the `themes/` folder.
+
+To create a new theme:
+
+1. **Scaffold**: Copy an existing theme folder (e.g., `themes/neo/`) to a new directory (e.g., `themes/material/`).
+2. **Metadata**: Update the `package.json` inside your new theme folder with the new theme name and version.
+3. **Styles**: Modify `styles/app.scss`. If using Tailwind, ensure your configuration matches the directory structure.
+4. **Playground Registration**: Open `playground/App.vue` and add your theme to the `currentTheme` dropdown list and `switchTheme` logic if necessary to ensure it renders correctly in the preview.
+5. **Build & Test**:
+   - Run `npm run test` to see the new theme's test project (automatically created).
+   - Run `npm run build` to generate the `dist/{theme_name}/` assets.
 
 ---
 

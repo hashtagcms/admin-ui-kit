@@ -17,8 +17,9 @@ Welcome to the documentation for `@hashtagcms/admin-ui-kit`. This package provid
 ## 🚀 I want to...
 
 - **Install the package**: Check the [Getting Started](./01-getting-started.md#installation) guide.
-- **Browse UI components**: See the [Components](./02-components.md) list.
+- **Browse UI components**: See the [Components Reference](./02-components.md) or the [Atomic UI Kit Suite](./components/ui-kit/README.md).
 - **Use form validation**: Read about the [Form Helper](./03-helpers.md#form-class).
+- **Use HcKit atomic components**: Check the [Atomic UI Kit (HcKit)](./components/ui-kit/README.md) for buttons, inputs, modals, etc.
 - **Show a notification**: View the [Toast Helper](./03-helpers.md#toast).
 - **Integrate into Laravel**: Follow the [Method 2 (Standalone)](./01-getting-started.md#method-2-standalone-bundle-direct-script--cdn) guide.
 - **Create a new theme**: Read the [Theme Contribution Guide](./05-theme-guide.md).

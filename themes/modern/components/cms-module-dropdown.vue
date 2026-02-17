@@ -1,0 +1,76 @@
+<template>
+  <div class="inline-block">
+    <split-button
+      v-if="hasChild()"
+      :data-options="allModules"
+      @change="onChange"
+      :data-parser="parseData"
+      :data-selected="currentIndex"
+      data-btn-css="bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30"
+    >
+      <span class="font-black tracking-tight uppercase text-[10px]">{{ selectedModule }}</span>
+    </split-button>
+  </div>
+</template>
+
+<script>
+import AdminConfig from "../../../helpers/admin-config";
+import { SafeJsonParse } from "../../../helpers/common";
+import SplitButton from "./library/split-button.vue";
+
+export default {
+  components: {
+    "split-button": SplitButton,
+  },
+  props: ["dataModules", "dataCurrentModule"],
+  mounted() {
+    //console.log(this.modules);
+  },
+  data() {
+    return {
+      modules: SafeJsonParse(this.dataModules, []),
+      selectedModule:
+        typeof this.dataCurrentModule == "undefined"
+          ? ""
+          : this.dataCurrentModule,
+    };
+  },
+  computed: {
+    currentIndex() {
+      if (this.allModules.length > 0) {
+        for (var i = 0; i < this.allModules.length; i++) {
+          var item = this.allModules[i];
+          if (
+            item.controller_name.toLowerCase() ==
+            this.selectedModule.toLowerCase()
+          ) {
+            return i;
+          }
+        }
+      }
+
+      return 0;
+    },
+    allModules() {
+      let options = this.modules.child;
+      options.splice(0, 0, {
+        name: this.modules.name,
+        controller_name: this.modules.controller_name,
+      });
+      return options;
+    },
+  },
+  methods: {
+    hasChild() {
+      return this.modules.parent_id == 0 && this.allModules.length > 1;
+    },
+    parseData: function (row) {
+      return { label: row.name, value: row.controller_name };
+    },
+    onChange(data) {
+      let url = AdminConfig.admin_path(data.value);
+      window.location = url;
+    },
+  },
+};
+</script>

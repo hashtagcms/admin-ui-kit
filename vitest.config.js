@@ -4,7 +4,7 @@ import path from 'path'
 import fs from 'fs'
 
 // Dynamic Theme Discovery
-const themesDir = path.resolve(__dirname, 'packages/themes');
+const themesDir = path.resolve(__dirname, 'themes');
 const discoveredThemes = fs.readdirSync(themesDir).filter(f => 
     fs.statSync(path.join(themesDir, f)).isDirectory()
 );
@@ -16,10 +16,10 @@ const testProjects = discoveredThemes.map(theme => ({
     name: theme,
     environment: 'jsdom',
     globals: true,
-    include: [`packages/themes/${theme}/tests/**/*.spec.js`],
+    include: [`themes/${theme}/tests/**/*.spec.js`],
     alias: {
-      [`@hashtagcms/theme/${theme}`]: path.resolve(__dirname, `packages/themes/${theme}/src`),
-      '@hashtagcms/helpers': path.resolve(__dirname, 'packages/helpers/src'),
+      [`@hashtagcms/theme/${theme}`]: path.resolve(__dirname, `themes/${theme}`),
+      '@hashtagcms/helpers': path.resolve(__dirname, 'helpers'),
       '@hashtagcms/testing': path.resolve(__dirname, 'tests/shared'),
     },
   }

@@ -28,9 +28,21 @@ import {
   AdminConfig, Toast, Loader, Modal, Form, ...
   
   // Utils
-  Storage, Fetcher, queryBuilder, ...
+  Storage, Fetcher, QueryBuilder, SafeJsonParse, SafeErrorData, ...
 } from "@hashtagcms/admin-ui-kit";
 ```
+
+### 🧰 Utility Functions
+
+#### `SafeJsonParse(prop, defaultValue = null)`
+Safely parses a prop value that may be a JSON string, object, undefined, or null.
+- **`prop`**: The value to parse.
+- **`defaultValue`**: Value returned if parsing fails or prop is empty.
+
+#### `SafeErrorData(error, defaults = {})`
+Safely extracts error data from an Axios catch block, handling network or CORS errors gracefully.
+- **`error`**: The error object from a catch block.
+- **`defaults`**: Optional default properties to include in the returned object.
 
 ---
 

@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Global Form Styles (Premium Modern Aesthetic) */
+.form-horizontal {
+    @apply space-y-6;
+}
+
+.row {
+    @apply flex flex-wrap -mx-4;
+}
+
+.v-space {
+    @apply mt-8;
+}
+
+.admin-form {
+    @apply w-full max-w-5xl mx-auto bg-white rounded-md p-12 shadow-lg border border-gray-100;
+}
+
+.form-group {
+    @apply mb-6;
+}
+
+.form-group.row {
+    @apply flex flex-col md:flex-row md:items-center gap-4;
+}
+
+.col-sm-2 {
+    @apply w-full md:w-1/6 px-4;
+}
+
+.col-sm-10 {
+    @apply w-full md:w-5/6 px-4;
+}
+
+.col-sm-9 {
+    @apply w-full md:w-3/4 px-4;
+}
+
+label {
+    @apply text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-1 block;
+}
+
+.form-control, .form-select {
+    @apply w-full px-6 py-4 bg-white border border-gray-100 rounded-md text-sm font-bold text-gray-700 shadow-sm transition-all outline-none;
+    @apply focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 hover:border-gray-300;
+}
+
+.form-control::placeholder {
+    @apply text-gray-300 font-medium;
+}
+
+.fieldset {
+    @apply border border-gray-100 rounded-md p-10 mb-10 bg-white/50 shadow-sm relative;
+}
+
+.fieldset legend {
+    @apply absolute -top-4 left-10 px-6 py-2 bg-gray-900 text-white text-[10px] font-black uppercase tracking-[0.3em] rounded-full shadow-lg;
+}
+
+/* Custom Checkbox/Radio */
+input[type="checkbox"], input[type="radio"] {
+    @apply w-5 h-5 rounded border-gray-200 text-blue-600 focus:ring-blue-500/20 transition-all cursor-pointer;
+}
+
+/* Buttons */
+.btn {
+    @apply inline-flex items-center justify-center px-8 py-3 text-xs font-black uppercase tracking-widest rounded-md transition-all shadow-sm active:scale-95;
+}
+
+.btn-success, .btn-primary {
+    @apply bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-500/30;
+}
+
+.btn-outline-secondary {
+    @apply bg-white text-gray-400 border border-gray-100 hover:border-blue-500 hover:text-blue-600;
+}
+
+/* Transitions */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+/* Dashboard Panels */
+.js_left_panel {
+    @apply h-full bg-[#0F172A] text-white shrink-0 transition-all duration-300;
+}
+
+.js_right_panel {
+    @apply flex-1 flex flex-col min-w-0 bg-slate-50 relative;
+}
+
+/* Custom Scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+    @apply w-2;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    @apply bg-transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-slate-200 rounded-full hover:bg-slate-300 transition-colors;
+}

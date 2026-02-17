@@ -91,3 +91,41 @@ Handles logic for Page Module forms (alias generation, etc.).
 import { PageManager } from "@hashtagcms/admin-ui-kit";
 PageManager.init("add", "page");
 ```
+
+---
+
+## 🔧 Utilities
+
+### `Fx`
+Animation helper using the `motion` library.
+
+```javascript
+import { Fx } from "@hashtagcms/admin-ui-kit";
+Fx.come("#element"); // Fade in
+Fx.out("#element");  // Fade out
+Fx.highlight("#element"); // Highlight background
+```
+
+### `EventBus`
+Global event emitter (using `mitt`).
+
+```javascript
+import { EventBus } from "@hashtagcms/admin-ui-kit";
+EventBus.emit("event-name", data);
+EventBus.on("event-name", (data) => { ... });
+```
+
+### `Humanize`
+String formatting utility.
+
+```javascript
+import { Humanize } from "@hashtagcms/admin-ui-kit";
+console.log(Humanize("hello_world")); // "Hello World"
+```
+
+### `MapAPI`
+Google Maps wrapper (re-exported from Admin SDK).
+
+```javascript
+import { MapAPI } from "@hashtagcms/admin-ui-kit";
+```

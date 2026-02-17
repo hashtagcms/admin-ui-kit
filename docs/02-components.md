@@ -14,6 +14,10 @@ Below is a comprehensive list of all UI components available in `@hashtagcms/adm
 - **[TabView](./components/tab-view.md)**: Flexible tabbed navigation.
 - **[Pagination](./components/pagination.md)**: Pagination controls.
 
+## 💎 Atomic UI Kit (HcKit)
+
+- **[HcKit Components Suite](./components/ui-kit/README.md)**: The complete library of atomic components (Buttons, Inputs, Modals, etc.) optimized for the Modern theme.
+
 ## ⚙️ Module & CMS Management
 
 - **[Homepage](./components/homepage.md)**: The drag-and-drop Dashboard editor.
@@ -38,6 +42,11 @@ Below is a comprehensive list of all UI components available in `@hashtagcms/adm
 - **[FileUploader](./components/file-uploader.md)**: Generic file upload widget.
 - **[ImageGallery](./components/image-gallery.md)**: Media manager modal.
 - **[SearchBar](./components/search-bar.md)**: Advanced search filter form.
+- **[DownloadButton](./components/downloads.md)**: Action button for downloads.
+- **[CategoryPlatform](./components/category-platform.md)**: Platform selector modal for categories.
+- **[CategorySettings](./components/category-settings.md)**: Category management dashboard.
+- **[PlatformButton](./components/platform-button.md)**: Platform selection dropdown.
+- **[MenuSorter](./components/menu-sorter.md)**: Drag-and-drop menu organizer.
 
 ## 🛠 Utilities
 
@@ -46,3 +55,8 @@ Below is a comprehensive list of all UI components available in `@hashtagcms/adm
 - **[Loader](./components/loader.md)**: Loading spinner.
 - **[ToastBox](./components/toast-box.md)**: Notification service.
 - **[ModalBox](./components/modal-box.md)**: Generic modal wrapper.
+- **[CopyPaste](./components/library/copy-paste.md)**: Form data clipboard helper.
+- **[SplitButton](./components/library/split-button.md)**: Dropdown button.
+- **[TimerButton](./components/library/timer-button.md)**: Auto-redirect countdown.
+- **[HtmlSlot](./components/html-slot.md)**: Dynamic HTML container.
+- **[LeftMenuShowHide](./components/library/left-menu-show-hide.md)**: Sidebar toggle.
