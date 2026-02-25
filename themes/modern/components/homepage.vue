@@ -45,7 +45,7 @@
         <div v-show="hasTheme" class="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl border border-blue-100/50">
             <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Active Theme</span>
             <span
-                class="text-xs font-black text-blue-700 cursor-help underline decoration-blue-300/50 decoration-2 underline-offset-4 hover:decoration-blue-500 transition-all"
+                class="text-xs font-black text-blue-700 cursor-pointer underline decoration-blue-300/50 decoration-2 underline-offset-4 hover:decoration-blue-500 transition-all"
                 title="Click to see theme info"
                 @click="showInfo('theme', themeInfo.id)"
             >{{ themeInfo.name }}</span>
@@ -86,113 +86,128 @@
       </div>
   </div>
 
-  <div class="flex flex-col xl:flex-row gap-10 mt-8">
-    <div class="flex-1">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 homepage-modules">
-        <div v-for="hook in hooks" :key="hook.info.id" :ref="'panel_' + hook.info.id" class="flex flex-col">
-          <div class="non-selectable shadow-lg rounded-lg bg-white border border-gray-100 overflow-hidden flex flex-col h-full transition-all hover:shadow-lg hover:shadow-blue-500/10 group">
-            <div
-              class="px-6 py-4 bg-gray-50/50 border-b border-gray-100 flex items-center justify-between cursor-pointer select-none"
-              @dblclick="showHideHookPanel(hook.info.id)"
-            >
-              <div class="flex items-center gap-3">
-                  <a
-                    href="javascript:void(0)"
-                    class="text-xs font-black text-gray-800 uppercase tracking-widest hover:text-blue-600 transition-colors"
-                    @click="showInfo('hook', hook.info.id)"
-                  >
-                    {{ hook.info.name }}
-                  </a>
-              </div>
-              
-              <div class="flex items-center gap-2">
-                  <button 
-                    @click="onlyMe(hook.info.id, $event)"
-                    class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
-                  >
-                    <i class="fa fa-expand text-[10px]"></i>
-                  </button>
-                  <button 
-                    @click="showHideHookPanel(hook.info.id)"
-                    class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
-                  >
-                    <i class="fa fa-minus text-[10px]"></i>
-                  </button>
-              </div>
-            </div>
-
-            <div
-              :ref="'hook_panel_' + hook.info.id"
-              class="flex-1 p-4 bg-white min-h-[150px] js_modules overflow-hidden"
-            >
-              <ul
-                :data-hook-id="hook.info.id"
-                class="space-y-2 js_modules js_hook_modules min-h-[100px]"
-              >
-                <template v-if="hook.modules.length > 0">
-                  <li
-                    v-for="module in hook.modules"
-                    :key="module.id"
-                    :data-module-id="module.id"
-                    class="px-4 py-3 bg-gray-50/50 hover:bg-white border border-transparent hover:border-blue-100/50 rounded-xl flex items-center justify-between group/item transition-all js_item cursor-grab active:cursor-grabbing"
-                  >
-                    <div class="flex items-center gap-3">
-                        <i class="fa fa-grip-lines text-[10px] text-gray-200 group-hover/item:text-blue-400 transition-colors"></i>
-                        <a
-                          href="javascript:void(0)"
-                          @click="showInfo('module', module.id)"
-                          class="text-xs font-bold text-gray-600 group-hover/item:text-blue-900 transition-colors"
-                        >{{ module.name }}</a>
-                    </div>
-                    
-                    <button
-                      v-if="canDelete"
-                      :data-hook-id="hook.info.id"
-                      class="text-gray-300 hover:text-red-500 transition-colors js_delete"
-                      title="Delete this module from the hook"
-                    >
-                      <i class="fa fa-trash-o text-xs"></i>
-                    </button>
-                  </li>
-                </template>
-                <li v-else class="h-[120px] border-2 border-dashed border-gray-100 rounded-lg flex items-center justify-center bg-gray-50/30">
-                    <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest text-center px-4">Ready for Modules</span>
-                </li>
-              </ul>
+  <div class="flex flex-row items-start gap-10 mt-8">
+    <!-- Left Column: Hooks Dashboard -->
+    <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 homepage-modules content-start pl-2">
+      <div
+        v-for="hook in hooks"
+        :key="hook.info.id"
+        :ref="el => setPanelRef(el, hook.info.id)"
+        v-show="onlyMeHookId === null || onlyMeHookId === hook.info.id"
+        :class="['flex flex-col transition-all duration-300', onlyMeHookId === hook.info.id ? 'col-span-full sticky top-24 z-30 self-start' : !collapsedHooks.has(hook.info.id.toString()) ? 'h-full' : '']"
+        :style="onlyMeHookId === hook.info.id ? 'height: calc(100vh - 7rem)' : ''"
+      >
+        <div 
+          :class="['non-selectable rounded-2xl border overflow-hidden flex flex-col transition-all group hcms-hook-box', onlyMeHookId === hook.info.id ? 'shadow-2xl shadow-indigo-500/10 ring-2 ring-indigo-400/40 bg-white border-indigo-200 h-full' : !collapsedHooks.has(hook.info.id.toString()) ? 'shadow-lg bg-indigo-50/40 border-indigo-100/50 hover:shadow-xl hover:shadow-indigo-500/10 h-full' : 'shadow-lg bg-indigo-50/40 border-indigo-100/50 hover:shadow-xl hover:shadow-indigo-500/10']"
+        >
+          <div
+            class="px-6 py-2 bg-indigo-100/30 border-b border-indigo-100/50 flex items-center justify-between cursor-pointer select-none"
+            @dblclick="showHideHookPanel(hook.info.id)"
+          >
+            <div class="flex items-center gap-3">
+                <a
+                  href="javascript:void(0)"
+                  class="text-xs font-black text-gray-800 uppercase tracking-widest hover:text-blue-600 transition-colors"
+                  @click="showInfo('hook', hook.info.id)"
+                >
+                  {{ hook.info.name }}
+                </a>
             </div>
             
-            <div
-              class="px-6 py-3 bg-gray-50/30 border-t border-gray-50 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity"
-              v-if="hasAnyModulesInAHook(hook) && canDelete"
-            >
-              <button
-                @click="deleteAllModuleFromHook(hook.info.id)"
-                class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest flex items-center gap-2 js_delete_from_hook"
-                :data-hook-id="hook.info.id"
-              >
-                  <i class="fa fa-trash-o"></i>
-                  Flush Hook
-              </button>
+            <div class="flex items-center gap-2">
+                <button 
+                  @click="onlyMe(hook.info.id)"
+                  :class="['w-8 h-8 flex items-center justify-center rounded-lg transition-all', onlyMeHookId === hook.info.id ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-blue-600 hover:bg-white']"
+                  :title="onlyMeHookId === hook.info.id ? 'Show all hooks' : 'Only show this hook'"
+                >
+                  <i :class="['fa text-[10px]', onlyMeHookId === hook.info.id ? 'fa-compress' : 'fa-expand']"></i>
+                </button>
+                <button 
+                  @click="showHideHookPanel(hook.info.id)"
+                  class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
+                  :title="collapsedHooks.has(hook.info.id.toString()) ? 'Expand hook' : 'Collapse hook'"
+                >
+                  <i :class="['fa text-[10px]', collapsedHooks.has(hook.info.id.toString()) ? 'fa-plus' : 'fa-minus']"></i>
+                </button>
             </div>
           </div>
-        </div>
-        <div v-if="hasTheme" ref="savePanel" class="col-span-full pt-12 flex justify-center pb-20">
-          <button 
-            :class="[saveButtonCss, 'px-20 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 active:scale-95 text-lg uppercase tracking-widest']" 
-            type="button" 
-            @click="saveModules()"
+
+          <div
+            :ref="el => setHookPanelRef(el, hook.info.id)"
+            v-show="!collapsedHooks.has(hook.info.id.toString())"
+            :class="['flex-1 p-4 bg-white js_modules overflow-y-auto', onlyMeHookId === hook.info.id ? 'min-h-0' : 'min-h-[150px]']"
           >
-            Save Configuration
-          </button>
+            <ul
+              :data-hook-id="hook.info.id"
+              class="space-y-2 js_modules js_hook_modules min-h-[100px] border border-blue-100/50 h-full"
+            >
+              <template v-if="hook.modules.length > 0">
+                <li
+                  v-for="module in hook.modules"
+                  :key="module.layoutId"
+                  :data-module-id="module.id"
+                  :data-layout-id="module.layoutId"
+                  draggable="true"
+                  class="px-4 py-1 bg-gray-50/50 hover:bg-white border border-transparent hover:border-blue-100/50 rounded-xl flex items-center justify-between group/item transition-all js_item cursor-grab active:cursor-grabbing"
+                >
+                  <div class="flex items-center gap-3">
+                      <i class="fa fa-grip-lines text-[10px] text-gray-200 group-hover/item:text-blue-400 transition-colors"></i>
+                      <a
+                        href="javascript:void(0)"
+                        @click="showInfo('module', module.id)"
+                        class="text-xs font-bold text-gray-600 group-hover/item:text-blue-900 transition-colors"
+                      >{{ module.name }}</a>
+                  </div>
+                  
+                  <button
+                    v-if="canDelete"
+                    :data-hook-id="hook.info.id"
+                    class="text-gray-300 hover:text-red-500 transition-colors js_delete"
+                    title="Delete this module from the hook"
+                    @click.stop="removeModules(module.layoutId, 'module_id', hook.info.id)"
+                  >
+                    <i class="fa fa-trash-o text-xs js_delete"></i>
+                  </button>
+                </li>
+              </template>
+              <li v-else class="h-[120px] border-2 border-dashed border-gray-100 rounded-lg flex items-center justify-center bg-gray-50/30 pointer-events-none">
+                  <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest text-center px-4">Ready for Modules</span>
+              </li>
+            </ul>
+          </div>
+          
+          <div
+            class="px-6 py-3 bg-gray-50/30 border-t border-gray-50 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity"
+            v-if="hasAnyModulesInAHook(hook) && canDelete"
+          >
+            <button
+              @click="deleteAllModuleFromHook(hook.info.id)"
+              class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest flex items-center gap-2 js_delete_from_hook"
+              :data-hook-id="hook.info.id"
+            >
+                <i class="fa fa-trash-o"></i>
+                Flush Hook
+            </button>
+          </div>
         </div>
+      </div>
+      <!-- Save button inside the grid but col-span-full -->
+      <div v-if="hasTheme" ref="savePanel" class="col-span-full pt-12 flex justify-center pb-20">
+        <button 
+          :class="[saveButtonCss, 'px-20 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 active:scale-95 text-lg uppercase tracking-widest']" 
+          type="button" 
+          @click="saveModules()"
+        >
+          Save Configuration
+        </button>
       </div>
     </div>
     
-    <!-- Right Module Browser -->
-    <div class="w-full xl:w-80 flex flex-col gap-6" v-if="!hasError">
-      <div class="bg-white rounded-lg shadow-lg border border-gray-100 p-6 space-y-6 sticky top-24">
+    <!-- Right Column: Module Browser (Pool) -->
+    <div class="w-80 shrink-0 flex flex-col gap-6" v-if="!hasError">
+      <div class="bg-white rounded-lg shadow-lg border border-gray-100 p-6 space-y-6 sticky top-24 self-start">
           <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600">
+              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm">
                   <i class="fa fa-cube"></i>
               </div>
               <div>
@@ -216,6 +231,7 @@
               v-for="module in filterModules"
               :key="module.id"
               :data-module-id="module.id"
+              draggable="true"
               class="px-4 py-3 bg-white border border-gray-100 rounded-xl flex items-center justify-between group/pool hover:border-blue-200 hover:shadow-md transition-all cursor-grab active:cursor-grabbing js_item"
             >
               <div class="flex items-center gap-3">
@@ -390,11 +406,11 @@
           
           <div class="bg-gray-50 p-6 rounded-lg border border-gray-100 shadow-inner" v-show="hasPlatformMoreThanOne">
             <label              
-              class="flex items-center gap-4 cursor-pointer group"
+              class="flex items-center cursor-pointer group leading-none"
               title="Delete from other platforms too"
             >
-              <input v-model="applicableForAllPlatforms" type="checkbox" class="w-6 h-6 rounded-lg border-gray-300 text-red-600 focus:ring-red-500 transition-all cursor-pointer shadow-sm" /> 
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-red-600 transition-colors">Apply deletion across all platforms</span>
+              <input v-model="applicableForAllPlatforms" type="checkbox" class="w-5 h-5 rounded-lg border-gray-300 text-red-600 focus:ring-red-500 transition-all cursor-pointer shadow-sm" /> 
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-red-600 transition-colors" :style="checkBoxAlignment">Apply deletion across all platforms</span>
             </label>
           </div>
       </div>
@@ -417,34 +433,18 @@
   <info-popup ref="infoPopup"></info-popup>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, nextTick, getCurrentInstance } from "vue";
+import axios from "axios";
 import AdminConfig from "../../../helpers/admin-config";
-
-import { Toast, Modal, Loader, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
-import Sortable from "sortablejs";
+import { Toast, Modal, Loader, SafeErrorData, SafeJsonParse, CheckBoxAlignment } from "../../../helpers/common";
+import HcmsSortable from "../../../helpers/hCmsSortable.js";
 import InfoPopup from "./info-popup.vue";
 import ModalBox from "./library/modal-box.vue";
 
-export default {
-  components: {
-    "info-popup": InfoPopup,
-    "modal-box": ModalBox,
-  },
-  mounted() {
-    /*console.log("siteInfo", this.siteInfo);
-        console.log("allModules", this.allModules);
-        console.log("categoryModules", this.categoryModules);
-        console.log("categoryInfo", this.categoryInfo);
-        console.log("themeInfo", this.themeInfo);
-        */
+const checkBoxAlignment = CheckBoxAlignment;
 
-    this.init();
-  },
-  created() {
-    //this.initData();
-  },
-
-  props: [
+const props = defineProps([
     "dataCategories",
     "dataMicrosites",
     "dataPlatforms",
@@ -461,683 +461,552 @@ export default {
     "dataUserRights",
     "dataIsModuleReadonly",
     "dataAllSites",
-  ],
-  computed: {
-    hasSiteMoreThanOne() {
-      //return true;
-      return this.allSites.length > 1;
-    },
-    hasMicrosites() {
-      //return true;
-      return this.microsites.length > 0;
-    },
-    hasPlatformMoreThanOne() {
-      //return true;
-      return this.platforms.length > 1;
-    },
-    hasTheme() {
-      return this.themeInfo && this.themeInfo["id"];
-    },
-    saveButtonCss() {
-      let disabled = this.enableDisableSave() === true ? "" : " disabled";
-      return "btn btn-success btn-form-submit" + disabled;
-    },
-    canEdit() {
-      return (
-        this.userRights.indexOf("edit") >= 0 && this.isModuleReadonly === false
-      );
-    },
-    canDelete() {
-      return (
-        this.userRights.indexOf("delete") >= 0 &&
-        this.isModuleReadonly === false
-      );
-    },
-    modalCss() {
-      /*  if (this.hasSiteMoreThanOne && this.hasPlatformMoreThanOne) {
-                return "modal-lg";
-            }*/
-      return "modal-lg";
-    },
-    fromCategories() {
-      return this.categoriesData[this.fromData.site_id] || [];
-    },
-    toCategories() {
-      return this.categoriesData[this.toData.site_id] || [];
-    },
-    hasError() {
-      return this.errors.length > 0;
-    },
-    filterModules() {
-      let key = this.searchKey;
-      if (key !== "" && key != null) {
-        key = key.toLowerCase();
-        return this.allModules.filter((current) => {
-          let alias = current.alias.toLowerCase();
-          let name = current.name.toLowerCase();
-          let id = current.id;
-          if (
-            id.toString() === key ||
-            alias.includes(key) ||
-            name.includes(key)
-          ) {
-            return true;
-          }
-        });
-      } else {
-        this.searchKey = "";
-        // console.log("data", this.allData.data);
-        return this.allModules;
-      }
-    },
-  },
-  data() {
-    return {
-      categoriesData: {},
-      categories: SafeJsonParse(this.dataCategories, []),
-      microsites: SafeJsonParse(this.dataMicrosites, []),
-      platforms: SafeJsonParse(this.dataPlatforms, []),
-      siteId:
-        typeof this.dataSiteId == "undefined" || this.dataSiteId === ""
-          ? 1
-          : parseInt(this.dataSiteId),
-      microSiteId:
-        typeof this.dataMicrositeId == "undefined" ||
-        this.dataMicrositeId === ""
-          ? 0
-          : parseInt(this.dataMicrositeId),
-      platformId:
-        typeof this.dataPlatformId == "undefined" || this.dataPlatformId === ""
-          ? 1
-          : parseInt(this.dataPlatformId),
-      categoryId:
-        typeof this.dataCategoryId == "undefined" || this.dataCategoryId === ""
-          ? 0
-          : parseInt(this.dataCategoryId),
-      siteInfo: SafeJsonParse(this.dataSiteInfo, []),
-      hookInfo: SafeJsonParse(this.dataHookInfo, []),
-      allModules: SafeJsonParse(this.dataAllModules, []),
-      categoryModules: SafeJsonParse(this.dataCategoryModules, []),
-      categoryInfo: SafeJsonParse(this.dataCategoryInfo, []),
-      themeInfo: SafeJsonParse(this.dataThemeInfo, []),
-      hooks: [],
-      hooksInfoCache: {},
-      moduleInfoCache: {},
-      noHookFound: false,
-      errors: [],
-      enableSave: false,
-      searchKey: "",
-      applicableForAllPlatforms: false,
-      fromData: { site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 },
-      toData: { site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 },
-      isWorking: false,
-      sortObj: { draggable: null },
-      userRights: SafeJsonParse(this.dataUserRights, []),
-      isModuleReadonly: this.dataIsModuleReadonly === "1" ? true : false,
-      allSites: SafeJsonParse(this.dataAllSites, []),
-      copyForAllPlatforms: false,
-    };
-  },
-  methods: {
-    init() {
-      if (this.categories.length === 0) {
-        this.addErrorMessage("No category found!");
-      }
-      if (this.categoryInfo.length === 0) {
-        this.addErrorMessage(
-          "There is a mismatch in site default category. Please fix that.",
-        );
-      }
-      //console.log('this.themeInfo["id"] ', this.themeInfo["id"])
-      if (this.hasTheme) {
-        this.parseTheme();
-        this.populateModules();
-        this.enableSorting();
-        this.makeCategories();
-      } else {
-        let path = AdminConfig.admin_path("category/settings", {
-          platform_id: this.platformId,
-        });
-        this
-          .addErrorMessage(`This category/platform/theme is not available in category_site table.
-                         You need to drag and drop in <a href='${path}'>category settings</a>.`);
-        this.addErrorMessage(`Dont' forget the set the theme there.`);
-      }
-    },
-    makeCategories() {
-      let totalSites = this.allSites.length;
-      if (totalSites > 0) {
-        for (let i = 0; i < totalSites; i++) {
-          let current = this.allSites[i];
-          this.categoriesData[current.id] = current.category;
-        }
-      }
-      this.setDefaultFromTo();
-    },
-    setDefaultFromTo() {
-      let totalSites = this.allSites.length;
-      if (totalSites > 0) {
-        this.fromData.site_id = this.allSites[0].id;
-        this.toData.site_id = this.siteId; //current site id
-      } else {
-        this.fromData.site_id = this.siteId; //current site
-        this.toData.site_id = this.siteId;
-      }
+]);
 
-      this.fromData.platform_id = this.platformId;
-      this.toData.platform_id = this.platformId;
-      this.toData.category_id = this.categoryId;
-    },
-    saveNow(url, data) {
-      Loader.show(this);
-      return new Promise((resolve, reject) => {
-        axios
-          .post(url, data)
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((error) => {
-            reject(SafeErrorData(error));
-          })
-          .finally(() => {
-            Loader.hide(this);
-          });
-      });
-    },
-    getWhere() {
-      let where = {
-        site_id: this.siteId,
-        microsite_id: this.microSiteId,
-        platform_id: this.platformId,
-        category_id: this.categoryId,
-      };
-      return where;
-    },
-    saveModules() {
-      if (this.enableDisableSave() === false) {
-        return false;
-      }
-      //Save in DB
-      let $this = this;
-      //let currentData = (action == "add") ? this.allData.data : this.siteData;
-      let postParams = {};
+const instance = getCurrentInstance();
 
-      //loop through all hooks
-      let allHooks = document.querySelectorAll(".js_hook_modules");
-      let datas = [];
-      allHooks.forEach(function (current) {
-        let allModules = current.querySelectorAll("li.js_item");
-        let hook_id = current.getAttribute("data-hook-id");
-        //console.log("hook_id: ", hook_id, allModules, allModules.length);
-        if (allModules.length > 0) {
-          let modules = [];
-          for (let i = 0; i < allModules.length; i++) {
-            //console.log(allModules[i]);
-            let currentModule = allModules[i];
-            let module_id = currentModule.getAttribute("data-module-id");
-            modules.push({ module_id: module_id, position: i + 1 });
-          }
+// Refs for components
+const infoPopup = ref(null);
+const copyBox = ref(null);
+const deleteBox = ref(null);
+const savePanel = ref(null);
 
-          let data = { hook_id: hook_id, modules: modules };
-          datas.push(data);
-        }
-        //console.log(datas);
-      });
+// Dynamic refs
+const panelRefs = reactive({});
+const hookPanelRefs = reactive({});
 
-      if (datas.length > 0) {
-        let where = $this.getWhere();
-        postParams.data = datas;
-        postParams.where = where;
-        postParams.applicableForAllPlatforms = false;
-        this.saveNow(
-          AdminConfig.admin_path("homepage/saveSettings"),
-          postParams,
-        )
-          .then(function (res) {
-            //console.log(res);
-            Toast.show($this, "Saved...");
-            $this.enableDisableSave(false);
-          })
-          .catch(function (res) {
-            $this.showError(res);
-          });
-      }
-    },
-    populateModules() {
-      //Display module on init
-      let $this = this;
-      let modules = this.categoryModules;
-
-      if (modules.length > 0) {
-        for (let i = 0; i < modules.length; i++) {
-          let current = modules[i];
-          let hook = $this.getHookInfoCache(current.hook_id);
-          try {
-            let moduleInfo = $this.getModuleInfo(current.module_id);
-            this.addModule(hook.hookIndex, moduleInfo);
-          } catch (e) {
-            console.error("@populateModules: " + e.message);
-            $this.showError("@populateModules: " + e.message);
-          }
-        }
-      } else {
-        console.info("There is no module added for this category.");
-        Toast.show(
-          this,
-          "There is no module added for this category. Drag from the right panel to the left boxes. ",
-          5000,
-        );
-      }
-    },
-    parseTheme() {
-      //console.log("this.themeInfo.length ",this.themeInfo);
-      if (this.hasTheme) {
-        let $this = this;
-        let theme = this.themeInfo;
-        let skeleton = theme.skeleton;
-        let regx_ske = /(%{cms.+}%)/gim; //find cms key
-        let conventions = skeleton.match(regx_ske);
-        let modules = {};
-        if (conventions && conventions.length > 0) {
-          let regx_m = /(cms.+})/;
-          let realIndex = 0;
-          conventions.forEach(function (current, index) {
-            let strcms = current.replace("%{cms.", "");
-            strcms = strcms.replace("}%", "");
-            let cms_arr = strcms.split(".");
-            let conventionType = cms_arr[0]; //can be hook or can be module;
-            let conventionName = cms_arr[1];
-
-            if (conventionType === "hook") {
-              let hookInfo = $this.getHookInfo(conventionName);
-              if (hookInfo !== null) {
-                $this.addHook({
-                  name: conventionName,
-                  modules: [],
-                  info: hookInfo,
-                });
-                $this.setHookInfoCache(hookInfo.id, {
-                  info: hookInfo,
-                  hookIndex: realIndex,
-                });
-                realIndex++;
-              } else {
-                console.error(
-                  "@parseTheme " +
-                    conventionName +
-                    ". You need to add in your site",
-                );
-              }
-            }
-            if (conventionType === "module") {
-            }
-          });
-        } else {
-          this.addErrorMessage(
-            `There is no hook defined in for this theme (${this.themeInfo.name}})`,
-          );
-        }
-      } else {
-        this.addErrorMessage("There is no theme available for this category");
-      }
-    },
-    addErrorMessage(message) {
-      this.errors.push({ message: message });
-    },
-    findModuleIndex(hookIndex, module) {
-      if (this.getHook(hookIndex) !== null) {
-        let modules = this.getHook(hookIndex).modules;
-        let found = modules.findIndex(function (current) {
-          return module.id === current.id;
-        });
-        return found;
-      }
-      return -1;
-    },
-    removeModules(idOrWhere, byType = "module_id", hookId = null) {
-      let $this = this;
-      let where;
-      if (Object.prototype.toString.call(idOrWhere) === "[object Object]") {
-        where = idOrWhere; // where is passed by param
-      } else {
-        where = this.getWhere();
-        where[byType] = parseInt(idOrWhere);
-      }
-
-      //hook and module
-      if (hookId !== null) {
-        where["hook_id"] = parseInt(hookId);
-        //remove from the hook->module array
-        let hookInfo = this.getHookInfoCache(hookId);
-        let module = this.getModuleInfo(idOrWhere);
-        let moduleIndex = this.findModuleIndex(hookInfo.hookIndex, module);
-        //remove module - refactor it
-        this.getHook(hookInfo.hookIndex).modules.splice(moduleIndex, 1);
-      }
-      let postParams = {};
-      postParams.where = where;
-      postParams.applicableForAllPlatforms = this.applicableForAllPlatforms;
-      this.enableDisableSave(true);
-
-      //Disable auto save on remove
-      /*return this.saveNow(AdminConfig.admin_path("homepage/removeModules"), postParams).then(function (res) {
-                console.log(res);
-                //Toast.show($this, res.message);
-                Toast.show($this, "Removed...");
-
-            }).catch(function (res) {
-                $this.showError(res, true);
-            });*/
-    },
-    addModule(hookIndex, module) {
-      //console.log("1: addModule ", hookIndex, module);
-      let found = this.findModuleIndex(hookIndex, module);
-
-      if (found === -1) {
-        let hook = this.getHook(hookIndex);
-        hook.modules.push(module);
-
-        //$this.refreshRightSide();
-        return hook.modules.length;
-      }
-
-      return false;
-    },
-    refreshRightSide() {
-      this.allModules.push(this.allModules[0]);
-      this.allModules.pop();
-    },
-    highlightEagerDrop(addRemove = "add") {
-      let js_hook_modules = document.querySelectorAll(".js_hook_modules");
-      js_hook_modules.forEach(function (current) {
-        current.classList[addRemove]("module-drop-eager");
-        current.closest("div.js_modules").classList[addRemove]("p-0", "m-0");
-      });
-    },
-    setHookInfoCache(hookId, data) {
-      return (this.hooksInfoCache[hookId] = data);
-    },
-    getHookInfoCache(hookId) {
-      return this.hooksInfoCache[hookId];
-    },
-    getHookInfo(hookValue, byKey = "alias") {
-      let hooks = this.hookInfo;
-
-      for (let i = 0; i < hooks.length; i++) {
-        let current = hooks[i];
-        if (current[byKey] === hookValue) {
-          return current;
-        }
-      }
-      return null;
-    },
-    addHook(data) {
-      this.hooks.push(data);
-    },
-    getHook(hookIndex) {
-      return this.hooks[hookIndex] || null;
-    },
-    getModuleInfo(module_id) {
-      if (this.moduleInfoCache[module_id]) {
-        return this.moduleInfoCache[module_id];
-      }
-      let found = null;
-      for (let i = 0; i < this.allModules.length; i++) {
-        let current = this.allModules[i];
-        if (current.id.toString() === module_id.toString()) {
-          this.moduleInfoCache[module_id] = current;
-          found = current;
-          break;
-        }
-      }
-      return found;
-    },
-    enableDragging() {
-      if (!this.canEdit) {
-        return false;
-      }
-      let $this = this;
-
-      //Right Side module
-      let draggableModules = document.getElementById("draggableModules");
-      this.sortObj.draggable = Sortable.create(draggableModules, {
-        animation: 200,
-        draggable: ".js_item",
-        group: {
-          name: "modulesBox" /*,
-                    pull: 'clone',
-                    revertClone: true*/,
-        },
-        sort: false,
-        ghostClass: "js_modules",
-        onEnd: function (/**Event*/ evt) {
-          let to = evt.to;
-          let item = evt.item; // dragged HTMLElement
-
-          let hookId = to.getAttribute("data-hook-id");
-          let moduleId = item.getAttribute("data-module-id");
-
-          if (hookId) {
-            let hookInfo = $this.getHookInfoCache(hookId);
-            //console.log(hookInfo);
-            let moduleInfo = $this.getModuleInfo(moduleId);
-
-            let isAdded = $this.addModule(hookInfo.hookIndex, moduleInfo);
-
-            //remove original dropped, because it is populated by reactive hook->modules
-            item.parentNode.removeChild(item);
-
-            $this.highlightEagerDrop("remove");
-
-            //we can send feedback
-            if (isAdded === false) {
-              Toast.show($this, "Module is already added in this hook...");
-            }
-          }
-
-          //Enable Drag
-
-          $this.enableDisableSave(true);
-        },
-        onStart: function (/**Event*/ evt) {
-          //console.log("on start");
-          $this.highlightEagerDrop("add");
-        },
-      });
-    },
-    enableSorting() {
-      if (!this.canEdit) {
-        return false;
-      }
-      let $this = this;
-      this.$nextTick(function () {
-        let list = document.querySelectorAll(".js_modules");
-        list.forEach(function (current) {
-          Sortable.create(current, {
-            animation: 200,
-            filter: ".js_delete",
-            group: {
-              name: "droppable",
-              put: "modulesBox",
-            },
-            onFilter: function (evt) {
-              let item = evt.item,
-                ctrl = evt.target;
-              let parent = item.parentNode;
-              let hookId = parent.getAttribute("data-hook-id");
-              let id = item.getAttribute("data-module-id");
-
-              if (Sortable.utils.is(ctrl, ".js_delete")) {
-                // Click on remove button
-                $this.removeModules(id, "module_id", hookId);
-              }
-            },
-            onUpdate: function (/**Event*/ evt) {
-              //console.log("@onUpdate: ", evt);
-              $this.enableDisableSave(true);
-              //reindex
-            },
-          });
-        });
-
-        $this.enableDragging(true);
-      });
-    },
-    deleteAllModuleFromHook(hookId) {
-      let hookInfo = this.getHookInfoCache(hookId);
-      let hook = this.getHook(hookInfo.hookIndex);
-      hook.modules = [];
-      this.removeModules(hookId, "hook_id");
-    },
-    hasAnyModulesInAHook(hook) {
-      return typeof hook.modules != "undefined" && hook.modules.length > 0;
-    },
-    enableDisableSave(val) {
-      if (val === undefined) {
-        return this.enableSave;
-      }
-      this.enableSave = val;
-    },
-    showHideDeleteAlert(isShow) {
-      if (isShow) {
-        Modal.open(this, "deleteBox");
-      } else {
-        Modal.close(this, "deleteBox");
-      }
-    },
-    deleteAllFromCategory() {
-      this.showHideDeleteAlert(false);
-
-      let allHooks = this.hooks;
-      for (let i = 0; i < allHooks.length; i++) {
-        allHooks[i].modules = [];
-      }
-      this.removeModules(this.categoryId, "category_id");
-    },
-    showHideCopyAlert(isShow = true) {
-      if (isShow) {
-        this.setDefaultFromTo();
-        Modal.open(this, "copyBox");
-      } else {
-        Modal.close(this, "copyBox");
-      }
-    },
-    copyDataFromCategory() {
-      this.isWorking = true;
-      let $this = this;
-      let fromData = this.fromData;
-      let toData = this.toData;
-      let data = {
-        fromData,
-        toData,
-      };
-      let url = AdminConfig.admin_path("homepage/copyData");
-      this.saveNow(url, data)
-        .then(function (res) {
-          //console.log(res)
-          if (res.data.error) {
-            Toast.show($this, res.data.message, 5000);
-          } else if (res.data.success) {
-            $this.showHideCopyAlert(false);
-            Toast.show($this, "Copied. Reloading...");
-            window.location.href = window.location.href;
-          }
-          $this.isWorking = false;
-        })
-        .catch(function (res) {
-          $this.showHideCopyAlert(false);
-          $this.isWorking = false;
-          $this.showError(res);
-        });
-    },
-    setWorking() {},
-    isValidModule(module) {
-      let isValid =
-        module != null && typeof module != "undefined" && module.id > 0;
-      if (isValid === false) {
-        console.error(
-          "There is some error in db entries for this category. " +
-            "This can be fixed by deleting all modules and drag and drop again.",
-        );
-      }
-      return isValid;
-    },
-    fetchNewData() {
-      let where = this.getWhere();
-      delete where.site_id;
-      if (where.microsite_id === 0) {
-        delete where.microsite_id;
-      }
-      let url = "homepage/ui";
-      window.location.href = AdminConfig.admin_path(url, where);
-    },
-    showInfo(type, id) {
-      this.$refs.infoPopup.showInfo(type, id);
-    },
-    showHideHookPanel(id) {
-      //console.log(id, this.$refs["hook_panel_"+id]);
-      let target = this.$refs["hook_panel_" + id][0];
-      if (target.className.indexOf("hide") === -1) {
-        target.classList.add("hide");
-      } else {
-        target.classList.remove("hide");
-      }
-    },
-    onlyMe(id, evt) {
-      let $this = this;
-
-      let target = this.$refs["panel_" + id][0];
-      if (target.className.indexOf("fixed") === -1) {
-        hideAllHooks(true);
-        //show current and fixed it
-        target.classList.remove("hide");
-        target.classList.add("fixed");
-        //evt.target.classList.add("fa-compress");
-      } else {
-        hideAllHooks(false);
-      }
-
-      function hideAllHooks(shouldHide) {
-        let savePanel = $this.$refs.savePanel;
-
-        //hide old one
-        for (let i = 0; i < $this.hooks.length; i++) {
-          let current = $this.hooks[i];
-          let current_ele = $this.$refs["panel_" + current.info.id][0];
-
-          if (shouldHide === true) {
-            current_ele.classList.add("hide");
-            current_ele.classList.remove("fixed");
-          } else {
-            current_ele.classList.remove("hide");
-            current_ele.classList.remove("fixed");
-          }
-        }
-
-        if (shouldHide === true) {
-          savePanel.classList.add("hide");
-        } else {
-          savePanel.classList.remove("hide");
-        }
-      }
-    },
-    showError(response, reload = false) {
-      let message = "";
-      if (typeof response == "string") {
-        message = response;
-      } else {
-        message =
-          response && response["data"] && response["data"]["message"]
-            ? response.data.message
-            : "Unknown error!";
-      }
-      Toast.show(this, message, 5000);
-      if (reload) {
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-    },
-  },
+const setPanelRef = (el, id) => {
+    if (el) panelRefs[id] = el;
 };
+const setHookPanelRef = (el, id) => {
+    if (el) hookPanelRefs[id] = el;
+};
+
+// State
+const categoriesData = reactive({});
+const onlyMeHookId = ref(null);
+const categories = ref(SafeJsonParse(props.dataCategories, []));
+const microsites = ref(SafeJsonParse(props.dataMicrosites, []));
+const platforms = ref(SafeJsonParse(props.dataPlatforms, []));
+const siteId = ref(
+    typeof props.dataSiteId == "undefined" || props.dataSiteId === ""
+        ? 1
+        : parseInt(props.dataSiteId)
+);
+const microSiteId = ref(
+    typeof props.dataMicrositeId == "undefined" || props.dataMicrositeId === ""
+        ? 0
+        : parseInt(props.dataMicrositeId)
+);
+const platformId = ref(
+    typeof props.dataPlatformId == "undefined" || props.dataPlatformId === ""
+        ? 1
+        : parseInt(props.dataPlatformId)
+);
+const categoryId = ref(
+    typeof props.dataCategoryId == "undefined" || props.dataCategoryId === ""
+        ? 0
+        : parseInt(props.dataCategoryId)
+);
+const siteInfo = ref(SafeJsonParse(props.dataSiteInfo, []));
+const hookInfo = ref(SafeJsonParse(props.dataHookInfo, []));
+const allModules = ref(SafeJsonParse(props.dataAllModules, []));
+const categoryModules = ref(SafeJsonParse(props.dataCategoryModules, []));
+const categoryInfo = ref(SafeJsonParse(props.dataCategoryInfo, []));
+const themeInfo = ref(SafeJsonParse(props.dataThemeInfo, []));
+const hooks = reactive([]);
+const hooksInfoCache = reactive({});
+const moduleInfoCache = reactive({});
+const noHookFound = ref(false);
+const errors = reactive([]);
+const enableSave = ref(false);
+const searchKey = ref("");
+const applicableForAllPlatforms = ref(false);
+const fromData = reactive({ site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 });
+const toData = reactive({ site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 });
+const isWorking = ref(false);
+const sortableInstances = new Map();
+const draggableInstance = ref(null);
+const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+const isModuleReadonly = ref(props.dataIsModuleReadonly === "1");
+const allSites = ref(SafeJsonParse(props.dataAllSites, []));
+const copyForAllPlatforms = ref(false);
+const collapsedHooks = reactive(new Set());
+
+// Computed
+const hasSiteMoreThanOne = computed(() => allSites.value.length > 1);
+const hasMicrosites = computed(() => microsites.value.length > 0);
+const hasPlatformMoreThanOne = computed(() => platforms.value.length > 1);
+const hasTheme = computed(() => themeInfo.value && themeInfo.value["id"]);
+const saveButtonCss = computed(() => {
+    let disabled = enableSave.value === true ? "" : " disabled";
+    return "btn btn-success btn-form-submit" + disabled;
+});
+const canEdit = computed(() => userRights.value.indexOf("edit") >= 0 && isModuleReadonly.value === false);
+const canDelete = computed(() => userRights.value.indexOf("delete") >= 0 && isModuleReadonly.value === false);
+const modalCss = computed(() => "modal-lg");
+const fromCategories = computed(() => categoriesData[fromData.site_id] || []);
+const toCategories = computed(() => categoriesData[toData.site_id] || []);
+const hasError = computed(() => errors.length > 0);
+
+const filterModules = computed(() => {
+    let key = searchKey.value;
+    if (key !== "" && key != null) {
+        key = key.toLowerCase();
+        return allModules.value.filter((current) => {
+            let alias = current.alias.toLowerCase();
+            let name = current.name.toLowerCase();
+            let id = current.id;
+            return id.toString() === key || alias.includes(key) || name.includes(key);
+        });
+    } else {
+        return allModules.value;
+    }
+});
+
+// Methods
+const addErrorMessage = (message) => {
+    errors.push({ message: message });
+};
+
+const showError = (response, reload = false) => {
+    let message = "";
+    if (typeof response == "string") {
+        message = response;
+    } else {
+        message = response && response["data"] && response["data"]["message"] ? response.data.message : "Unknown error!";
+    }
+    Toast.show(instance.proxy, message, 5000);
+    if (reload) {
+        setTimeout(() => { window.location.reload(); }, 1000);
+    }
+};
+
+const getHookInfoCache = (hookId) => hooksInfoCache[hookId?.toString()];
+const setHookInfoCache = (hookId, data) => { hooksInfoCache[hookId?.toString()] = data; };
+
+const getHookInfo = (hookValue, byKey = "alias") => {
+    let hooksArr = hookInfo.value;
+    for (let i = 0; i < hooksArr.length; i++) {
+        let current = hooksArr[i];
+        if (current[byKey] === hookValue) return current;
+    }
+    return null;
+};
+
+const getModuleInfo = (module_id) => {
+    if (moduleInfoCache[module_id]) return moduleInfoCache[module_id];
+    let found = null;
+    for (let i = 0; i < allModules.value.length; i++) {
+        let current = allModules.value[i];
+        if (current.id.toString() === module_id.toString()) {
+            moduleInfoCache[module_id] = current;
+            found = current;
+            break;
+        }
+    }
+    return found;
+};
+
+const findModuleIndex = (hookIndex, module) => {
+    if (hooks[hookIndex]) {
+        let modules = hooks[hookIndex].modules;
+        return modules.findIndex(current => module.id === current.id);
+    }
+    return -1;
+};
+
+const getWhere = () => ({
+    site_id: siteId.value,
+    microsite_id: microSiteId.value,
+    platform_id: platformId.value,
+    category_id: categoryId.value,
+});
+
+const enableDisableSave = (val) => {
+    if (val === undefined) return enableSave.value;
+    enableSave.value = val;
+};
+
+const saveNow = (url, data) => {
+    Loader.show(instance.proxy);
+    return new Promise((resolve, reject) => {
+        axios.post(url, data)
+            .then(resolve)
+            .catch(error => reject(SafeErrorData(error)))
+            .finally(() => Loader.hide(instance.proxy));
+    });
+};
+
+const addHook = (data) => { hooks.push(data); };
+
+const parseTheme = () => {
+    if (hasTheme.value) {
+        let theme = themeInfo.value;
+        let skeleton = theme.skeleton;
+        let regx_ske = /(%{cms.+}%)/gim;
+        let conventions = skeleton.match(regx_ske);
+        if (conventions && conventions.length > 0) {
+            let realIndex = 0;
+            conventions.forEach(current => {
+                let strcms = current.replace("%{cms.", "").replace("}%", "");
+                let cms_arr = strcms.split(".");
+                let conventionType = cms_arr[0];
+                let conventionName = cms_arr[1];
+
+                if (conventionType === "hook") {
+                    let hookInfoData = getHookInfo(conventionName);
+                    if (hookInfoData !== null) {
+                        addHook({ name: conventionName, modules: [], info: hookInfoData });
+                        setHookInfoCache(hookInfoData.id, { info: hookInfoData, hookIndex: realIndex });
+                        realIndex++;
+                    } else {
+                        console.error("@parseTheme " + conventionName + ". You need to add in your site");
+                    }
+                }
+            });
+        } else {
+            addErrorMessage(`There is no hook defined in for this theme (${themeInfo.value.name}})`);
+        }
+    } else {
+        addErrorMessage("There is no theme available for this category");
+    }
+};
+
+const populateModules = () => {
+    let modulesArr = categoryModules.value;
+    if (modulesArr.length > 0) {
+        for (let i = 0; i < modulesArr.length; i++) {
+            let current = modulesArr[i];
+            let hookCache = getHookInfoCache(current.hook_id);
+            try {
+                let moduleInfoData = getModuleInfo(current.module_id);
+                if (moduleInfoData) {
+                    const targetHook = hooks[hookCache.hookIndex];
+                    // Give initial items a layoutId so they can be reordered safely
+                    targetHook.modules.push({ 
+                        ...moduleInfoData, 
+                        layoutId: `hcms_init_${current.module_id}_${Math.random().toString(36).substr(2, 5)}` 
+                    });
+                }
+            } catch (e) {
+                console.error("@populateModules: " + e.message);
+                showError("@populateModules: " + e.message);
+            }
+        }
+    } else {
+        Toast.show(instance.proxy, "There is no module added for this category. Drag from the right panel to the left boxes. ", 5000);
+    }
+};
+
+const highlightEagerDrop = (addRemove = "add") => {
+    const js_hook_modules = document.querySelectorAll(".js_hook_modules");
+    const dashboard = document.querySelector(".homepage-modules");
+    
+    if (dashboard) {
+        dashboard.classList[addRemove]("is-dragging-active");
+    }
+
+    js_hook_modules.forEach(current => {
+        current.classList[addRemove]("module-drop-eager");
+    });
+};
+
+const enableDragging = () => {
+    if (!canEdit.value) return false;
+    let draggableModules = document.getElementById("draggableModules");
+    if (!draggableModules) return;
+
+    if (draggableInstance.value) draggableInstance.value.destroy();
+
+    draggableInstance.value = HcmsSortable.create(draggableModules, {
+        draggable: ".js_item",
+        onStart: () => highlightEagerDrop("add"),
+        onEnd: () => {
+            highlightEagerDrop("remove");
+        },
+        onAdd: (evt) => {
+            // Dragging FROM a hook BACK to the pool
+            const moduleId = evt.item.getAttribute("data-module-id");
+            const layoutId = evt.item.getAttribute("data-layout-id");
+            moveModuleState(moduleId, null, null, false, layoutId); 
+            enableDisableSave(true);
+        }
+    });
+};
+
+const moveModuleState = (moduleId, targetHookId, nextLayoutId = null, isCopy = false, existingLayoutId = null) => {
+    let moduleInfo = getModuleInfo(moduleId);
+    if (!moduleInfo) return;
+
+    // Use existing layoutId if moving, otherwise generate new one if adding from pool
+    const lid = existingLayoutId || `hcms_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const newInstance = { ...moduleInfo, layoutId: lid };
+
+    // 1. Remove from its current location using layoutId if it's a move (not a copy)
+    if (!isCopy) {
+        hooks.forEach(h => {
+            const idx = h.modules.findIndex(m => m.layoutId === lid);
+            if (idx !== -1) h.modules.splice(idx, 1);
+        });
+    }
+
+    // 2. If targetHookId is null, we just wanted to remove it
+    if (targetHookId === null) return;
+
+    // 3. Find target hook
+    const hookCache = getHookInfoCache(targetHookId);
+    if (!hookCache) return;
+    const targetHook = hooks[hookCache.hookIndex];
+
+    // 4. Prevent duplicates within the SAME hook
+    //    Check by module_id (not layoutId) so the same component can't appear twice in one hook
+    const alreadyInHook = targetHook.modules.some(m => m.id.toString() === moduleId.toString());
+    if (alreadyInHook) {
+        Toast.show(instance.proxy, `"${moduleInfo.name}" is already in this hook.`);
+        return;
+    }
+
+    // 5. Find insertion index using nextLayoutId
+    let targetIndex = targetHook.modules.length;
+    if (nextLayoutId) {
+        const foundIndex = targetHook.modules.findIndex(m => m.layoutId === nextLayoutId);
+        if (foundIndex !== -1) targetIndex = foundIndex;
+    }
+
+    // 6. Insert at new position
+    targetHook.modules.splice(targetIndex, 0, newInstance);
+};
+
+
+const removeModules = (idOrWhere, byType = "module_id", hookId = null) => {
+    let $this = instance.proxy;
+    let where;
+    let layoutId = null;
+
+    if (Object.prototype.toString.call(idOrWhere) === "[object Object]") {
+        where = idOrWhere;
+    } else {
+        where = getWhere();
+        const isLayoutId = typeof idOrWhere === 'string' && idOrWhere.startsWith('hcms_');
+        where[byType] = isLayoutId ? idOrWhere : parseInt(idOrWhere);
+    }
+
+    if (hookId !== null) {
+        where["hook_id"] = parseInt(hookId);
+        let hookCache = getHookInfoCache(hookId);
+        
+        // If sorting via custom engine, we might have a specific layout item to remove
+        if (typeof idOrWhere === 'string' && idOrWhere.startsWith('hcms_')) {
+            layoutId = idOrWhere;
+        }
+
+        if (hooks[hookCache.hookIndex]) {
+            const modules = hooks[hookCache.hookIndex].modules;
+            const idx = layoutId ? modules.findIndex(m => m.layoutId === layoutId) : modules.findIndex(m => m.id.toString() === idOrWhere.toString());
+            if (idx !== -1) modules.splice(idx, 1);
+        }
+    }
+    enableDisableSave(true);
+};
+
+const enableSorting = () => {
+    if (!canEdit.value) return false;
+    nextTick(() => {
+        let lists = document.querySelectorAll(".js_hook_modules");
+        lists.forEach(current => {
+            const hookId = current.getAttribute("data-hook-id");
+            
+            if (sortableInstances.has(hookId)) {
+                sortableInstances.get(hookId).destroy();
+            }
+
+            const s = HcmsSortable.create(current, {
+                draggable: ".js_item",
+                filter: ".js_delete",
+                onFilter: (evt) => {
+                    // Delete button clicked — use layoutId for precision targeting
+                    const item = evt.item;
+                    const layoutId = item.getAttribute("data-layout-id");
+                    const moduleId = item.getAttribute("data-module-id");
+                    // Use layoutId if available (for unique instance targeting), else fall back to moduleId
+                    removeModules(layoutId || moduleId, "module_id", hookId);
+                },
+                onAdd: (evt) => {
+                    // Drop from pool (copy) or from another hook (move)
+                    const moduleId = evt.item.getAttribute("data-module-id");
+                    const isFromPool = evt.from && evt.from.id === "draggableModules";
+                    moveModuleState(moduleId, hookId, evt.nextLayoutId, isFromPool, evt.layoutId);
+                    enableDisableSave(true);
+                },
+                onUpdate: (evt) => {
+                    // Reorder within the same hook
+                    const moduleId = evt.item.getAttribute("data-module-id");
+                    moveModuleState(moduleId, hookId, evt.nextLayoutId, false, evt.layoutId);
+                    enableDisableSave(true);
+                },
+            });
+            sortableInstances.set(hookId, s);
+        });
+        enableDragging();
+    });
+};
+
+const setDefaultFromTo = () => {
+    if (allSites.value.length > 0) {
+        fromData.site_id = allSites.value[0].id;
+        toData.site_id = siteId.value;
+    } else {
+        fromData.site_id = siteId.value;
+        toData.site_id = siteId.value;
+    }
+    fromData.platform_id = platformId.value;
+    toData.platform_id = platformId.value;
+    toData.category_id = categoryId.value;
+};
+
+const makeCategories = () => {
+    let totalSites = allSites.value.length;
+    if (totalSites > 0) {
+        for (let i = 0; i < totalSites; i++) {
+            let current = allSites.value[i];
+            categoriesData[current.id] = current.category;
+        }
+    }
+    setDefaultFromTo();
+};
+
+const init = () => {
+    if (categories.value.length === 0) addErrorMessage("No category found!");
+    if (categoryInfo.value.length === 0) addErrorMessage("There is a mismatch in site default category. Please fix that.");
+    if (hasTheme.value) {
+        parseTheme();
+        populateModules();
+        enableSorting();
+        makeCategories();
+    } else {
+        let path = AdminConfig.admin_path("category/settings", { platform_id: platformId.value });
+        addErrorMessage(`This category/platform/theme is not available in category_site table.
+                         You need to drag and drop in <a href='${path}'>category settings</a>.`);
+        addErrorMessage(`Dont' forget the set the theme there.`);
+    }
+};
+
+const saveModules = () => {
+    if (enableDisableSave() === false) return false;
+    let postParams = {};
+    
+    // Use synced reactive state for final module order (reliable Source of Truth)
+    let datas = [];
+    hooks.forEach(hook => {
+        if (hook.modules && hook.modules.length > 0) {
+            let modulesArr = hook.modules.map((m, index) => {
+                return { module_id: m.id, position: index + 1 };
+            });
+            datas.push({ hook_id: hook.info.id, modules: modulesArr });
+        }
+    });
+
+    if (datas.length > 0) {
+        postParams.data = datas;
+        postParams.where = getWhere();
+        postParams.applicableForAllPlatforms = false;
+        saveNow(AdminConfig.admin_path("homepage/saveSettings"), postParams)
+            .then(() => {
+                Toast.show(instance.proxy, "Saved...");
+                enableDisableSave(false);
+            })
+            .catch(res => showError(res));
+    }
+};
+
+const fetchNewData = () => {
+    let where = getWhere();
+    delete where.site_id;
+    if (where.microsite_id === 0) delete where.microsite_id;
+    window.location.href = AdminConfig.admin_path("homepage/ui", where);
+};
+
+const deleteAllModuleFromHook = (hookId) => {
+    let hookCache = getHookInfoCache(hookId);
+    if (hooks[hookCache.hookIndex]) hooks[hookCache.hookIndex].modules = [];
+    removeModules(hookId, "hook_id");
+};
+
+const showHideDeleteAlert = (isShow) => {
+    if (isShow) Modal.open(instance.proxy, "deleteBox");
+    else Modal.close(instance.proxy, "deleteBox");
+};
+
+const deleteAllFromCategory = () => {
+    showHideDeleteAlert(false);
+    hooks.forEach(h => h.modules = []);
+    removeModules(categoryId.value, "category_id");
+};
+
+const showHideCopyAlert = (isShow = true) => {
+    if (isShow) {
+        setDefaultFromTo();
+        Modal.open(instance.proxy, "copyBox");
+    } else {
+        Modal.close(instance.proxy, "copyBox");
+    }
+};
+
+const copyDataFromCategory = () => {
+    isWorking.value = true;
+    let data = { fromData, toData };
+    saveNow(AdminConfig.admin_path("homepage/copyData"), data)
+        .then(res => {
+            if (res.data.error) showError(res.data.message);
+            else if (res.data.success) {
+                showHideCopyAlert(false);
+                Toast.show(instance.proxy, "Copied. Reloading...");
+                window.location.reload();
+            }
+            isWorking.value = false;
+        })
+        .catch(res => {
+            showHideCopyAlert(false);
+            isWorking.value = false;
+            showError(res);
+        });
+};
+
+const showInfo = (type, id) => infoPopup.value?.showInfo(type, id);
+
+const showHideHookPanel = (id) => {
+    const key = id.toString();
+    if (collapsedHooks.has(key)) {
+        collapsedHooks.delete(key);
+    } else {
+        collapsedHooks.add(key);
+    }
+};
+
+const onlyMe = (id) => {
+    const isExpanding = onlyMeHookId.value !== id;
+    onlyMeHookId.value = isExpanding ? id : null;
+    // Always ensure the hook is open when entering expand mode
+    if (isExpanding) {
+        collapsedHooks.delete(id.toString());
+    }
+};
+
+const hasAnyModulesInAHook = (hook) => hook.modules && hook.modules.length > 0;
+
+onMounted(() => init());
 </script>
+
+<style scoped>
+.is-dragging-active .js_delete_from_hook,
+.is-dragging-active .js_delete {
+    pointer-events: none !important;
+    opacity: 0.3;
+}
+.module-drop-eager {
+    outline: 2px dashed #6366f1 !important;
+    outline-offset: -2px;
+    background-color: rgba(99, 102, 241, 0.03);
+}
+</style>

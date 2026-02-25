@@ -62,97 +62,77 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
-export default {
-  mounted() {},
-  props: [
-    "dataList",
-    "dataControllerName",
-    "dataModulesAllowed",
-    "dataIsAdmin",
-    "dataHashtagcmsVersion",
-  ],
-  data() {
-    return {
-      allData: SafeJsonParse(this.dataList, []),
-      modulesAllowed: SafeJsonParse(this.dataModulesAllowed, []),
-    };
-  },
-  computed: {
-    linkForHashtag() {
-      return `https://www.hashtagcms.org/?utm_src=${window.location.href}`;
-    },
-  },
-  methods: {
-    getIconLabel(data) {
-      return data.icon_css === "" || !data.icon_css
-        ? data.controller_name.charAt(0).toUpperCase()
-        : "";
-    },
-    getIconCss(data) {
-      return data.icon_css === "" || !data.icon_css
-        ? "badge badge-info text-small"
-        : data.icon_css;
-    },
-    hasChild(data) {
-      return data.child.length > 0;
-    },
-    getActiveCss(controller_name, data) {
-      return this.isActive(controller_name, data) ? "active" : "";
-    },
-    isActive(controller_name, data) {
-      if (this.dataControllerName === controller_name) {
-        return true;
-      }
 
-      if (data && data.child && data.child.length > 0) {
-        let controllerName = this.dataControllerName;
-        return data.child.find(function (c) {
-          return c.controller_name === controllerName;
-        });
-      }
-    },
-    getHref(data) {
-      return AdminConfig.admin_path(data.controller_name);
-    },
-    hideAll() {
-      let $this = this;
-      document
-        .querySelectorAll(".js_left_menu .js_child")
-        .forEach(function (ele) {
-          ele.classList.remove("active", "animated", "fadeIn");
-        });
-    },
-    showHide(event) {
-      this.hideAll();
-      let ele = event.target;
-      if (ele.classList.contains("js_more")) {
-        event.preventDefault();
-        //ele.nextSibling.style.display = "block";
-        ele.parentElement.nextElementSibling.classList.add(
-          "active",
-          "animated",
-          "fadeIn",
-        );
-      }
-    },
-    hasAccess(module_id) {
-      if (this.dataIsAdmin.toString() === "1") {
-        return true;
-      }
-      for (let i = 0; i < this.modulesAllowed.length; i++) {
-        let current = this.modulesAllowed[i];
-        if (current.module_id === module_id) {
-          return true;
-        }
-      }
-      return false;
-    },
-    getMinHeight() {
-      return `height:${window.innerHeight}px;`;
-    },
-  },
+const props = defineProps([
+  "dataList",
+  "dataControllerName",
+  "dataModulesAllowed",
+  "dataIsAdmin",
+  "dataHashtagcmsVersion",
+]);
+
+// State
+const allData = ref(SafeJsonParse(props.dataList, []));
+const modulesAllowed = ref(SafeJsonParse(props.dataModulesAllowed, []));
+
+// Computed
+const linkForHashtag = computed(
+  () => `https://www.hashtagcms.org/?utm_src=${encodeURIComponent(window.location.href)}`
+);
+
+// Methods
+const getIconLabel = (data) =>
+  data.icon_css === "" || !data.icon_css ? data.controller_name.charAt(0).toUpperCase() : "";
+
+const getIconCss = (data) =>
+  data.icon_css === "" || !data.icon_css ? "badge badge-info text-small" : data.icon_css;
+
+const hasChild = (data) => data.child && data.child.length > 0;
+
+const isActive = (controller_name, data) => {
+  if (props.dataControllerName === controller_name) {
+    return true;
+  }
+  if (data && data.child && data.child.length > 0) {
+    const activeController = props.dataControllerName;
+    return data.child.some((c) => c.controller_name === activeController);
+  }
+  return false;
 };
+
+const getActiveCss = (controller_name, data) => (isActive(controller_name, data) ? "active" : "");
+
+const getHref = (data) => AdminConfig.admin_path(data.controller_name);
+
+const hideAll = () => {
+  document.querySelectorAll(".js_left_menu .js_child").forEach((ele) => {
+    ele.classList.remove("active", "animated", "fadeIn");
+  });
+};
+
+const showHide = (event) => {
+  hideAll();
+  const ele = event.target;
+  if (ele.classList.contains("js_more")) {
+    event.preventDefault();
+    const childUl = ele.parentElement.nextElementSibling;
+    if (childUl) {
+      childUl.classList.add("active", "animated", "fadeIn");
+    }
+  }
+};
+
+const hasAccess = (module_id) => {
+  if (props.dataIsAdmin.toString() === "1") {
+    return true;
+  }
+  return modulesAllowed.value.some((current) => current.module_id === module_id);
+};
+
+const getMinHeight = () => `height:${window.innerHeight}px;`;
 </script>
+

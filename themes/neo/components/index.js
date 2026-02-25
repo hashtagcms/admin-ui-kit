@@ -24,8 +24,8 @@ import PlatformButton from "./platform-button.vue";
 import SearchBar from "./search-bar.vue";
 import SiteButton from "./site-button.vue";
 import SiteCloner from "./site-cloner.vue";
-import SitewiseCopier from "./sitewise-copier.vue";
-import SitewiseData from "./sitewise-data.vue";
+import SiteWiseCopier from "./sitewise-copier.vue";
+import SiteWiseData from "./sitewise-data.vue";
 import Sorter from "./sorter.vue";
 import TabularView from "./tabular-view.vue";
 import TabView from "./tab-view.vue";
@@ -67,8 +67,8 @@ export {
     SearchBar,
     SiteButton,
     SiteCloner,
-    SitewiseCopier,
-    SitewiseData,
+    SiteWiseCopier,
+    SiteWiseData,
     Sorter,
     TabularView,
     TabView,
@@ -122,8 +122,8 @@ const HashtagCmsAdminUI = {
     SearchBar,
     SiteButton,
     SiteCloner,
-    SitewiseCopier,
-    SitewiseData,
+    SiteWiseCopier,
+    SiteWiseData,
     Sorter,
     TabularView,
     TabView,

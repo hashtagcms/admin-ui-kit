@@ -60,80 +60,75 @@
   </form>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, onMounted } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  mounted() {
-    this.init();
-  },
-  props: [
-    "dataSelectedParams",
-    "dataControllerName",
-    "dataFields",
-    "dataActionFields",
-  ],
-  data() {
-    return {
-      searchParams: { q: "", f: "id", o: "=" },
-      actionUrl: AdminConfig.admin_path(this.dataControllerName + "/search"),
-      searchFields: SafeJsonParse(this.dataFields, []),
-      operators: ["=", "!=", ">", "<", ">=", "<=", "like%", "%like%"],
-      hasAction: SafeJsonParse(this.dataActionFields, []).length > 0,
-      defaultSearchParams: { q: "", f: "id", o: "=" },
-      inputType: "text",
-    };
-  },
-  methods: {
-    searchNow() {
-      var url;
-      if (this.searchParams.q.trim() == "") {
-        url = AdminConfig.admin_path(this.dataControllerName);
-      } else {
-        var q = encodeURI(JSON.stringify(this.searchParams));
-        var sep = this.actionUrl.indexOf("?") == -1 ? "?" : "&";
-        url = this.actionUrl + sep + "q=" + q;
-      }
+const props = defineProps([
+  "dataSelectedParams",
+  "dataControllerName",
+  "dataFields",
+  "dataActionFields",
+]);
 
-      window.location.href = url;
+const defaultSearchParams = { q: "", f: "id", o: "=" };
 
-      return false;
-    },
-    resetForm() {
-      var url = AdminConfig.admin_path(this.dataControllerName);
-      //alert(url);
-      window.location.href = url;
-    },
-    getFieldName(key, prop) {
-      prop = prop ? prop : "label";
-      return typeof key == "string"
-        ? key
-        : key[prop] == undefined
-          ? key
-          : key[prop];
-    },
-    changeInputText() {
-      if (
-        this.searchParams.f.endsWith("_date") ||
-        this.searchParams.f.endsWith("_at")
-      ) {
-        this.inputType = "date";
-      } else {
-        this.inputType = "text";
-      }
-    },
-    init() {
-      if (this.hasAction) {
-        this.searchFields.pop();
-      }
+// State
+const searchParams = reactive({ q: "", f: "id", o: "=" });
+const actionUrl = ref(AdminConfig.admin_path(`${props.dataControllerName}/search`));
+const searchFields = ref(SafeJsonParse(props.dataFields, []));
+const operators = ["=", "!=", ">", "<", ">=", "<=", "like%", "%like%"];
+const hasAction = ref(SafeJsonParse(props.dataActionFields, []).length > 0);
+const inputType = ref("text");
 
-      this.searchParams = SafeJsonParse(this.dataSelectedParams, this.defaultSearchParams);
-
-      if (this.searchParams.f == undefined) {
-        this.searchParams = this.defaultSearchParams;
-      }
-    },
-  },
+// Methods
+const getFieldName = (key, prop = "label") => {
+  return typeof key === "string" ? key : key[prop] === undefined ? key : key[prop];
 };
+
+const changeInputText = () => {
+  if (searchParams.f.endsWith("_date") || searchParams.f.endsWith("_at")) {
+    inputType.value = "date";
+  } else {
+    inputType.value = "text";
+  }
+};
+
+const searchNow = () => {
+  let url;
+  if (searchParams.q.trim() === "") {
+    url = AdminConfig.admin_path(props.dataControllerName);
+  } else {
+    const q = encodeURI(JSON.stringify(searchParams));
+    const sep = actionUrl.value.indexOf("?") === -1 ? "?" : "&";
+    url = `${actionUrl.value}${sep}q=${q}`;
+  }
+  window.location.href = url;
+  return false;
+};
+
+const resetForm = () => {
+  const url = AdminConfig.admin_path(props.dataControllerName);
+  window.location.href = url;
+};
+
+const init = () => {
+  if (hasAction.value) {
+    searchFields.value.pop();
+  }
+
+  const selectedParams = SafeJsonParse(props.dataSelectedParams, defaultSearchParams);
+  if (selectedParams.f === undefined) {
+    Object.assign(searchParams, defaultSearchParams);
+  } else {
+    Object.assign(searchParams, selectedParams);
+  }
+  changeInputText();
+};
+
+onMounted(() => {
+  init();
+});
 </script>
+

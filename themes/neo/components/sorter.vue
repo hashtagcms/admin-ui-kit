@@ -27,161 +27,143 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, nextTick, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import Sortable from "sortablejs";
 import { Toast, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
-import Form from "../../../helpers/form";
 
-export default {
-  mounted() {
-    this.enableSorting();
-    console.log(this.controllerName);
-  },
+const props = defineProps(["dataAllModules", "dataControllerName"]);
 
-  props: ["dataAllModules", "dataControllerName"],
+const instance = getCurrentInstance();
 
-  data() {
-    return {
-      allData: SafeJsonParse(this.dataAllModules, []),
-      sortable: null,
-      sortingInterval: -1,
-      updateIndexUrl: AdminConfig.admin_path(
-        this.controllerName + "/updateIndex",
-      ),
-      lastTarget: "",
-    };
-  },
-  computed: {
-    controllerName() {
-      let cName =
-        typeof this.dataControllerName == "undefined"
-          ? ""
-          : this.dataControllerName.toLocaleLowerCase();
-      return cName.replace(/\s/g, "");
-    },
-  },
-  methods: {
-    hasChild(data) {
-      return data.child.length > 0;
-    },
-    hideAll() {
-      var $this = this;
-      document.querySelectorAll(".sortElem .parent").forEach(function (i) {
-        i.classList.remove("active");
-      });
-    },
-    showHide(event) {
-      let ele = event.target;
-      if (ele.parentElement.parentElement.parentElement != this.lastTarget) {
-        this.hideAll();
-        if (ele.classList.contains("js_more")) {
-          event.preventDefault();
-          ele.parentElement.parentElement.parentElement.classList.add(
-            "active",
-            "animated",
-            "fadeIn",
-          );
-        }
-        this.lastTarget = ele.parentElement.parentElement.parentElement;
-      } else {
-        if (
-          ele.parentElement.parentElement.parentElement.classList.contains(
-            "active",
-          )
-        ) {
-          ele.parentElement.parentElement.parentElement.classList.remove(
-            "active",
-          );
-        } else {
-          ele.parentElement.parentElement.parentElement.classList.add("active");
-        }
-      }
-    },
-    getActiveCss(controller_name, data) {
-      return this.isActive(controller_name, data) ? "active" : "";
-    },
-    isActive(controller_name, data) {
-      if (this.controllerName == controller_name) {
-        return true;
-      }
+// State
+const allData = ref(SafeJsonParse(props.dataAllModules, []));
+const sortable = ref(null);
+const sortingInterval = ref(-1);
+const lastTarget = ref("");
 
-      if (data && data.child && data.child.length > 0) {
-        var controllerName = this.controllerName;
-        return data.child.find(function (c) {
-          return c.controller_name == controllerName;
-        });
-      }
-    },
-    enableSorting() {
-      this.$nextTick(function () {
-        if (this.sortable != null) {
-          this.sortable.destroy();
-        }
-        var el = document.getElementById("sortableField");
-        this.sortable = Sortable.create(el, {
-          onEnd: this.sortingCallback,
-          onStart: this.cancelSortingCallback,
-        });
-      });
-    },
-    cancelSortingCallback() {
-      if (this.sortingInterval != -1) {
-        clearInterval(this.sortingInterval);
-      }
-    },
-    sortingCallback(evt) {
-      var text = "";
-      var $this = this;
-      var data = [];
-      // console.log(evt);
-      document
-        .querySelectorAll(".sortElem .parent")
-        .forEach(function (i, index) {
-          var text = i.children[0].children[0].innerText;
-          var indx = index;
-          for (var a = 0; a < $this.allData.length; a++) {
-            if (
-              $this.allData[a].module_pid == 0 &&
-              $this.allData[a].name == text
-            ) {
-              data[a] = {};
-              data[a].id = $this.allData[a].id;
-              data[a].position = index;
-              data[a].name = $this.allData[a].name;
-            }
-          }
-        });
-      // console.log(data);
-      this.updateIndex(data);
-      this.cancelSortingCallback();
-    },
-    submit(requestType, url, data) {
-      return new Promise((resolve, reject) => {
-        axios[requestType](url, data)
-          .then((response) => {
-            this.onSuccess(response);
-          })
-          .catch((error) => {
-            this.onFailure(SafeErrorData(error));
-          });
-      });
-    },
-    updateIndex(data) {
-      this.submit("post", this.updateIndexUrl, data)
-        .then((response) => this.onSuccess(response))
-        .catch((response) => this.onFailure(response));
-    },
-    onSuccess(res) {
-      Toast.show(this, "Modules Sorted.");
-    },
-    onFailure(res) {
-      console.log(res);
-    },
-  },
+// Computed
+const controllerName = computed(() => {
+  const cName = typeof props.dataControllerName === "undefined" ? "" : props.dataControllerName.toLocaleLowerCase();
+  return cName.replace(/\s/g, "");
+});
+
+const updateIndexUrl = computed(() => AdminConfig.admin_path(`${controllerName.value}/updateIndex`));
+
+// Methods
+const hasChild = (data) => data.child && data.child.length > 0;
+
+const hideAll = () => {
+  document.querySelectorAll(".sortElem .parent").forEach((i) => {
+    i.classList.remove("active");
+  });
 };
+
+const showHide = (event) => {
+  const ele = event.target;
+  const parentParentParent = ele.parentElement?.parentElement?.parentElement;
+  if (parentParentParent !== lastTarget.value) {
+    hideAll();
+    if (ele.classList.contains("js_more")) {
+      event.preventDefault();
+      if (parentParentParent) {
+        parentParentParent.classList.add("active", "animated", "fadeIn");
+      }
+    }
+    lastTarget.value = parentParentParent;
+  } else {
+    if (parentParentParent) {
+      if (parentParentParent.classList.contains("active")) {
+        parentParentParent.classList.remove("active");
+      } else {
+        parentParentParent.classList.add("active");
+      }
+    }
+  }
+};
+
+const isActive = (c_name, data) => {
+  if (controllerName.value === c_name) {
+    return true;
+  }
+  if (data && data.child && data.child.length > 0) {
+    const currentControllerName = controllerName.value;
+    return data.child.find((c) => c.controller_name === currentControllerName);
+  }
+  return false;
+};
+
+const cancelSortingCallback = () => {
+  if (sortingInterval.value !== -1) {
+    clearInterval(sortingInterval.value);
+  }
+};
+
+const onSuccess = (res) => {
+  Toast.show(instance, "Modules Sorted.");
+};
+
+const onFailure = (res) => {
+  console.log(res);
+};
+
+const submit = (requestType, url, data) => {
+  return new Promise((resolve, reject) => {
+    axios[requestType](url, data)
+      .then((response) => {
+        onSuccess(response);
+        resolve(response);
+      })
+      .catch((error) => {
+        onFailure(SafeErrorData(error));
+        reject(error);
+      });
+  });
+};
+
+const updateIndex = (data) => {
+  submit("post", updateIndexUrl.value, data);
+};
+
+const sortingCallback = (evt) => {
+  const data = [];
+  document.querySelectorAll(".sortElem .parent").forEach((i, index) => {
+    const text = i.children[0].children[0].innerText;
+    for (let a = 0; a < allData.value.length; a++) {
+      if (allData.value[a].module_pid === 0 && allData.value[a].name === text) {
+        data[a] = {
+          id: allData.value[a].id,
+          position: index,
+          name: allData.value[a].name,
+        };
+      }
+    }
+  });
+  updateIndex(data);
+  cancelSortingCallback();
+};
+
+const enableSorting = () => {
+  nextTick(() => {
+    if (sortable.value != null) {
+      sortable.value.destroy();
+    }
+    const el = document.getElementById("sortableField");
+    if (el) {
+      sortable.value = Sortable.create(el, {
+        onEnd: sortingCallback,
+        onStart: cancelSortingCallback,
+      });
+    }
+  });
+};
+
+onMounted(() => {
+  enableSorting();
+});
 </script>
+
 
 <style>
 .sortElem {

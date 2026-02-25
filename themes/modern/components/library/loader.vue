@@ -31,39 +31,46 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ["dataLoadingText", "dataAsModal"],
-  mounted() {
-    this.fixLayout();
-  },
-  data() {
-    return {
-      loadingText:
-        typeof this.dataLoadingText === "undefined"
-          ? "Loading. Please wait..."
-          : this.dataLoadingText,
-      asModal:
-        typeof dataAsModal === "undefined" || dataAsModal === true
-          ? true
-          : false,
-      visible: false,
-    };
-  },
-  methods: {
-    fixLayout(position = null) {
-        // Tailwind handles layout automatically via fixed inset-0
-    },
-    show(message = null, position = null) {
-      this.visible = true;
+<script setup>
+import { ref, onMounted } from "vue";
 
-      if (typeof message == "string") {
-        this.loadingText = message;
-      }
-    },
-    hide() {
-      this.visible = false;
-    },
-  },
+const props = defineProps(["dataLoadingText", "dataAsModal"]);
+
+const loadingText = ref(
+    typeof props.dataLoadingText === "undefined"
+        ? "Loading. Please wait..."
+        : props.dataLoadingText
+);
+
+const asModal = ref(
+    typeof props.dataAsModal === "undefined" || props.dataAsModal === true
+);
+
+const visible = ref(false);
+
+const fixLayout = (position = null) => {
+    // Tailwind handles layout automatically via fixed inset-0
 };
+
+onMounted(() => {
+    fixLayout();
+});
+
+const show = (message = null, position = null) => {
+    visible.value = true;
+
+    if (typeof message == "string") {
+        loadingText.value = message;
+    }
+};
+
+const hide = () => {
+    visible.value = false;
+};
+
+defineExpose({
+    show,
+    hide
+});
 </script>
+

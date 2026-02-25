@@ -28,6 +28,8 @@ export default defineConfig({
         ...THEME_ALIASES,
         '@hashtagcms/helpers': path.resolve(__dirname, 'helpers'),
         'bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
+        '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
+
     }
   },
   css: {

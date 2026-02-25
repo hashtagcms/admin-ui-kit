@@ -1,9 +1,9 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SitewiseData from '@hashtagcms/theme/modern/components/sitewise-data.vue';
+import SiteWiseData from '@hashtagcms/theme/modern/components/sitewise-data.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
-describe('Modern: SitewiseData.vue', () => {
+describe('Modern: SiteWiseData.vue', () => {
 
   const dataProps = loadFakeData('site-wise.txt');
 
@@ -16,7 +16,7 @@ describe('Modern: SitewiseData.vue', () => {
         dataSiteId: '1'
     };
 
-    const wrapper = shallowMount(SitewiseData, { props: finalProps });
+    const wrapper = shallowMount(SiteWiseData, { props: finalProps });
 
     // Header styling
     const headers = wrapper.findAll('h3');
@@ -45,7 +45,7 @@ describe('Modern: SitewiseData.vue', () => {
         dataCurrentKey: 'test',
         dataSiteId: '1'
     };
-    const wrapper = shallowMount(SitewiseData, { props: finalProps });
+    const wrapper = shallowMount(SiteWiseData, { props: finalProps });
     
     // Search input should now be visible
     const searchInput = wrapper.find('input[placeholder="Filter available..."]');

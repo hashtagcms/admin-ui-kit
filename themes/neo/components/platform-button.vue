@@ -5,7 +5,7 @@
       :id="id"
       @change="setPlatform"
       v-model="selected"
-      :multiple="dataMultiple == 'true' ? multiple : false"
+      :multiple="dataMultiple == 'true' ? true : false"
     >
       <option value="">Select Platform</option>
       <option v-for="platform in platforms" :value="platform.id">
@@ -16,99 +16,85 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import axios from "axios";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
-import SplitButton from "./library/split-button.vue";
 import { EventBus } from "../../../helpers/event-bus";
 
-export default {
-  components: {
-    "split-button": SplitButton,
-  },
-  props: [
-    "dataName",
-    "dataId",
-    "dataPlatforms",
-    "dataSelected",
-    "dataMultiple",
-    "dataSiteId",
-    "dataFetchOnInit",
-  ],
-  mounted() {
-    if (this.fetchOnInit !== false) {
-      this.init();
-    }
+const props = defineProps([
+  "dataName",
+  "dataId",
+  "dataPlatforms",
+  "dataSelected",
+  "dataMultiple",
+  "dataSiteId",
+  "dataFetchOnInit",
+]);
 
-    console.log("selected ", this.selected);
-
-    EventBus.$on("site_changed", this.populatePlatform);
-  },
-  computed: {
-    selected: {
-      get() {
-        //if this is not multiple
-        if (
-          typeof this.dataMultiple === "undefined" ||
-          this.dataMultiple !== "true"
-        ) {
-          return typeof this.dataSelected === "undefined"
-            ? 1
-            : parseInt(this.dataSelected);
-        }
-        //this is multiple
-        return SafeJsonParse(this.dataSelected, [1]);
-      },
-      set(newValue) {
-        return newValue;
-      },
-    },
-  },
-  data() {
-    return {
-      platforms: SafeJsonParse(this.dataPlatforms, []),
-      name:
-        typeof this.dataName === "undefined" ? "platform_id" : this.dataName,
-      id: typeof this.dataId === "undefined" ? "platform_id" : this.dataId,
-      multiple:
-        typeof this.dataMultiple === "undefined" ? "" : "multiple='multiple'",
-      siteId:
-        typeof this.dataSiteId === "undefined" ? 1 : parseInt(this.dataSiteId),
-      fetchOnInit:
-        typeof this.dataFetchOnInit === "undefined" ||
-        this.dataFetchOnInit === "false"
-          ? false
-          : this.dataFetchOnInit,
-      isLoading: false,
-      selectedValue: this.selected,
-    };
-  },
-  methods: {
-    init() {
-      this.populatePlatform(this.siteId);
-    },
-    setPlatform() {
-      EventBus.$emit("platform_changed", this.selected);
-    },
-    populatePlatform(siteId = null) {
-      if (siteId === null || siteId === "") {
-        this.platforms = [];
-        return false;
-      }
-      this.isLoading = true;
-
-      let $this = this;
-      let platformUrl = AdminConfig.admin_path("ajax/getInfo/site/" + siteId);
-      axios
-        .get(platformUrl)
-        .then(function (res) {
-          $this.platforms = res.data.results.platform;
-          $this.isLoading = false;
-        })
-        .catch(function (res) {
-          console.error(res.data);
-        });
-    },
-  },
+// Helpers
+const getInitialSelected = () => {
+  if (typeof props.dataMultiple === "undefined" || props.dataMultiple !== "true") {
+    return typeof props.dataSelected === "undefined" ? 1 : parseInt(props.dataSelected);
+  }
+  return SafeJsonParse(props.dataSelected, [1]);
 };
+
+// State
+const platforms = ref(SafeJsonParse(props.dataPlatforms, []));
+const name = ref(typeof props.dataName === "undefined" ? "platform_id" : props.dataName);
+const id = ref(typeof props.dataId === "undefined" ? "platform_id" : props.dataId);
+const isMultiple = computed(() => props.dataMultiple === "true");
+const siteId = ref(typeof props.dataSiteId === "undefined" ? 1 : parseInt(props.dataSiteId));
+const fetchOnInit = ref(
+  typeof props.dataFetchOnInit === "undefined" || props.dataFetchOnInit === "false"
+    ? false
+    : props.dataFetchOnInit
+);
+const isLoading = ref(false);
+const selected = ref(getInitialSelected());
+
+// Methods
+const populatePlatform = (sId = null) => {
+  if (sId === null || sId === "") {
+    platforms.value = [];
+    return false;
+  }
+  isLoading.value = true;
+
+  const platformUrl = AdminConfig.admin_path(`ajax/getInfo/site/${sId}`);
+  axios
+    .get(platformUrl)
+    .then((res) => {
+      platforms.value = res.data.results.platform;
+    })
+    .catch((err) => {
+      console.error(err.response?.data || err.message);
+    })
+    .finally(() => {
+      isLoading.value = false;
+    });
+};
+
+const setPlatform = () => {
+  EventBus.emit("platform_changed", selected.value);
+};
+
+const init = () => {
+  populatePlatform(siteId.value);
+};
+
+// Lifecycle
+onMounted(() => {
+  if (fetchOnInit.value !== false) {
+    init();
+  }
+  EventBus.on("site_changed", populatePlatform);
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("site_changed", populatePlatform);
+});
 </script>
+

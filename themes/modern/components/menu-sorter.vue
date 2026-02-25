@@ -16,7 +16,7 @@
         ></split-button>
     </div>
 
-    <ul class="divide-y divide-gray-50 bg-white shadow-lg rounded-lg border border-gray-100 overflow-hidden js_sortable">
+    <ul v-if="allData.length > 0" class="divide-y divide-gray-50 bg-white shadow-lg rounded-lg border border-gray-100 overflow-hidden js_sortable">
       <template v-for="(item, index) in allData" :key="getId(item)">
         <li
           data-is-parent="true"
@@ -58,6 +58,16 @@
       </template>
     </ul>
 
+    <div v-else class="bg-amber-50 border border-amber-100 text-amber-700 px-8 py-6 rounded-xl flex items-center gap-4 shadow-sm animate-fadeIn">
+        <div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-500 shrink-0">
+            <i class="fa fa-exclamation-circle text-lg"></i>
+        </div>
+        <div class="flex flex-col gap-1">
+            <span class="text-sm font-black uppercase tracking-widest">Nothing to sort</span>
+            <span class="text-xs font-bold opacity-70">There are no records found to arrange in this group.</span>
+        </div>
+    </div>
+
     <div class="flex justify-center pt-6" v-if="allData.length > 1">
       <button
         type="button"
@@ -70,205 +80,170 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, nextTick, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import Sortable from "sortablejs";
 import { Toast, Loader, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
-
 import SplitButton from "./library/split-button.vue";
 
-export default {
-  components: {
-    "split-button": SplitButton,
-  },
+const props = defineProps([
+  "dataAllData",
+  "dataFields",
+  "dataControllerName",
+  "dataControllerChildName",
+  "dataGroups",
+  "dataGroupName",
+  "dataShowGroups",
+]);
 
-  mounted() {
-    this.enableSorting();
-    //console.log(this.controllerName);
-    //console.log(this.allData);
-  },
+const instance = getCurrentInstance();
 
-  props: [
-    "dataAllData",
-    "dataFields",
-    "dataControllerName",
-    "dataControllerChildName",
-    "dataGroups",
-    "dataGroupName",
-    "dataShowGroups",
-  ],
+// State
+const allData = ref(SafeJsonParse(props.dataAllData, []));
+const groups = ref(SafeJsonParse(props.dataGroups, []));
+const groupName = ref(props.dataGroupName && props.dataGroupName !== "" ? props.dataGroupName : "");
+const showGroups = ref(!!(props.dataShowGroups && props.dataShowGroups === "true"));
 
-  data() {
-    return {
-      allData: SafeJsonParse(this.dataAllData, []),
-      groups: SafeJsonParse(this.dataGroups, []),
-      groupName:
-        this.dataGroupName && this.dataGroupName !== ""
-          ? this.dataGroupName
-          : "",
-      showGroups: !!(this.dataShowGroups && this.dataShowGroups === "true"),
+// Computed
+const fields = computed(() => {
+  let fConfig = SafeJsonParse(props.dataFields, null);
+  if (fConfig === null) {
+    fConfig = {
+      id: "id",
+      label: "name",
+      isImage: false,
     };
-  },
-  computed: {
-    fields() {
-      let fields = SafeJsonParse(this.dataFields, null);
-      if (fields === null) {
-        fields = {};
-        fields.id = "id";
-        fields.label = "name";
-        fields.isImage = false;
-      }
-      return fields;
-    },
-    controllerName() {
-      let cName =
-        typeof this.dataControllerName == "undefined"
-          ? ""
-          : this.dataControllerName.toLowerCase();
-      return cName.replace(/\s/g, "");
-    },
-    controlerChildName() {
-      let cName =
-        typeof this.dataControllerChildName == "undefined"
-          ? ""
-          : this.dataControllerChildName.toLowerCase();
-      return cName.replace(/\s/g, "");
-    },
-    selectedIndex() {
-      let index = 0;
-      for (let i = 0; i < this.groups.length; i++) {
-        if (this.groups[i] === this.groupName) {
-          index = i;
-          break;
-        }
-      }
-      return index;
-    },
-  },
-  methods: {
-    isParent(data) {
-      return data.parent_id === 0 || !data.parent_id;
-    },
-    arrangeAgain(data) {
-      window.location.href = AdminConfig.admin_path(
-        this.controllerName + "/sort/" + data.value,
-      );
-    },
-    hasChild(data) {
-      return data.child && data.child.length > 0;
-    },
-    getName(data) {
-      //Added media support
-      if (this.fields.isImage === true) {
-        let path = data[this.fields.label]
-          ? AdminConfig.get_media(data[this.fields.label])
-          : AdminConfig.get_media(data.lang[this.fields.label]);
-        return `<a href='${path}' target='_blank'><img height='30' src='${path}' /></a>`;
-      } else {
-        return data[this.fields.label]
-          ? data[this.fields.label]
-          : data.lang[this.fields.label];
-      }
-    },
-    getId(data) {
-      return data[this.fields.id];
-    },
-    enableSorting() {
-      let $this = this;
-      this.$nextTick(function () {
-        let list = document.querySelectorAll(".js_sortable");
-        list.forEach(function (current) {
-          Sortable.create(current, {
-            animation: 500,
-            ghostClass: "text-danger",
-            onUpdate: function (/**Event*/ evt) {
-              //console.log("onUpdate ", evt.item);
-              //let item = evt.item;
-              //let isParent = (item.getAttribute("data-is-parent") === "true");
-              //$this.updateIndex(isParent);
-            },
-          });
-        });
-      });
-    },
-    submit(requestType, url, data, controllerName) {
-      Loader.show(this, "Please wait. Saving sorting data...");
-      return new Promise((resolve, reject) => {
-        axios[requestType](url, data)
-          .then((response) => {
-            this.onSuccess(response, controllerName);
-          })
-          .catch((error) => {
-            this.onFailure(SafeErrorData(error));
-          })
-          .finally(() => {
-            Loader.hide(this);
-          });
-      });
-    },
-    updateIndex(isParent = false) {
-      let items = document.querySelectorAll(".item");
-      let datas = [];
+  }
+  return fConfig;
+});
 
-      let controllerName = this.controllerName;
+const controllerName = computed(() => {
+  let cName = typeof props.dataControllerName === "undefined" ? "" : props.dataControllerName.toLowerCase();
+  return cName.replace(/\s/g, "");
+});
 
-      let saveAll = true;
+const controlerChildName = computed(() => {
+  let cName = typeof props.dataControllerChildName === "undefined" ? "" : props.dataControllerChildName.toLowerCase();
+  return cName.replace(/\s/g, "");
+});
 
-      if (this.controlerChildName !== "") {
-        saveAll = false;
-      }
+const selectedIndex = computed(() => {
+  let index = 0;
+  for (let i = 0; i < groups.value.length; i++) {
+    if (groups.value[i] === groupName.value) {
+      index = i;
+      break;
+    }
+  }
+  return index;
+});
 
-      controllerName =
-        isParent === true
-          ? this.controllerName
-          : this.controlerChildName !== ""
-            ? this.controlerChildName
-            : this.controllerName;
+// Methods
+const getId = (data) => data[fields.value.id];
 
-      let counter = 1;
-
-      console.log("saveAll " + saveAll);
-
-      items.forEach(function (current, index) {
-        if (saveAll === true) {
-          let id = current.getAttribute("data-id");
-          let position = counter;
-          datas.push({ position: position, where: { id: parseInt(id) } });
-          counter = counter + 1;
-        } else {
-          let isParentElement = current.getAttribute("data-is-parent");
-          let id = current.getAttribute("data-id");
-
-          if (isParent.toString() === isParentElement.toString()) {
-            let id = current.getAttribute("data-id");
-            let position = counter;
-            datas.push({ position: position, where: { id: parseInt(id) } });
-            counter = counter + 1;
-          }
-        }
-      });
-
-      let updateIndexUrl = AdminConfig.admin_path(
-        controllerName + "/updateIndex",
-      );
-
-      this.submit("post", updateIndexUrl, datas, controllerName);
-    },
-    onSuccess(res, controllerName) {
-      Toast.show(this, controllerName.toUpperCase() + " Sorted.");
-    },
-    onFailure(res) {
-      Toast.show(
-        this,
-        res?.statusText || "There is some error! Don't know the reason",
-        5000,
-      );
-      console.log(res);
-    },
-    setData(data) {
-      this.allData = data;
-    },
-  },
+const getName = (data) => {
+  if (fields.value.isImage === true) {
+    let path = data[fields.value.label]
+      ? AdminConfig.get_media(data[fields.value.label])
+      : AdminConfig.get_media(data.lang[fields.value.label]);
+    return `<a href='${path}' target='_blank'><img height='30' src='${path}' /></a>`;
+  } else {
+    return data[fields.value.label] ? data[fields.value.label] : data.lang[fields.value.label];
+  }
 };
+
+const isParent = (data) => data.parent_id === 0 || !data.parent_id;
+const hasChild = (data) => data.child && data.child.length > 0;
+
+const arrangeAgain = (data) => {
+  window.location.href = AdminConfig.admin_path(controllerName.value + "/sort/" + data.value);
+};
+
+const enableSorting = () => {
+  nextTick(() => {
+    let list = document.querySelectorAll(".js_sortable");
+    list.forEach((current) => {
+      Sortable.create(current, {
+        animation: 500,
+        ghostClass: "text-danger",
+        onUpdate: () => {
+          // Update logic if needed
+        },
+      });
+    });
+  });
+};
+
+const onSuccess = (res, cName) => {
+  Toast.show(instance.proxy, cName.toUpperCase() + " Sorted.");
+};
+
+const onFailure = (res) => {
+  Toast.show(
+    instance.proxy,
+    res?.statusText || "There is some error! Don't know the reason",
+    5000
+  );
+  console.log(res);
+};
+
+const submit = (requestType, url, data, cName) => {
+  Loader.show(instance.proxy, "Please wait. Saving sorting data...");
+  return new Promise((resolve, reject) => {
+    axios[requestType](url, data)
+      .then((response) => {
+        onSuccess(response, cName);
+        resolve(response);
+      })
+      .catch((error) => {
+        onFailure(SafeErrorData(error));
+        reject(error);
+      })
+      .finally(() => {
+        Loader.hide(instance.proxy);
+      });
+  });
+};
+
+const updateIndex = (isParentFlag = false) => {
+  // Keeping .item as per original but it might be a bug in original code
+  let items = document.querySelectorAll(".item");
+  let datas = [];
+  let nameToUse = isParentFlag === true
+    ? controllerName.value
+    : controlerChildName.value !== ""
+      ? controlerChildName.value
+      : controllerName.value;
+
+  let saveAll = controlerChildName.value === "";
+  let counter = 1;
+
+  items.forEach((current) => {
+    if (saveAll === true) {
+      let id = current.getAttribute("data-id");
+      datas.push({ position: counter, where: { id: parseInt(id) } });
+      counter++;
+    } else {
+      let isParentElement = current.getAttribute("data-is-parent");
+      let id = current.getAttribute("data-id");
+      if (isParentFlag.toString() === isParentElement.toString()) {
+        datas.push({ position: counter, where: { id: parseInt(id) } });
+        counter++;
+      }
+    }
+  });
+
+  let updateIndexUrl = AdminConfig.admin_path(nameToUse + "/updateIndex");
+  submit("post", updateIndexUrl, datas, nameToUse);
+};
+
+const setData = (data) => {
+  allData.value = data;
+};
+
+onMounted(() => {
+  enableSorting();
+});
 </script>
+

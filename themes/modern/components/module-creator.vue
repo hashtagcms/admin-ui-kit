@@ -16,7 +16,7 @@
       <div class="p-8 space-y-6">
           <!-- File Creation Toggle -->
           <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
-              <label class="flex items-center gap-3 cursor-pointer group">
+              <label class="flex items-center cursor-pointer group leading-none">
                 <div class="relative flex items-center">
                     <input
                       v-model="form.createFiles"
@@ -25,7 +25,7 @@
                       class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded-md focus:ring-blue-500 transition-all shadow-sm"
                     />
                 </div>
-                <div>
+                <div style="position: relative; top: -5px; left: 7px;">
                     <span class="text-sm font-bold text-gray-800 group-hover:text-blue-700 transition-colors">Generate Boilerplate Files</span>
                     <p class="text-[11px] text-gray-500 mt-0.5">Automates creation of Controller, Model, View, and Validator.</p>
                 </div>
@@ -33,7 +33,7 @@
           </div>
 
           <!-- Basic Info Section -->
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-6">
               <input v-model="form.display_name" type="hidden" />
               
               <div class="space-y-1.5">
@@ -50,7 +50,7 @@
                 <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.name">{{ errors.name }}</div>
               </div>
 
-               <div class="space-y-1.5">
+              <div class="space-y-1.5">
                 <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Sub Title</label>
                 <input
                   v-model="form.sub_title"
@@ -106,16 +106,13 @@
               </div>
 
               <div class="space-y-1.5">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">List View</label>
-                        <input v-model="form.list_view_name" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none block w-full px-3 py-2" placeholder="common/listing" />
-                    </div>
-                    <div class="space-y-1.5">
-                        <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Edit View</label>
-                        <input v-model="form.edit_view_name" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none block w-full px-3 py-2" placeholder="addedit" />
-                    </div>
-                </div>
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">List View</label>
+                <input v-model="form.list_view_name" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none block w-full px-3 py-2" placeholder="common/listing" />
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Edit View</label>
+                <input v-model="form.edit_view_name" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none block w-full px-3 py-2" placeholder="addedit" />
               </div>
           </div>
 
@@ -126,7 +123,7 @@
                   <h3 class="text-lg font-black text-gray-800">Master Data Configuration</h3>
               </div>
 
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div class="space-y-6">
                   <div class="space-y-1.5">
                     <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Main Table</label>
                     <select
@@ -190,9 +187,9 @@
                                       <option value="hasOne">hasOne</option>
                                     </select>
                                 </div>
-                                <label class="flex items-center gap-2 cursor-pointer mt-1">
+                                <label class="flex items-center cursor-pointer mt-1 leading-none">
                                     <input v-model="rModel.isLanguage" type="checkbox" class="w-3.5 h-3.5 text-blue-600 rounded border-gray-300" />
-                                    <span class="text-[10px] font-bold text-gray-500">I18n / Language?</span>
+                                    <span class="text-[10px] font-bold text-gray-500" :style="checkBoxAlignment">I18n / Language?</span>
                                 </label>
                             </div>
                         </div>
@@ -206,7 +203,7 @@
                     <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Select Fields to Include</h4>
                   </div>
                   
-                  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div class="space-y-4">
                       <!-- Main Table Fields -->
                       <div class="bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col h-[400px]">
                           <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-blue-50/20">
@@ -309,20 +306,26 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, nextTick, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import axios from "axios";
-
-import { Toast, SafeJsonParse } from "../../../helpers/common";
+import { Toast, SafeJsonParse, CheckBoxAlignment } from "../../../helpers/common";
 import Form from "../../../helpers/form";
 import Sortable from "sortablejs";
 import pluralize from "pluralize";
 
-class DbData {
-  static get data() {
-    return {};
-  }
+const props = defineProps([
+  "dataDatabaseTables",
+  "dataControllerName",
+  "dataBackUrl",
+  "dataCmsModules",
+]);
 
+const instance = getCurrentInstance();
+const checkBoxAlignment = CheckBoxAlignment;
+
+class DbData {
   static getFields(table) {
     return new Promise((resolve, reject) => {
       axios
@@ -330,312 +333,280 @@ class DbData {
         .then(function (res) {
           resolve(res);
         })
-        .catch(function () {
-          reject(this);
+        .catch(function (err) {
+          reject(err);
         });
     });
   }
 }
 
-export default {
-  mounted() {
-    //console.log("backUrl "+this.dataBackUrl)
-    //console.log(this.controllerName);
-  },
-  props: [
-    "dataDatabaseTables",
-    "dataControllerName",
-    "dataBackUrl",
-    "dataCmsModules",
-  ],
-  computed: {
-    saveURL: function () {
-      return AdminConfig.admin_path(this.dataControllerName + "/createModule");
-    },
-  },
-  data() {
-    return {
-      allTables: SafeJsonParse(this.dataDatabaseTables, []),
-      allModules: SafeJsonParse(this.dataCmsModules, []),
-      mainModel: { tableName: "", fields: [], modelName: "", selected: [] },
-      relationModels: { tableName: "", models: [] },
+const allTables = ref(SafeJsonParse(props.dataDatabaseTables, []));
+const allModules = ref(SafeJsonParse(props.dataCmsModules, []));
+const mainModel = reactive({ tableName: "", fields: [], modelName: "", selected: [] });
+const relationModels = reactive({ tableName: "", models: [] });
 
-      form: new Form({
-        name: "",
-        controller_name: "",
-        validator_name: "",
-        dataWith: [],
-        dataSource: "",
-        createFiles: true,
-        selectedFields: [],
-        relationModels: [],
-        parent_id: "",
-        display_name: "",
-        sub_title: "",
-        icon_css: "",
-        list_view_name: "",
-        edit_view_name: "",
-      }),
-      errors: {},
-      cacheData: {},
-      sortable: null,
-      sortingInterval: -1,
-      errorMessage: "",
-    };
-  },
-  methods: {
-    updateControllerName(controller_name) {
-      let name = controller_name || this.form.name;
-      name = name.toLowerCase().replace(/\s/g, "");
+const form = reactive(new Form({
+  name: "",
+  controller_name: "",
+  validator_name: "",
+  dataWith: [],
+  dataSource: "",
+  createFiles: true,
+  selectedFields: [],
+  relationModels: [],
+  parent_id: "",
+  display_name: "",
+  sub_title: "",
+  icon_css: "",
+  list_view_name: "",
+  edit_view_name: "",
+}));
 
-      this.form.controller_name = pluralize.singular(name);
-      this.form.validator_name = this.form.controller_name;
+const errors = ref({});
+const cacheData = reactive({});
+const sortable = ref(null);
+const sortingInterval = ref(-1);
+const errorMessage = ref("");
 
-      //check controller existence
-      if (controller_name !== undefined) {
-        this.isControllerExists(this.form.controller_name);
+const saveURL = computed(() => {
+  return AdminConfig.admin_path(props.dataControllerName + "/createModule");
+});
+
+const getModelName = (modelName = "") => {
+  modelName = pluralize.singular(modelName) + "::class";
+  let arr = modelName.split("_");
+  arr = arr.map((a) => a.charAt(0).toUpperCase() + a.substr(1, a.length));
+  return arr.join("");
+};
+
+const isControllerExists = (name = "") => {
+  if (name !== "") {
+    axios.get("isControllerExists?name=" + name).then(function (res) {
+      if (res.data === 1) {
+        Toast.show(instance.proxy, "Controller already exist");
       }
+    });
+  }
+};
 
-      this.form.icon_css = this.form.controller_name;
+const updateControllerName = (controller_name) => {
+  let name = controller_name || form.name;
+  name = name.toLowerCase().replace(/\s/g, "");
 
-      //console.log("this.form.validator_name "+this.form.validator_name);
-    },
-    getModelName(modelName = "") {
-      let tableName = modelName;
-      let $this = this;
-      modelName = pluralize.singular(modelName) + "::class";
-      let arr = modelName.split("_");
-      arr = arr.map((a) => a.charAt(0).toUpperCase() + a.substr(1, a.length));
+  form.controller_name = pluralize.singular(name);
+  form.validator_name = form.controller_name;
 
-      return arr.join("");
-    },
-    populateMainDataFields() {
-      let $this = this;
-      if (this.mainModel.tableName !== "") {
-        this.mainModel.fields = ["Please wait..."];
-        DbData.getFields(this.mainModel.tableName).then(function (res) {
-          $this.mainModel.fields = res.data;
-        });
-        this.mainModel.modelName = this.getModelName(this.mainModel.tableName);
-        this.form.dataSource = this.mainModel.modelName;
-      }
-    },
-    updateWithData() {
-      this.form.dataWith = [];
-      for (let i = 0; i < this.relationModels.models.length; i++) {
-        let current = this.relationModels.models[i];
-        if (this.form.dataWith.indexOf(current.relationAlias) === -1) {
-          this.form.dataWith.push(current.relationAlias);
-        }
-      }
-    },
-    addRelationModel() {
-      if (this.relationModels.tableName !== "") {
-        let tableName = this.relationModels.tableName;
-        let modelName = this.getModelName(tableName);
+  if (controller_name !== undefined) {
+    isControllerExists(form.controller_name);
+  }
+  form.icon_css = form.controller_name;
+};
 
-        if (this.hasInRelationModel(modelName) === false) {
-          let relationAlias = "";
-          if (tableName.endsWith("_langs") || tableName.endsWith("_sites")) {
-            relationAlias = tableName.endsWith("_langs") ? "lang" : "site";
-          } else {
-            relationAlias = pluralize
-              .singular(tableName.replace(/_/g, ""))
-              .toLowerCase();
-          }
+const populateMainDataFields = () => {
+  if (mainModel.tableName !== "") {
+    mainModel.fields = ["Please wait..."];
+    DbData.getFields(mainModel.tableName).then(function (res) {
+      mainModel.fields = res.data;
+    });
+    mainModel.modelName = getModelName(mainModel.tableName);
+    form.dataSource = mainModel.modelName;
+  }
+};
 
-          let isLanguage = relationAlias === "lang";
+const updateWithData = () => {
+  form.dataWith = [];
+  for (let i = 0; i < relationModels.models.length; i++) {
+    let current = relationModels.models[i];
+    if (form.dataWith.indexOf(current.relationAlias) === -1) {
+      form.dataWith.push(current.relationAlias);
+    }
+  }
+};
 
-          let relationType = "hasMany";
+const hasInRelationModel = (modelName) => {
+  return cacheData[modelName] || false;
+};
 
-          let relationalData = {
-            model: modelName,
-            relationAlias: relationAlias,
-            relationType: relationType,
-            isLanguage: isLanguage,
-            fields: [],
-            selected: [],
-          };
+const addRelationModel = () => {
+  if (relationModels.tableName !== "") {
+    let tableName = relationModels.tableName;
+    let modelName = getModelName(tableName);
 
-          //not to show same table again.
-          if (!this.cacheData[modelName]) {
-            this.relationModels.models.push(relationalData);
-          }
-          //Add in cache
-          this.cacheData[modelName] = relationalData;
-          this.cacheData[modelName].fields = ["Please wait..."];
-          DbData.getFields(tableName).then((res) => {
-            this.cacheData[modelName].fields = res.data;
-          });
-
-          this.updateWithData();
-        }
-      }
-    },
-    hasInRelationModel(modelName) {
-      return this.cacheData[modelName] || false;
-    },
-    updateRelationModel(event, index, key) {
-      let alias = this.relationModels.models[index][key];
-      this.relationModels.models[index][key] = event.target.value;
-
-      if (key === "relationAlias") {
-        //reset
-        this.relationModels.models[index].selected = [];
-        this.removeSelectedRelationFields(alias);
-      }
-
-      this.updateWithData();
-    },
-    removeSelectedRelationFields(alias) {
-      if (this.mainModel.selected.length > 0) {
-        let selected = [];
-        for (let i = 0; i < this.mainModel.selected.length; i++) {
-          let current = this.mainModel.selected[i];
-          if (!current.startsWith(alias + ".")) {
-            selected.push(current);
-          } else {
-            // this.mainModel.selected.splice(i, 1); this is not working
-          }
-        }
-        this.mainModel.selected = selected;
-      }
-    },
-    removeRelationModel(index, model) {
-      let alias = this.relationModels.models[index].relationAlias;
-
-      delete this.cacheData[model];
-      this.relationModels.models.splice(index, 1);
-      this.relationModels.tableName = "";
-
-      this.removeSelectedRelationFields(alias);
-    },
-    hasRelation() {
-      return this.relationModels.models.length > 0;
-    },
-    hasMainDataSource() {
-      return this.mainModel.tableName !== "";
-    },
-    selectAllField(where, relation = "") {
-      if (where.selected.length === 0) {
-        where.selected = where.fields.slice();
-        if (relation !== "") {
-          where.selected = where.selected.map((c) => relation + "." + c);
-        }
+    if (hasInRelationModel(modelName) === false) {
+      let relationAlias = "";
+      if (tableName.endsWith("_langs") || tableName.endsWith("_sites")) {
+        relationAlias = tableName.endsWith("_langs") ? "lang" : "site";
       } else {
-        for (let i = 0; i < where.fields.length; i++) {
-          this.selectField(where.fields[i], where, relation);
-        }
+        relationAlias = pluralize
+          .singular(tableName.replace(/_/g, ""))
+          .toLowerCase();
       }
 
-      this.enableSorting();
-    },
-    selectField(field, where, relation = "") {
-      field = relation !== "" ? relation + "." + field : field;
+      let isLanguage = relationAlias === "lang";
+      let relationType = "hasMany";
 
-      if (where.selected.indexOf(field) === -1) {
-        where.selected.push(field);
-      }
-
-      this.enableSorting();
-    },
-    removeField(where, index) {
-      where.selected.splice(index, 1);
-    },
-    removeAllField(where) {
-      where.selected = [];
-      this.form.selectedFields = [];
-    },
-    isControllerExists(name = "") {
-      if (name !== "") {
-        let $this = this;
-        axios.get("isControllerExists?name=" + name).then(function (res) {
-          if (res.data === 1) {
-            Toast.show($this, "Controller already exist");
-          }
-        });
-      }
-    },
-    createModule() {
-      this.setSortedFields();
-      this.form.relationModels = this.relationModels;
-
-      //console.log(this.mainModel);
-      //console.log(this.relationModels);
-      //console.log(this.form);
-
-      this.form
-        .post(this.saveURL)
-        .then((response) => this.resetForm(response))
-        .catch((response) => this.showError(response));
-    },
-    enableSorting() {
-      this.$nextTick(function () {
-        if (this.sortable != null) {
-          this.sortable.destroy();
-        }
-        let el = document.getElementById("selectedFields");
-        this.sortable = Sortable.create(el, {
-          onEnd: this.sortingCallback,
-          onStart: this.cancelSortingCallback,
-        });
-      });
-    },
-    cancelSortingCallback() {
-      if (this.sortingInterval !== -1) {
-        clearInterval(this.sortingInterval);
-      }
-    },
-    sortingCallback() {
-      this.cancelSortingCallback();
-    },
-    setSortedFields() {
-      let items = document.querySelectorAll("#selectedFields li");
-      let count = items.length;
-      if (count > 1) {
-        let selected = [];
-        for (let i = 0; i < count; i++) {
-          let current = items[i];
-          let field = current.getAttribute("data-fieldname");
-          selected.push(field);
-        }
-        this.form.selectedFields = selected;
-      }
-    },
-    showError(res) {
-      this.errors = {};
-      for (let i in res.errors) {
-        if (res.errors.hasOwnProperty(i)) {
-          this.errors[i] = res.errors[i][0];
-        }
-      }
-
-      this.errorMessage = res.message;
-    },
-    hideErrorMessage(event) {
-      let name = event.target.getAttribute("name");
-      this.errors[name] = "";
-
-      if (this.errorMessage !== "") {
-        this.errorMessage = "";
-      }
-    },
-    resetForm(response) {
-      this.mainModel = {
-        tableName: "",
+      let relationalData = {
+        model: modelName,
+        relationAlias: relationAlias,
+        relationType: relationType,
+        isLanguage: isLanguage,
         fields: [],
-        modelName: "",
         selected: [],
       };
-      this.relationModels = { tableName: "", models: [] };
 
-      if (response.created === 0) {
-        Toast.show(this, "There is some error...");
-        this.errorMessage = response.message;
-      } else {
-        Toast.show(this, "Created...");
+      if (!cacheData[modelName]) {
+        relationModels.models.push(relationalData);
       }
-    },
-  },
+      cacheData[modelName] = relationalData;
+      cacheData[modelName].fields = ["Please wait..."];
+      DbData.getFields(tableName).then((res) => {
+        cacheData[modelName].fields = res.data;
+      });
+
+      updateWithData();
+    }
+  }
+};
+
+const removeSelectedRelationFields = (alias) => {
+  if (mainModel.selected.length > 0) {
+    mainModel.selected = mainModel.selected.filter(current => !current.startsWith(alias + "."));
+  }
+};
+
+const updateRelationModel = (event, index, key) => {
+  let alias = relationModels.models[index][key];
+  relationModels.models[index][key] = event.target.value;
+
+  if (key === "relationAlias") {
+    relationModels.models[index].selected = [];
+    removeSelectedRelationFields(alias);
+  }
+
+  updateWithData();
+};
+
+const removeRelationModel = (index, model) => {
+  let alias = relationModels.models[index].relationAlias;
+  delete cacheData[model];
+  relationModels.models.splice(index, 1);
+  relationModels.tableName = "";
+  removeSelectedRelationFields(alias);
+};
+
+const hasRelation = () => relationModels.models.length > 0;
+const hasMainDataSource = () => mainModel.tableName !== "";
+
+const cancelSortingCallback = () => {
+  if (sortingInterval.value !== -1) {
+    clearInterval(sortingInterval.value);
+  }
+};
+
+const sortingCallback = () => {
+  cancelSortingCallback();
+};
+
+const enableSorting = () => {
+  nextTick(function () {
+    if (sortable.value != null) {
+      sortable.value.destroy();
+    }
+    let el = document.getElementById("selectedFields");
+    if (el) {
+      sortable.value = Sortable.create(el, {
+        onEnd: sortingCallback,
+        onStart: cancelSortingCallback,
+      });
+    }
+  });
+};
+
+const selectField = (field, where, relation = "") => {
+  const fieldName = relation !== "" ? relation + "." + field : field;
+  if (where.selected.indexOf(fieldName) === -1) {
+    where.selected.push(fieldName);
+  }
+  enableSorting();
+};
+
+const selectAllField = (where, relation = "") => {
+  if (where.selected.length === 0) {
+    where.selected = where.fields.slice();
+    if (relation !== "") {
+      where.selected = where.selected.map((c) => relation + "." + c);
+    }
+  } else {
+    for (let i = 0; i < where.fields.length; i++) {
+      selectField(where.fields[i], where, relation);
+    }
+  }
+  enableSorting();
+};
+
+const removeField = (where, index) => {
+  where.selected.splice(index, 1);
+};
+
+const removeAllField = (where) => {
+  where.selected = [];
+  form.selectedFields = [];
+};
+
+const setSortedFields = () => {
+  let items = document.querySelectorAll("#selectedFields li");
+  let count = items.length;
+  if (count > 0) {
+    let selected = [];
+    for (let i = 0; i < count; i++) {
+      let current = items[i];
+      let field = current.getAttribute("data-fieldname");
+      selected.push(field);
+    }
+    form.selectedFields = selected;
+  }
+};
+
+const showError = (res) => {
+  errors.value = {};
+  for (let i in res.errors) {
+    if (res.errors.hasOwnProperty(i)) {
+      errors.value[i] = res.errors[i][0];
+    }
+  }
+  errorMessage.value = res.message;
+};
+
+const hideErrorMessage = (event) => {
+  let name = event.target.getAttribute("name");
+  if (name) errors.value[name] = "";
+  if (errorMessage.value !== "") errorMessage.value = "";
+};
+
+const resetFormFields = (response) => {
+  mainModel.tableName = "";
+  mainModel.fields = [];
+  mainModel.modelName = "";
+  mainModel.selected = [];
+  relationModels.tableName = "";
+  relationModels.models = [];
+  Object.keys(cacheData).forEach(key => delete cacheData[key]);
+
+  if (response.created === 0) {
+    Toast.show(instance.proxy, "There is some error...");
+    errorMessage.value = response.message;
+  } else {
+    Toast.show(instance.proxy, "Created...");
+  }
+};
+
+const createModule = () => {
+  setSortedFields();
+  form.relationModels = relationModels;
+  form
+    .post(saveURL.value)
+    .then((response) => resetFormFields(response))
+    .catch((response) => showError(response));
 };
 </script>
+

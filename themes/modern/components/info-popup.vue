@@ -36,87 +36,91 @@
   </modal-box>
 </template>
 
-<script>
+<script setup>
+import { ref, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { Toast, Loader } from "../../../helpers/common";
 import ModalBox from "./library/modal-box.vue";
 import { EventBus } from "../../../helpers/event-bus";
 
-export default {
-  components: {
-    "modal-box": ModalBox,
-  },
-  props: ["dataModel", "dataModuleRelations", "dataId"],
-  mounted() {
-    //console.log('Component mounted...')
-  },
-  data() {
-    return {
-      model:
-        typeof this.dataModel === "undefined" || this.dataModel === ""
-          ? null
-          : this.dataModel,
-      relation:
-        typeof this.dataModuleRelations === "undefined" ||
-        this.dataModuleRelations === ""
-          ? ""
-          : this.dataModuleRelations,
-      id:
-        typeof this.dataId === "undefined" || this.dataId === ""
-          ? 0
-          : parseInt(this.dataId),
-      resData: [],
-      errorMessage: "",
-      isEditable: true,
-      excludeFields: [],
-    };
-  },
-  methods: {
-    shouldExclude(key) {
-      return this.excludeFields.indexOf(key) >= 0;
-    },
-    getValue(key, value) {
-      if (!this.isEditable) {
-        return value;
-      }
-      if (key === "id" && this.isEditable) {
-        let path = `edit/${value}`;
-        path = AdminConfig.admin_path(`${this.model}/${path}`);
-        return `<a href="${path}">${value}</a>`;
-      }
-      return value;
-    },
-    showInfo(model, id, excludeFields = [], isEditable = true) {
-      this.isEditable = isEditable.toString() === "true";
-      this.excludeFields = excludeFields;
-      this.model = model;
-      let $this = this;
-      Loader.show(this);
-      axios
-        .get(AdminConfig.get("base_path") + `/ajax/getInfo/${model}/${id}`)
-        .then(function (res) {
-          $this.errorMessage = "";
-          $this.resData = {};
-          $this.resData = res.data.results;
-          if (res.data.error === true) {
-            $this.errorMessage = res.data.message;
-          }
-          $this.open();
-          Loader.hide($this);
-        })
-        .catch(function (res) {
-          Toast.show($this, res.message);
-          Loader.hide($this);
-        });
-    },
-    open() {
-      this.$refs.infoModal.open();
-      EventBus.emit("info-popup-open");
-    },
-    close() {
-      this.$refs.infoModal.close();
-      EventBus.emit("info-popup-close");
-    },
-  },
+const props = defineProps(["dataModel", "dataModuleRelations", "dataId"]);
+const instance = getCurrentInstance();
+
+const infoModal = ref(null);
+
+const model = ref(
+  props.dataModel === "undefined" || props.dataModel === ""
+    ? null
+    : props.dataModel
+);
+const relation = ref(
+  props.dataModuleRelations === "undefined" || props.dataModuleRelations === ""
+    ? ""
+    : props.dataModuleRelations
+);
+const id = ref(
+  props.dataId === "undefined" || props.dataId === ""
+    ? 0
+    : parseInt(props.dataId)
+);
+const resData = ref([]);
+const errorMessage = ref("");
+const isEditable = ref(true);
+const excludeFields = ref([]);
+
+const shouldExclude = (key) => {
+  return excludeFields.value.indexOf(key) >= 0;
 };
+
+const getValue = (key, value) => {
+  if (!isEditable.value) {
+    return value;
+  }
+  if (key === "id" && isEditable.value) {
+    let path = `edit/${value}`;
+    path = AdminConfig.admin_path(`${model.value}/${path}`);
+    return `<a href="${path}">${value}</a>`;
+  }
+  return value;
+};
+
+const open = () => {
+  infoModal.value?.open();
+  EventBus.emit("info-popup-open");
+};
+
+const close = () => {
+  infoModal.value?.close();
+  EventBus.emit("info-popup-close");
+};
+
+const showInfo = (modelParam, idParam, excludeFieldsParam = [], isEditableParam = true) => {
+  isEditable.value = isEditableParam.toString() === "true";
+  excludeFields.value = excludeFieldsParam;
+  model.value = modelParam;
+  
+  Loader.show(instance.proxy);
+  axios
+    .get(AdminConfig.get("base_path") + `/ajax/getInfo/${modelParam}/${idParam}`)
+    .then(function (res) {
+      errorMessage.value = "";
+      resData.value = res.data.results;
+      if (res.data.error === true) {
+        errorMessage.value = res.data.message;
+      }
+      open();
+      Loader.hide(instance.proxy);
+    })
+    .catch(function (res) {
+      Toast.show(instance.proxy, res.message);
+      Loader.hide(instance.proxy);
+    });
+};
+
+defineExpose({
+  showInfo,
+  open,
+  close,
+});
 </script>
+

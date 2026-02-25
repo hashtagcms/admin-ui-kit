@@ -32,105 +32,102 @@
   <div class="modal-backdrop fade show" :style="backDropStyle"></div>
 </template>
 
-<script>
-export default {
-  emits: ["onClose"],
-  props: [
-    "dataShowModal",
-    "dataShowFooter",
-    "dataTitleCss",
-    "dataContentCss",
-    "dataFooterCss",
-    "dataModalCss",
-    "dataWidth",
-  ],
-  mounted() {
-    if (this.visible) {
-      this.open();
-    }
-  },
-  data() {
-    return {
-      modelCss: "modal modal-lg fade show",
-      titleCss:
-        typeof this.dataTitleCss === "undefined" ? "" : this.dataTitleCss,
-      contentCss:
-        typeof this.dataContentCss === "undefined" ? "" : this.dataContentCss,
-      footerCss:
-        typeof this.dataFooterCss === "undefined" ? "" : this.dataFooterCss,
-      visible:
-        this.dataShowModal !== undefined &&
-        this.dataShowModal.toString() === "true",
-      style: "",
-      toBeReturned: {},
-      title: "Alert",
-      content: "Modal Content",
-      footerContent: "",
-      backDropStyle: "display:none",
-    };
-  },
-  computed: {
-    showFooter() {
-      return (
-        (typeof this.dataShowFooter !== "undefined" &&
-          this.dataShowFooter.toString() === "true") ||
-        this.footerContent !== ""
-      );
-    },
-    modalWidth() {
-      if (typeof this.dataWidth != "undefined" && this.dataWidth !== "") {
-        return `width:${this.dataWidth}`;
-      } else {
-        return "";
-      }
-    },
-  },
-  methods: {
-    open(toBeReturned = {}) {
-      this.visible = true;
-      this.backDropStyle = this.style = "display:block";
-      this.modelCss = "modal modal-lg fade show animated bounceInDown";
-      this.toBeReturned = toBeReturned;
-    },
-    close() {
-      this.visible = false;
-      this.modelCss = "modal modal-lg animated bounceOutUp";
-      this.backDropStyle = "display:none";
+<script setup>
+import { ref, computed, onMounted } from "vue";
 
-      if (typeof this.toBeReturned === "function") {
-        this.toBeReturned();
-      }
-    },
-    sendData(isOkay) {
-      this.close();
-      this.$emit("onClose", isOkay, this.toBeReturned);
-    },
+const props = defineProps([
+  "dataShowModal",
+  "dataShowFooter",
+  "dataTitleCss",
+  "dataContentCss",
+  "dataFooterCss",
+  "dataModalCss",
+  "dataWidth",
+]);
 
-    show(message, position, callback, timeout) {
-      if (typeof message == "string") {
-        this.content = message;
-      } else {
-        if (message.title) {
-          this.title = message.title;
-        }
-        if (message.content) {
-          this.content = message.content;
-        }
-        if (message.footerContent) {
-          this.footerContent = message.footerContent;
-        }
-      }
+const emit = defineEmits(["onClose"]);
 
-      //handle position
-      if (position) {
-        //align this
-      }
+// State
+const modelCss = ref("modal modal-lg fade show");
+const titleCss = ref(props.dataTitleCss || "");
+const contentCss = ref(props.dataContentCss || "");
+const footerCss = ref(props.dataFooterCss || "");
+const visible = ref(props.dataShowModal?.toString() === "true");
+const style = ref("");
+const toBeReturned = ref({});
+const title = ref("Alert");
+const content = ref("Modal Content");
+const footerContent = ref("");
+const backDropStyle = ref("display:none");
 
-      this.open(callback);
-    },
-    hide() {
-      this.close();
-    },
-  },
+// Computed
+const showFooter = computed(() => {
+  return (props.dataShowFooter?.toString() === "true") || footerContent.value !== "";
+});
+
+const modalWidth = computed(() => {
+  if (props.dataWidth && props.dataWidth !== "") {
+    return `width:${props.dataWidth}`;
+  }
+  return "";
+});
+
+// Methods
+const open = (data = {}) => {
+  visible.value = true;
+  backDropStyle.value = style.value = "display:block";
+  modelCss.value = "modal modal-lg fade show animated bounceInDown";
+  toBeReturned.value = data;
 };
+
+const close = () => {
+  visible.value = false;
+  modelCss.value = "modal modal-lg animated bounceOutUp";
+  backDropStyle.value = "display:none";
+
+  if (typeof toBeReturned.value === "function") {
+    toBeReturned.value();
+  }
+};
+
+const sendData = (isOkay) => {
+  close();
+  emit("onClose", isOkay, toBeReturned.value);
+};
+
+const show = (message, position, callback, timeout) => {
+  if (typeof message === "string") {
+    content.value = message;
+  } else {
+    if (message.title) {
+      title.value = message.title;
+    }
+    if (message.content) {
+      content.value = message.content;
+    }
+    if (message.footerContent) {
+      footerContent.value = message.footerContent;
+    }
+  }
+
+  // handle position
+  if (position) {
+    // align this
+  }
+
+  open(callback);
+};
+
+const hide = () => {
+  close();
+};
+
+defineExpose({ open, close, sendData, show, hide });
+
+onMounted(() => {
+  if (visible.value) {
+    open();
+  }
+});
 </script>
+

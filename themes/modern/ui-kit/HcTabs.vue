@@ -5,6 +5,7 @@
       <ul class="flex flex-nowrap overflow-x-auto no-scrollbar -mb-px">
         <li v-for="tab in tabs" :key="tab.id" class="mr-6 flex-shrink-0">
           <button 
+            ref="tabButtons"
             @click="activeId = tab.id"
             :class="[
               'py-4 px-1 border-b-[3px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95',
@@ -51,6 +52,34 @@ export default {
     return {
       activeId: this.initialTab || (this.tabs.length ? this.tabs[0].id : '')
     };
+  },
+  watch: {
+    activeId() {
+      this.scrollToActiveTab();
+    },
+    tabs: {
+      handler() {
+        this.$nextTick(() => this.scrollToActiveTab());
+      },
+      deep: true
+    }
+  },
+  mounted() {
+    this.scrollToActiveTab();
+  },
+  methods: {
+    scrollToActiveTab() {
+      this.$nextTick(() => {
+        const index = this.tabs.findIndex(t => t.id === this.activeId);
+        if (index !== -1 && this.$refs.tabButtons && this.$refs.tabButtons[index]) {
+          this.$refs.tabButtons[index].scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+          });
+        }
+      });
+    }
   }
 };
 </script>

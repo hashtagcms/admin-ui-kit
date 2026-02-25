@@ -243,318 +243,305 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, nextTick, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import Sortable from "sortablejs";
 import { Toast, SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  mounted() {
-    this.init();
-  },
-  props: [
-    "dataSiteId",
-    "dataSitePlatforms",
-    "dataSiteCategories",
-    "dataSiteThemes",
-    "dataSiteMicrosites",
-    "dataPlatformId",
-    "dataMicrositeId",
-    "dataCategories",
-    "dataUserRights",
-  ],
-  data() {
-    return {
-      checkAll: false,
-      showCheckbox: false,
-      sitePlatforms: SafeJsonParse(this.dataSitePlatforms, []),
-      siteCategories: SafeJsonParse(this.dataSiteCategories, []),
-      siteThemes: SafeJsonParse(this.dataSiteThemes, []),
-      siteMicrosites: SafeJsonParse(this.dataSiteMicrosites, []),
-      categories: SafeJsonParse(this.dataCategories, []),
-      platformId:
-        typeof this.dataPlatformId === "undefined" || this.dataPlatformId === ""
-          ? 1
-          : parseInt(this.dataPlatformId),
-      micrositeId:
-        typeof this.dataMicrositeId === "undefined" ||
-        this.dataMicrositeId === ""
-          ? 0
-          : parseInt(this.dataMicrositeId),
-      searchKeyPlatformCategory: "",
-      searchKeyCategory: "",
-      applicableForAllPlatforms: false,
-      categoryId: 0,
-      currentSelection: { category_id: 0, theme_id: "", cache_category: "" },
-      allCategories: [],
-      allCategoriesInfo: {},
-      allSiteCategories: [],
-      siteId:
-        typeof this.dataSiteId === "undefined" ? 1 : parseInt(this.dataSiteId),
-      showUpdateAllBtn: true,
-      showUpdateAllDiv: false,
-      globalTheme: "",
-      userRights: SafeJsonParse(this.dataUserRights, []),
+const props = defineProps([
+  "dataSiteId",
+  "dataSitePlatforms",
+  "dataSiteCategories",
+  "dataSiteThemes",
+  "dataSiteMicrosites",
+  "dataPlatformId",
+  "dataMicrositeId",
+  "dataCategories",
+  "dataUserRights",
+]);
+
+const instance = getCurrentInstance();
+const droppableArea = ref(null);
+const popover = ref(null);
+
+// State
+const checkAll = ref(false);
+const showCheckbox = ref(false);
+const sitePlatforms = ref(SafeJsonParse(props.dataSitePlatforms, []));
+const siteCategories = ref(SafeJsonParse(props.dataSiteCategories, []));
+const siteThemes = ref(SafeJsonParse(props.dataSiteThemes, []));
+const siteMicrosites = ref(SafeJsonParse(props.dataSiteMicrosites, []));
+const categories = ref(SafeJsonParse(props.dataCategories, []));
+const platformId = ref(
+  typeof props.dataPlatformId === "undefined" || props.dataPlatformId === ""
+    ? 1
+    : parseInt(props.dataPlatformId)
+);
+const micrositeId = ref(
+  typeof props.dataMicrositeId === "undefined" || props.dataMicrositeId === ""
+    ? 0
+    : parseInt(props.dataMicrositeId)
+);
+const searchKeyPlatformCategory = ref("");
+const searchKeyCategory = ref("");
+const applicableForAllPlatforms = ref(false);
+const categoryId = ref(0);
+const currentSelection = reactive({ category_id: 0, theme_id: "", cache_category: "" });
+const allCategories = ref([]);
+const allCategoriesInfo = reactive({});
+const allSiteCategories = ref([]);
+const siteId = ref(typeof props.dataSiteId === "undefined" ? 1 : parseInt(props.dataSiteId));
+const showUpdateAllBtn = ref(true);
+const showUpdateAllDiv = ref(false);
+const globalTheme = ref("");
+const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+
+// Computed
+const hasPlatformsMoreThanOne = computed(() => sitePlatforms.value.length > 1);
+const hasMicrosites = computed(() => siteMicrosites.value.length > 0);
+const canEdit = computed(() => userRights.value.indexOf("edit") >= 0);
+const canDelete = computed(() => userRights.value.indexOf("delete") >= 0);
+
+// Methods
+const getThemeName = (id) => {
+  for (let i = 0; i < siteThemes.value.length; i++) {
+    if (siteThemes.value[i].id == id) {
+      return siteThemes.value[i].name;
+    }
+  }
+  return "";
+};
+
+const getWhere = () => {
+  return {
+    microsite_id: micrositeId.value,
+    platform_id: platformId.value,
+    category_id: categoryId.value,
+    site_id: siteId.value,
+  };
+};
+
+const saveNow = (url, data) => {
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, data)
+      .then((response) => resolve(response))
+      .catch((error) => reject(error.response));
+  });
+};
+
+const getCategoryInfo = (catId, findIn = "allSiteCategories") => {
+  let found = null;
+  const whereArr = findIn === "allSiteCategories" ? allSiteCategories.value : allCategories.value;
+
+  for (let i = 0; i < whereArr.length; i++) {
+    const current = whereArr[i];
+    if (parseInt(current.category_id) === parseInt(catId)) {
+      found = current;
+      break;
+    }
+  }
+  return found;
+};
+
+const findIndex = (catId, findIn = "allCategories") => {
+  let index = -1;
+  const whereArr = findIn === "allCategories" ? allCategories.value : allSiteCategories.value;
+  if (whereArr.length > 0) {
+    for (let i = 0; i < whereArr.length; i++) {
+      const current = whereArr[i];
+      if (parseInt(current.category_id) === parseInt(catId)) {
+        index = i;
+        break;
+      }
+    }
+  }
+  return index;
+};
+
+const updateIndex = () => {
+  const allCatsElements = document.querySelectorAll(".js_category li");
+  const pId = platformId.value;
+  const datas = [];
+  for (let i = 0; i < allCatsElements.length; i++) {
+    const current = allCatsElements[i];
+    const categoryInfo = getCategoryInfo(current.getAttribute("data-category-id"), "allCategories");
+    const data = { position: i + 1 };
+    const where = {
+      category_id: categoryInfo.category_id,
+      platform_id: pId,
     };
-  },
-  computed: {
-    hasPlatformsMoreThanOne() {
-      return this.sitePlatforms.length > 1;
-    },
-    hasMicrosites() {
-      return this.siteMicrosites.length > 0;
-    },
-    canEdit() {
-      return this.userRights.indexOf("edit") >= 0;
-    },
-    canDelete() {
-      return this.userRights.indexOf("delete") >= 0;
-    },
-  },
-  methods: {
-    init() {
-      this.makeData();
-      if (this.canEdit) {
-        this.enableSorting();
-      }
-    },
-    selectAllData(findIn = "allCategories", holder) {
-      let $this = this;
-      let whereArr =
-        findIn === "allCategories"
-          ? this.allCategories
-          : this.allSiteCategories;
-      let selected = holder.checked;
-      whereArr.forEach(function (current) {
-        $this.$set(current, "selected", selected);
-      });
-    },
-    makeData() {
-      let $this = this;
-      //this.allCategories = this.categories;
-      let categories = this.categories;
-      let selected = false;
-      if (categories.length > 0) {
-        categories.forEach(function (current) {
-          let category_id = current.category_id;
-          let category_name = current.lang.name || current.category_name;
-          let theme_id = current.theme_id;
-          let cache_category = current.cache_category;
-          let obj = {
-            category_id,
-            category_name,
-            theme_id,
-            cache_category,
-            selected,
-          };
-          $this.allCategories.push(obj);
-          $this.allCategoriesInfo[category_id.toString()] = obj;
-        });
-      }
-      //Site Categories
-      categories = this.siteCategories;
-      //console.log("categories ", categories);
-      if (categories.length > 0) {
-        categories.forEach(function (current) {
-          let category_id = current.category_id;
-          let category_name = current.name;
-          let theme_id = "";
-          let cache_category = "";
-          let obj = {
-            category_id,
-            category_name,
-            theme_id,
-            cache_category,
-            selected,
-          };
-          $this.allSiteCategories.push(obj);
-        });
-      }
+    datas.push({ where, data });
+  }
 
-      //console.log($this.allSiteCategories);
-    },
-    getWhere() {
-      let where = {
-        microsite_id: this.micrositeId,
-        platform_id: this.platformId,
-        category_id: this.categoryId,
-        site_id: this.siteId,
+  if (datas.length > 0) {
+    const url = AdminConfig.admin_path("category/updateIndex");
+    const postParams = { data: datas };
+    saveNow(url, postParams)
+      .then(() => {
+        Toast.show(instance, "Saved...");
+      })
+      .catch((res) => {
+        Toast.show(instance, res.data.message, 2000);
+      });
+  }
+};
+
+const closePopup = () => {
+  if (popover.value) {
+    popover.value.classList.add(...["animated", "fadeOut", "hide"]);
+  }
+};
+
+const showInfo = (source, target, where = "center-right") => {
+  target.classList.remove(...["animated", "fadeOut", "hide"]);
+  const srcOpt = source.getBoundingClientRect();
+  const tgtOpt = target.getBoundingClientRect();
+
+  const left = srcOpt.left + srcOpt.width;
+  const top = srcOpt.top + srcOpt.height - tgtOpt.height / 2;
+
+  target.classList.add(...["animated", "jello"]);
+
+  switch (where) {
+    case "center-right":
+      target.style.position = "absolute";
+      target.style.left = left + "px";
+      target.style.top = top + "px";
+      break;
+  }
+};
+
+const setCurrentSelection = (evt) => {
+  const target = evt.currentTarget;
+  const span = evt.target;
+
+  const catId = target.getAttribute("data-category-id");
+  const tId = target.getAttribute("data-theme-id");
+
+  const categoryInfo = getCategoryInfo(catId, "allCategories");
+
+  currentSelection.theme_id = tId;
+  currentSelection.category_id = catId;
+  currentSelection.cache_category = categoryInfo.cache_category;
+
+  if (span.classList.contains("js_info")) {
+    showInfo(target, popover.value);
+  }
+};
+
+const fetchNewData = () => {
+  const where = getWhere();
+  delete where.category_id;
+  if (where.microsite_id === 0) {
+    delete where.microsite_id;
+  }
+  const url = "category/settings";
+  window.location.href = AdminConfig.admin_path(url, where);
+};
+
+const highlightEagerDrop = (addRemove = "add") => {
+  const js_hook_modules = document.querySelectorAll(".js_category");
+  js_hook_modules.forEach((current) => {
+    current.classList[addRemove]("module-drop-eager");
+  });
+};
+
+const removeCategory = (id) => {
+  const index = findIndex(id);
+  if (index !== -1) {
+    const categoryInfo = allCategories.value.splice(index, 1)[0];
+    
+    const url = AdminConfig.admin_path("category/deleteCategory");
+    const where = getWhere();
+    const postParams = {
+      where: {
+        category_id: categoryInfo.category_id,
+        microsite_id: where.microsite_id,
+      },
+    };
+
+    if (!applicableForAllPlatforms.value) {
+      postParams.where.platform_id = where.platform_id;
+    }
+    
+    saveNow(url, postParams)
+      .then(() => {
+        Toast.show(instance, "Saved...");
+      })
+      .catch((res) => {
+        Toast.show(instance, res.data.message, 2000);
+      });
+    return [categoryInfo];
+  }
+};
+
+const addCategory = (category) => {
+  const index = findIndex(category.category_id);
+  let isAdded = false;
+  if (index === -1) {
+    const catIdStr = category.category_id.toString();
+    allCategoriesInfo[catIdStr] = {
+      index: index,
+      info: category,
+    };
+
+    const updateInDB = () => {
+      const url = AdminConfig.admin_path("category/insertCategory");
+      const where = getWhere();
+      const postParams = {};
+      const categoryData = { ...category };
+      delete categoryData["name"];
+      categoryData.platform_id = where.platform_id;
+      postParams.data = {
+        category_id: categoryData.category_id,
+        platform_id: where.platform_id,
+        site_id: where.site_id,
       };
-      return where;
-    },
-    saveNow(url, data) {
-      return new Promise((resolve, reject) => {
-        axios
-          .post(url, data)
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((error) => {
-            reject(error.response);
-          });
-      });
-    },
-    updateIndex() {
-      let $this = this;
-      let allCategories = document.querySelectorAll(".js_category li");
-      let platformId = this.platformId;
-      let datas = [];
-      for (let i = 0; i < allCategories.length; i++) {
-        let current = allCategories[i];
-        //console.log("current ", current);
-        let categoryInfo = this.getCategoryInfo(
-          current.getAttribute("data-category-id"),
-          "allCategories",
-        );
-        //console.log("categoryInfo ", categoryInfo);
-        let data = { position: i + 1 };
-        let where = {
-          category_id: categoryInfo.category_id,
-          platform_id: platformId,
-        }; //microsite_id:
-        datas.push({ where, data });
-      }
+      postParams.applicableForAllPlatforms = applicableForAllPlatforms.value;
+      saveNow(url, postParams)
+        .then(() => {
+          Toast.show(instance, "Saved...");
+        })
+        .catch((res) => {
+          Toast.show(instance, res.data.message, 2000);
+        });
+    };
 
-      if (datas.length > 0) {
-        let url = AdminConfig.admin_path("category/updateIndex");
-        let postParams = {};
-        postParams.data = datas;
-        //postParams.applicableForAllPlatforms = $this.applicableForAllPlatforms;
-        this.saveNow(url, postParams)
-          .then(function (res) {
-            //console.log(res);
-            Toast.show($this, "Saved...");
-          })
-          .catch(function (res) {
-            Toast.show($this, res.data.message, 2000);
-          });
-      }
-    },
-    showSearch(findIn = "allCategories") {
-      let whereArr =
-        findIn === "allCategories"
-          ? this.allCategories
-          : this.allSiteCategories;
-      return whereArr.length > 10;
-    },
-    filterData(findIn = "allCategories") {
-      let key =
-        findIn === "allCategories"
-          ? this.searchKeyPlatformCategory
-          : this.searchKeyCategory;
-      let whereArr =
-        findIn === "allCategories"
-          ? this.allCategories
-          : this.allSiteCategories;
-      if (key !== "" && key != null) {
-        key = key.toLowerCase();
+    setTimeout(updateInDB, 1);
+    isAdded = allCategories.value.push(category);
+  }
+  return isAdded;
+};
 
-        return whereArr.filter(function (current) {
-          let name = current.category_name.toLowerCase();
-          let id = current.category_id;
-          if (id.toString() === key.toString() || name.includes(key)) {
-            return current;
+const enableSorting = () => {
+  nextTick(() => {
+    const list = document.querySelectorAll(".js_category");
+    list.forEach((current) => {
+      Sortable.create(current, {
+        animation: 200,
+        filter: ".js_delete",
+        group: {
+          name: "droppable",
+          put: "modulesBox",
+        },
+        onFilter: (evt) => {
+          const item = evt.item;
+          const ctrl = evt.target;
+          const id = item.getAttribute("data-category-id");
+          if (Sortable.utils.is(ctrl, ".js_delete")) {
+            removeCategory(id);
           }
-        });
-      } else {
-        // console.log("data", this.allData.data);
-        return findIn === "allCategories"
-          ? this.allCategories
-          : this.allSiteCategories;
-      }
-    },
-    setCurrentSelection(evt) {
-      let target = evt.currentTarget;
-      let span = evt.target;
-
-      let category_id = target.getAttribute("data-category-id");
-      let theme_id = target.getAttribute("data-theme-id");
-
-      let categoryInfo = this.getCategoryInfo(category_id, "allCategories");
-
-      this.currentSelection.theme_id = theme_id;
-      this.currentSelection.category_id = category_id;
-      this.currentSelection.cache_category = categoryInfo.cache_category;
-
-      let action;
-      if (span.classList.contains("js_info")) {
-        action = "info";
-        showInfo(target, this.$refs.popover);
-      }
-      if (span.classList.contains("js_delete")) {
-        action = "delete";
-      }
-
-      // console.log(this.currentSelection);
-
-      function showInfo(source, target, where = "center-right") {
-        target.classList.remove(...["animated", "fadeOut", "hide"]);
-        let src = source;
-        let tgt = target;
-        let srcOpt = src.getBoundingClientRect();
-        let tgtOpt = tgt.getBoundingClientRect();
-
-        let left = srcOpt.left + srcOpt.width;
-        let top = srcOpt.top + srcOpt.height - tgtOpt.height / 2;
-
-        target.classList.add(...["animated", "jello"]);
-
-        switch (where) {
-          case "center-right":
-            tgt.style.position = "absolute";
-            tgt.style.left = left + "px";
-            tgt.style.top = top + "px";
-            break;
-        }
-      }
-    },
-    closePopup() {
-      this.$refs.popover.classList.add(...["animated", "fadeOut", "hide"]);
-      setTimeout(() => {});
-    },
-    fetchNewData() {
-      let where = this.getWhere();
-      delete where.category_id;
-      if (where.microsite_id === 0) {
-        delete where.microsite_id;
-      }
-      let url = "category/settings";
-      window.location.href = AdminConfig.admin_path(url, where);
-    },
-    enableSorting() {
-      let $this = this;
-      this.$nextTick(function () {
-        let list = document.querySelectorAll(".js_category");
-        list.forEach(function (current) {
-          Sortable.create(current, {
-            animation: 200,
-            filter: ".js_delete",
-            group: {
-              name: "droppable",
-              put: "modulesBox",
-            },
-            onFilter: function (evt) {
-              let item = evt.item,
-                ctrl = evt.target;
-              let id = item.getAttribute("data-category-id");
-
-              if (Sortable.utils.is(ctrl, ".js_delete")) {
-                // Click on remove button
-                $this.removeCategory(id);
-              }
-            },
-            onUpdate: function (/**Event*/ evt) {
-              //console.log("onUpdate ", evt);
-              $this.updateIndex();
-            },
-          });
-        });
+        },
+        onUpdate: () => {
+          updateIndex();
+        },
       });
+    });
 
-      //Right Side module
-      let draggableModules = document.getElementById("draggableItems");
-
+    const draggableModules = document.getElementById("draggableItems");
+    if (draggableModules) {
       Sortable.create(draggableModules, {
         animation: 200,
         draggable: ".js_item",
@@ -565,233 +552,158 @@ export default {
         },
         sort: false,
         ghostClass: ".js_category",
-        onEnd: function (/**Event*/ evt) {
-          let to = evt.to;
-          let item = evt.item; // dragged HTMLElement
-
-          let categoryId = item.getAttribute("data-category-id");
-
-          if (categoryId) {
-            let categoryInfo = $this.getCategoryInfo(
-              categoryId,
-              "allSiteCategories",
-            );
-
-            //console.log("onEnd: categoryInfo ",categoryInfo);
-
-            let isAdded;
+        onEnd: (evt) => {
+          const item = evt.item;
+          const catId = item.getAttribute("data-category-id");
+          if (catId) {
+            const categoryInfo = getCategoryInfo(catId, "allSiteCategories");
+            let isAddSuccess;
             if (categoryInfo !== null) {
-              isAdded = $this.addCategory(categoryInfo);
+              isAddSuccess = addCategory(categoryInfo);
             }
-
             item.parentNode.removeChild(item);
-
-            $this.highlightEagerDrop("remove");
-
-            //we can send feedback
-            if (isAdded === false) {
-              Toast.show(
-                $this,
-                "Category is already added in this platform...",
-              );
+            highlightEagerDrop("remove");
+            if (isAddSuccess === false) {
+              Toast.show(instance, "Category is already added in this platform...");
             }
           }
         },
-        onStart: function (/**Event*/ evt) {
-          $this.highlightEagerDrop("add");
+        onStart: () => {
+          highlightEagerDrop("add");
         },
       });
-    },
-    highlightEagerDrop(addRemove = "add") {
-      let js_hook_modules = document.querySelectorAll(".js_category");
-      js_hook_modules.forEach(function (current) {
-        current.classList[addRemove]("module-drop-eager");
-      });
-    },
-    getCategoryInfo(categoryId, findIn = "allSiteCategories") {
-      let found = null;
-      let whereArr =
-        findIn === "allSiteCategories"
-          ? this.allSiteCategories
-          : this.allCategories;
-
-      for (let i = 0; i < whereArr.length; i++) {
-        let current = whereArr[i];
-        if (parseInt(current.category_id) === parseInt(categoryId)) {
-          found = current;
-          break;
-        }
-      }
-      return found;
-    },
-    findIndex(categoryId, findIn = "allCategories") {
-      //allCategories is left site
-      let index = -1;
-      let whereArr =
-        findIn === "allCategories"
-          ? this.allCategories
-          : this.allSiteCategories;
-      if (whereArr.length > 0) {
-        for (let i = 0; i < whereArr.length; i++) {
-          let current = whereArr[i];
-          if (parseInt(current.category_id) === parseInt(categoryId)) {
-            index = i;
-            break;
-          }
-        }
-      }
-      return index;
-    },
-    addCategory(category) {
-      let $this = this;
-      let index = this.findIndex(category.category_id);
-      let isAdded = false;
-      if (index === -1) {
-        //add in info
-        this.allCategoriesInfo[category.category_id.toString()] = {
-          index: index,
-          info: category,
-        };
-
-        //save in db
-        setTimeout(function () {
-          updateInDB();
-        }, 1);
-
-        isAdded = this.allCategories.push(category);
-
-        //console.log("isAdded 2 ",isAdded);
-      }
-
-      return isAdded;
-
-      function updateInDB() {
-        let url = AdminConfig.admin_path("category/insertCategory");
-        let where = $this.getWhere();
-        let postParams = {};
-        delete category["name"];
-        category.platform_id = where.platform_id;
-        postParams.data = {
-          category_id: category.category_id,
-          platform_id: where.platform_id,
-          site_id: where.site_id,
-        };
-        postParams.applicableForAllPlatforms = $this.applicableForAllPlatforms;
-        $this
-          .saveNow(url, postParams)
-          .then(function (res) {
-            Toast.show($this, "Saved...");
-          })
-          .catch(function (res) {
-            Toast.show($this, res.data.message, 2000);
-          });
-      }
-    },
-    setThemeEtc() {
-      let $this = this;
-      let current = this.currentSelection;
-      //set them in array
-      let index = this.findIndex(current.category_id);
-
-      if (index !== -1) {
-        this.allCategories[index].theme_id = current.theme_id;
-        this.allCategories[index].cache_category = current.cache_category;
-        this.categoryId = parseInt(current.category_id);
-
-        let postParams = {};
-        postParams.where = this.getWhere();
-        postParams.data = {
-          cache_category: current.cache_category || "",
-          theme_id: current.theme_id,
-        };
-        postParams.applicableForAllPlatforms = $this.applicableForAllPlatforms;
-
-        let url = AdminConfig.admin_path("category/updateThemeAndEtc");
-        this.saveNow(url, postParams)
-          .then(function (res) {
-            Toast.show($this, "Saved...");
-          })
-          .catch(function (res) {
-            Toast.show($this, res.data.message, 2000);
-          });
-      }
-      this.closePopup();
-    },
-    removeCategory(id) {
-      let $this = this;
-      let index = this.findIndex(id);
-      if (index !== -1) {
-        let categoryInfo = this.allCategories.splice(index, 1);
-        removeNow(categoryInfo[0]);
-        return categoryInfo;
-      }
-
-      function removeNow(categoryInfo) {
-        let url = AdminConfig.admin_path("category/deleteCategory");
-        let postParams = {};
-        let where = $this.getWhere();
-
-        postParams.where = {
-          category_id: categoryInfo.category_id,
-          microsite_id: where.microsite_id,
-        };
-
-        if (!$this.applicableForAllPlatforms) {
-          postParams.where.platform_id = where.platform_id;
-        }
-        $this
-          .saveNow(url, postParams)
-          .then(function (res) {
-            Toast.show($this, "Saved...");
-          })
-          .catch(function (res) {
-            Toast.show($this, res.data.message, 2000);
-          });
-      }
-    },
-    getThemeName(id) {
-      for (let i = 0; i < this.siteThemes.length; i++) {
-        if (this.siteThemes[i].id == id) {
-          return this.siteThemes[i].name;
-        }
-      }
-      return "";
-    },
-    updateThemeToAllCategories() {
-      let $this = this;
-      let url = AdminConfig.admin_path("category/updateThemeForAllCategories");
-      let categories = this.filterData("allCategories");
-
-      if (this.globalTheme !== "") {
-        if (categories.length > 0) {
-          let where = this.getWhere();
-          delete where.category_id;
-          delete where.microsite_id;
-
-          let postParams = {
-            data: { theme_id: this.globalTheme },
-            where: where,
-          };
-          Toast.show($this, "Please wait...");
-          this.saveNow(url, postParams)
-            .then(function (res) {
-              //console.log(res);
-              if (res.data["error"]) {
-                Toast.show($this, res.data.message, 5000);
-              } else {
-                Toast.show($this, "Saved");
-                for (let i = 0; i < categories.length; i++) {
-                  categories[i].theme_id = $this.globalTheme;
-                  //console.log(categories[i]);
-                }
-              }
-            })
-            .catch(function (res) {
-              Toast.show($this, res.data.message, 2000);
-            });
-        }
-      }
-    },
-  },
+    }
+  });
 };
+
+const makeData = () => {
+  if (categories.value.length > 0) {
+    categories.value.forEach((current) => {
+      const obj = {
+        category_id: current.category_id,
+        category_name: current.lang.name || current.category_name,
+        theme_id: current.theme_id,
+        cache_category: current.cache_category,
+        selected: false,
+      };
+      allCategories.value.push(obj);
+      allCategoriesInfo[current.category_id.toString()] = obj;
+    });
+  }
+
+  if (siteCategories.value.length > 0) {
+    siteCategories.value.forEach((current) => {
+      const obj = {
+        category_id: current.category_id,
+        category_name: current.name,
+        theme_id: "",
+        cache_category: "",
+        selected: false,
+      };
+      allSiteCategories.value.push(obj);
+    });
+  }
+};
+
+const selectAllData = (findIn = "allCategories", holder) => {
+  const whereArr = findIn === "allCategories" ? allCategories.value : allSiteCategories.value;
+  const selected = holder.checked;
+  whereArr.forEach((current) => {
+    current.selected = selected;
+  });
+};
+
+const showSearch = (findIn = "allCategories") => {
+  const whereArr = findIn === "allCategories" ? allCategories.value : allSiteCategories.value;
+  return whereArr.length > 10;
+};
+
+const filterData = (findIn = "allCategories") => {
+  let key = findIn === "allCategories" ? searchKeyPlatformCategory.value : searchKeyCategory.value;
+  const whereArr = findIn === "allCategories" ? allCategories.value : allSiteCategories.value;
+  if (key !== "" && key != null) {
+    key = key.toLowerCase();
+    return whereArr.filter((current) => {
+      const name = current.category_name.toLowerCase();
+      const id = current.category_id;
+      return id.toString() === key.toString() || name.includes(key);
+    });
+  }
+  return whereArr;
+};
+
+const setThemeEtc = () => {
+  const current = currentSelection;
+  const index = findIndex(current.category_id);
+
+  if (index !== -1) {
+    allCategories.value[index].theme_id = current.theme_id;
+    allCategories.value[index].cache_category = current.cache_category;
+    categoryId.value = parseInt(current.category_id);
+
+    const postParams = {
+      where: getWhere(),
+      data: {
+        cache_category: current.cache_category || "",
+        theme_id: current.theme_id,
+      },
+      applicableForAllPlatforms: applicableForAllPlatforms.value,
+    };
+
+    const url = AdminConfig.admin_path("category/updateThemeAndEtc");
+    saveNow(url, postParams)
+      .then(() => {
+        Toast.show(instance, "Saved...");
+      })
+      .catch((res) => {
+        Toast.show(instance, res.data.message, 2000);
+      });
+  }
+  closePopup();
+};
+
+const updateThemeToAllCategories = () => {
+  const url = AdminConfig.admin_path("category/updateThemeForAllCategories");
+  const filteredCats = filterData("allCategories");
+
+  if (globalTheme.value !== "") {
+    if (filteredCats.length > 0) {
+      const where = getWhere();
+      delete where.category_id;
+      delete where.microsite_id;
+
+      const postParams = {
+        data: { theme_id: globalTheme.value },
+        where: where,
+      };
+      Toast.show(instance, "Please wait...");
+      saveNow(url, postParams)
+        .then((res) => {
+          if (res.data["error"]) {
+            Toast.show(instance, res.data.message, 5000);
+          } else {
+            Toast.show(instance, "Saved");
+            filteredCats.forEach((cat) => {
+              cat.theme_id = globalTheme.value;
+            });
+          }
+        })
+        .catch((res) => {
+          Toast.show(instance, res.data.message, 2000);
+        });
+    }
+  }
+};
+
+const init = () => {
+  makeData();
+  if (canEdit.value) {
+    enableSorting();
+  }
+};
+
+onMounted(() => {
+  init();
+});
 </script>
+

@@ -15,34 +15,22 @@
   </div>
 </template>
 
-<script>
-import SplitButton from "./library/split-button.vue";
+<script setup>
+import { ref } from "vue";
 import { EventBus } from "../../../helpers/event-bus";
 import { SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  components: {
-    "split-button": SplitButton,
-  },
-  props: ["dataName", "dataId", "dataSites", "dataSelected"],
-  mounted() {
-    //this.init();
-  },
-  data() {
-    return {
-      sites: SafeJsonParse(this.dataSites, []),
-      selected:
-        typeof this.dataSelected === "undefined"
-          ? 1
-          : parseInt(this.dataSelected),
-      name: typeof this.dataName === "undefined" ? "site_id" : this.dataName,
-      id: typeof this.dataId === "undefined" ? "site_id" : this.dataId,
-    };
-  },
-  methods: {
-    setSite() {
-      EventBus.$emit("site_changed", this.selected);
-    },
-  },
+const props = defineProps(["dataName", "dataId", "dataSites", "dataSelected"]);
+
+const sites = ref(SafeJsonParse(props.dataSites, []));
+const selected = ref(
+  typeof props.dataSelected === "undefined" ? 1 : parseInt(props.dataSelected)
+);
+const name = ref(typeof props.dataName === "undefined" ? "site_id" : props.dataName);
+const id = ref(typeof props.dataId === "undefined" ? "site_id" : props.dataId);
+
+const setSite = () => {
+  EventBus.emit("site_changed", selected.value);
 };
 </script>
+

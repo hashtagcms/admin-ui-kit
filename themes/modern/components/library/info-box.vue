@@ -11,7 +11,7 @@
       ]" 
       body-class="flex items-center gap-6"
     >
-      <div :class="[getModernColor(), 'w-14 h-14 flex shrink-0 items-center justify-center rounded-lg transition-transform group-hover:rotate-12 shadow-lg shadow-current/10']">
+      <div :class="[colorClasses.icon, 'w-14 h-14 flex shrink-0 items-center justify-center rounded-lg transition-transform group-hover:rotate-12 shadow-lg']">
           <i style="font-style: normal" :class="[icon, 'text-sm font-black uppercase tracking-tighter leading-none']">
               {{ getIconText() }}
           </i>
@@ -34,98 +34,93 @@
   </component>
 </template>
 
-<script>
-import { Store } from "@hashtagcms/admin-sdk";
-import { SafeJsonParse } from "../../../../helpers/common";
+<script setup>
+import { computed } from "vue";
+import { Store, SafeJsonParse } from "../../../../helpers/common";
 import HcCard from "../../ui-kit/HcCard.vue";
 
-export default {
-  components: {
-    HcCard
-  },
-  mounted() {},
-  props: [
-    "dataInfo",
-    "dataColorIndex",
-    "dataSubTitle",
-    "dataTitle",
-    "dataIconCss",
-    "dataLink",
-  ],
-  data() {
-    return {
-      info: SafeJsonParse(this.dataInfo, null),
-      subTitle:
-        typeof this.dataSubTitle !== "undefined" ? this.dataSubTitle : "",
-      iconCss: this.dataIconCss,
-      link: typeof this.dataLink == "undefined" ? "" : this.dataLink,
-    };
-  },
-  computed: {
-    content() {
-      return this.info !== null
-        ? this.info.name || this.info.title
-        : this.dataTitle;
-    },
-    icon() {
-      if (
-        (typeof this.iconCss == "undefined" || this.iconCss === "") &&
-        this.info !== null
-      ) {
-        return this.info.icon_css || this.info.iconCss;
-      } else {
-        return this.iconCss;
-      }
-    },
-  },
-  methods: {
-    getIconText() {
-      return this.info?.icon_css || typeof this.iconCss === "undefined"
-        ? this.content
-            .replace(/[^a-zA-Z- ]/g, "")
-            .match(/\b\w/g)
-            .join("")
-        : "";
-    },
-    getModernColor: function () {
-      const colors = [
-          'bg-blue-50 text-blue-600',
-          'bg-indigo-50 text-indigo-600',
-          'bg-purple-50 text-purple-600',
-          'bg-emerald-50 text-emerald-600',
-          'bg-rose-50 text-rose-600',
-          'bg-amber-50 text-amber-600',
-          'bg-violet-50 text-violet-600',
-          'bg-cyan-50 text-cyan-600',
-          'bg-teal-50 text-teal-600',
-          'bg-pink-50 text-pink-600'
-      ];
-      let n = !this.dataColorIndex
-        ? this.getSerialNumber()
-        : this.dataColorIndex;
-      
-      return colors[(n - 1) % colors.length];
-    },
-    getRandom(min = 1, max = 10) {
-      //not in used
-      min = parseInt(min);
-      max = parseInt(max);
-      return Math.floor(Math.random() * (max - min)) + min;
-    },
-    getSerialNumber() {
-      if (Store.fetch("counter") === undefined) {
-        Store.store("counter", 1);
-      }
+const props = defineProps({
+  dataInfo: [String, Object],
+  dataColorIndex: [Number, String],
+  dataSubTitle: String,
+  dataTitle: String,
+  dataIconCss: String,
+  dataLink: String,
+});
 
-      let counter = Store.fetch("counter");
+const info = computed(() => SafeJsonParse(props.dataInfo, null));
+const subTitle = computed(() => typeof props.dataSubTitle !== "undefined" ? props.dataSubTitle : "");
+const iconCss = computed(() => props.dataIconCss);
+const link = computed(() => typeof props.dataLink === "undefined" ? "" : props.dataLink);
 
-      if (counter > 10) {
-        counter = 1;
-      }
-      Store.store("counter", counter + 1);
+const content = computed(() => {
+  return info.value !== null
+    ? info.value.name || info.value.title
+    : props.dataTitle;
+});
 
-      return counter;
-    },
-  },
+const icon = computed(() => {
+  if (
+    (typeof iconCss.value === "undefined" || iconCss.value === "") &&
+    info.value !== null
+  ) {
+    return info.value.icon_css || info.value.iconCss;
+  } else {
+    return iconCss.value;
+  }
+});
+
+const getIconText = () => {
+  return info.value?.icon_css || typeof iconCss.value === "undefined"
+    ? content.value
+        .replace(/[^a-zA-Z- ]/g, "")
+        .match(/\b\w/g)
+        ?.join("") || ""
+    : "";
 };
+
+const getSerialNumber = () => {
+  if (Store.fetch("counter") === undefined) {
+    Store.store("counter", 1);
+  }
+
+  let counter = Store.fetch("counter");
+
+  if (counter > 10) {
+    counter = 1;
+  }
+  Store.store("counter", counter + 1);
+
+  return counter;
+};
+
+const colorClasses = computed(() => {
+  const colors = [
+    { icon: 'bg-indigo-600 text-white shadow-indigo-500/30' },
+    { icon: 'bg-emerald-500 text-white shadow-emerald-500/30' },
+    { icon: 'bg-rose-500 text-white shadow-rose-500/30' },
+    { icon: 'bg-amber-500 text-white shadow-amber-500/30' },
+    { icon: 'bg-blue-600 text-white shadow-blue-500/30' },
+    { icon: 'bg-purple-600 text-white shadow-purple-500/30' },
+    { icon: 'bg-pink-500 text-white shadow-pink-500/30' },
+    { icon: 'bg-orange-500 text-white shadow-orange-500/30' },
+    { icon: 'bg-cyan-500 text-white shadow-cyan-500/30' },
+    { icon: 'bg-violet-600 text-white shadow-violet-500/30' }
+  ];
+
+  let n = props.dataColorIndex;
+  
+  if (!n) {
+    // Generate a consistent index based on the title if no color index is provided
+    const str = content.value || "";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    n = Math.abs(hash) % colors.length + 1;
+  }
+  
+  return colors[(n - 1) % colors.length];
+});
 </script>
+

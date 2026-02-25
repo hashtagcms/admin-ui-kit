@@ -1,31 +1,31 @@
-# SitewiseData Component
+# SiteWiseData Component
 
-**Package:** `@hashtagcms/components`
-**Source:** `packages/components/src/sitewise-data.vue`
+**Package:** `@hashtagcms/admin-ui-kit`
+**Source:** `themes/modern/components/sitewise-data.vue`
 
-Manages the association of data (e.g., categories, modules) to specific sites. Displays two lists: "Available" and "Selected".
+Manages the association of data (e.g., categories, modules) to specific sites. Displays two lists: "Available" and "Attached".
 
 ## 🚀 Import
 
 ```javascript
-import SitewiseData from "@hashtagcms/components/sitewise-data";
+import { SiteWiseData } from "@hashtagcms/admin-ui-kit";
 ```
 
 ## 🛠 Props
 
 | Prop            | Type          | Description                           |
 | :-------------- | :------------ | :------------------------------------ |
-| `data-list`     | `JSON String` | All available items.                  |
-| `data-selected` | `JSON String` | Items currently assigned to the site. |
+| `data-all-data` | `JSON String` | All available items in the pool.      |
+| `data-site-data`| `JSON String` | Items currently assigned to the site. |
 | `data-site-id`  | `Number`      | The target site ID.                   |
-| `data-save-url` | `String`      | API endpoint to save changes.         |
+| `data-controller-name` | `String` | Controller name for API calls (default: "site"). |
 
 ## 🛠 Usage
 
 ```html
-<sitewise-data
-  data-list="[...]"
-  data-selected="[...]"
+<site-wise
+  data-all-data="[...]"
+  data-site-data="[...]"
   data-site-id="1"
-></sitewise-data>
+></site-wise>
 ```

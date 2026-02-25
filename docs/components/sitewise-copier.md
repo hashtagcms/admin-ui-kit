@@ -1,34 +1,38 @@
-# Sitewise Copier Component
+# SiteWiseCopier Component
 
-The `SitewiseCopier` component allows users to copy data and settings from one site (platform/language) to another. It typically fetches source and destination options via API and handles the copy operation.
+**Package:** `@hashtagcms/admin-ui-kit`
+**Source:** `themes/modern/components/sitewise-copier.vue`
 
-## Usage
+The `SiteWiseCopier` component allows users to copy data and settings from one site context to another. It uses the `SiteWiseData` component internally to handle the data selection and visualization.
 
-```html
-<sitewise-copier
-  :data-title="title"
-  :data-label="label"
-  :data-submit-label="submitLabel"
-  :data-api-url="apiUrl"
-/>
+## 🚀 Import
+
+```javascript
+import { SiteWiseCopier } from "@hashtagcms/admin-ui-kit";
 ```
 
-## Props
+## 🛠 Usage
+
+```html
+<site-wise-copier
+  data-all-sites="[...]"
+  data-current-key="city"
+  data-site-id="1"
+></site-wise-copier>
+```
+
+## 🛠 Props
 
 | Prop | Type | Description |
 | :--- | :--- | :--- |
-| `dataTitle` | `String` | Title of the copier section. |
-| `dataLabel` | `String` | Label for the selection input. |
-| `dataSubmitLabel` | `String` | Text for the submit button. |
-| `dataApiUrl` | `String` | API endpoint to fetch comparison data or copy targets. |
+| `data-all-sites` | `JSON String` | List of all sites available for selection as source. |
+| `data-site-id` | `Number` | The destination (current) site ID. |
+| `data-current-key` | `String` | The type of data being copied (e.g., 'city', 'country'). |
+| `data-controller-name` | `String` | API controller to handle copy/remove (default: "site"). |
 
-## Behavior
+## ⚙️ Behavior
 
-1.  **Loading**: Fetches available copy options on mount.
-2.  **Selection**: User selects target site/language.
-3.  **Action**: Triggers API call to perform the copy.
-4.  **Feedback**: Displays toast messages on success/failure.
-
-## Events
-
-This component primarily interacts via internal API calls and Global Toast notifications.
+1.  **Selection**: User selects an "Origin Context" (Source Site).
+2.  **Hydration**: Component fetches data from the source site via API.
+3.  **Visualization**: Displays differences using the internal `SiteWiseData` grid.
+4.  **Execution**: User can add (copy) or remove items from the destination site.

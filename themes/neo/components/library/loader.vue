@@ -51,91 +51,86 @@
   </div>
 </template>
 
-<script>
-export default {
-  props: ["dataLoadingText", "dataAsModal"],
-  mounted() {
-    this.fixLayout();
-  },
-  data() {
-    return {
-      loadingText:
-        typeof this.dataLoadingText === "undefined"
-          ? "Loading. Please wait..."
-          : this.dataLoadingText,
-      asModal:
-        typeof dataAsModal === "undefined" || dataAsModal === true
-          ? true
-          : false,
-      visible: false,
-    };
-  },
-  methods: {
-    fixLayout(position = null) {
-      let heightWidth = getHeightWidth();
+<script setup>
+import { ref, onMounted } from "vue";
 
-      let loaderModal = this.$refs.loaderModal;
-      let loaderSpinner = this.$refs.loaderSpinner;
+const props = defineProps(["dataLoadingText", "dataAsModal"]);
 
-      //loader width/height
-      loaderModal.style.width = heightWidth.width + "px";
-      loaderModal.style.height = heightWidth.height + "px";
+// Template Refs
+const loaderModal = ref(null);
+const loaderSpinner = ref(null);
 
-      if (position !== null) {
-        if (position.left) {
-          loaderSpinner.style.left = position.left + "px";
-        }
+// State
+const loadingText = ref(
+  props.dataLoadingText === undefined ? "Loading. Please wait..." : props.dataLoadingText
+);
+const asModal = ref(props.dataAsModal === undefined || props.dataAsModal === true);
+const visible = ref(false);
 
-        if (position.top) {
-          loaderSpinner.style.top = position.top + "px";
-        }
+// Helpers
+const getHeightWidth = () => {
+  let width = 0;
+  let height = 0;
+  if (typeof window.innerWidth === "number") {
+    // Non-IE
+    width = window.innerWidth;
+    height = window.innerHeight;
+  } else if (
+    document.documentElement &&
+    (document.documentElement.clientWidth || document.documentElement.clientHeight)
+  ) {
+    // IE 6+ in 'standards compliant mode'
+    width = document.documentElement.clientWidth;
+    height = document.documentElement.clientHeight;
+  } else if (document.body && (document.body.clientWidth || document.body.clientHeight)) {
+    // IE 4 compatible
+    width = document.body.clientWidth;
+    height = document.body.clientHeight;
+  }
 
-        if (position.right) {
-          loaderSpinner.style.top = position.right + "px";
-        }
-      }
-
-      function getHeightWidth() {
-        var width = 0,
-          height = 0;
-        if (typeof window.innerWidth == "number") {
-          //Non-IE
-          width = window.innerWidth;
-          height = window.innerHeight;
-        } else if (
-          document.documentElement &&
-          (document.documentElement.clientWidth ||
-            document.documentElement.clientHeight)
-        ) {
-          //IE 6+ in 'standards compliant mode'
-          width = document.documentElement.clientWidth;
-          height = document.documentElement.clientHeight;
-        } else if (
-          document.body &&
-          (document.body.clientWidth || document.body.clientHeight)
-        ) {
-          //IE 4 compatible
-          width = document.body.clientWidth;
-          height = document.body.clientHeight;
-        }
-
-        return { width, height };
-      }
-
-      //console.log(width, height);
-    },
-    show(message = null, position = null) {
-      this.visible = true;
-
-      if (typeof message == "string") {
-        this.loadingText = message;
-      }
-
-      this.fixLayout(position);
-    },
-    hide() {
-      this.visible = false;
-    },
-  },
+  return { width, height };
 };
+
+// Methods
+const fixLayout = (position = null) => {
+  const heightWidth = getHeightWidth();
+
+  if (loaderModal.value) {
+    loaderModal.value.style.width = `${heightWidth.width}px`;
+    loaderModal.value.style.height = `${heightWidth.height}px`;
+  }
+
+  if (loaderSpinner.value && position !== null) {
+    if (position.left) {
+      loaderSpinner.value.style.left = `${position.left}px`;
+    }
+    if (position.top) {
+      loaderSpinner.value.style.top = `${position.top}px`;
+    }
+    if (position.right) {
+      loaderSpinner.value.style.top = `${position.right}px`;
+    }
+  }
+};
+
+const show = (message = null, position = null) => {
+  visible.value = true;
+
+  if (typeof message === "string") {
+    loadingText.value = message;
+  }
+
+  fixLayout(position);
+};
+
+const hide = () => {
+  visible.value = false;
+};
+
+defineExpose({ show, hide });
+
+onMounted(() => {
+  fixLayout();
+});
 </script>
+

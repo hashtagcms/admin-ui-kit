@@ -5,39 +5,40 @@
   >
 </template>
 
-<script>
-export default {
-  props: ["dataBackUrl", "dataTimeout"],
-  data() {
-    return {
-      totalTime:
-        typeof this.dataTimeout == "undefined" ? 5 : parseInt(this.dataTimeout),
-      timeRemaining: 0,
-      intervalId: 0,
-      seconds: "Seconds",
-    };
-  },
-  mounted() {
-    this.intervalId = setInterval(this.updateTime, 1000);
-  },
-  methods: {
-    goBack() {
-      //console.log(this.dataBackUrl);
-      clearInterval(this.intervalId);
-      window.location.href = this.dataBackUrl;
-    },
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
 
-    updateTime() {
-      if (this.timeRemaining >= this.totalTime) {
-        clearInterval(this.intervalId);
-        this.goBack();
-      } else {
-        this.timeRemaining++;
-      }
+const props = defineProps(["dataBackUrl", "dataTimeout"]);
 
-      this.seconds =
-        this.totalTime - this.timeRemaining <= 1 ? "Second" : "Seconds";
-    },
-  },
+// State
+const totalTime = ref(props.dataTimeout === undefined ? 5 : parseInt(props.dataTimeout));
+const timeRemaining = ref(0);
+const intervalId = ref(0);
+const seconds = ref("Seconds");
+
+// Methods
+const goBack = () => {
+  clearInterval(intervalId.value);
+  window.location.href = props.dataBackUrl;
 };
+
+const updateTime = () => {
+  if (timeRemaining.value >= totalTime.value) {
+    clearInterval(intervalId.value);
+    goBack();
+  } else {
+    timeRemaining.value++;
+  }
+
+  seconds.value = totalTime.value - timeRemaining.value <= 1 ? "Second" : "Seconds";
+};
+
+onMounted(() => {
+  intervalId.value = setInterval(updateTime, 1000);
+});
+
+onBeforeUnmount(() => {
+  clearInterval(intervalId.value);
+});
 </script>
+

@@ -4,18 +4,13 @@
   </button>
 </template>
 
-<script>
+<script setup>
 import AdminConfig from "../../../helpers/admin-config";
 
-export default {
-  mounted() {},
-  props: ["dataControllerName"],
-  methods: {
-    downloadNow() {
-      window.location.href = AdminConfig.admin_path(
-        this.dataControllerName + "/download",
-      );
-    },
-  },
+const props = defineProps(["dataControllerName"]);
+
+const downloadNow = () => {
+  window.location.href = AdminConfig.admin_path(`${props.dataControllerName}/download`);
 };
 </script>
+

@@ -1,6 +1,6 @@
-import { shallowMount } from '@vue/test-utils';
+import { shallowMount, flushPromises } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
-import SitewiseCopier from '@hashtagcms/theme/neo/components/sitewise-copier.vue';
+import SiteWiseCopier from '@hashtagcms/theme/neo/components/sitewise-copier.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 // Mock dependencies
@@ -10,10 +10,11 @@ vi.mock('@hashtagcms/helpers/admin-config', () => ({
   }
 }));
 
-vi.mock('@hashtagcms/helpers/common', () => ({ SafeJsonParse: (d, def) => { try { return JSON.parse(d); } catch { return def; } }, SafeJsonParse: (d, def) => { try { return JSON.parse(d); } catch { return def; } },
+vi.mock('@hashtagcms/helpers/common', () => ({ 
+  SafeJsonParse: (d, def) => { try { return JSON.parse(d); } catch { return def; } },
   Loader: { show: vi.fn(), hide: vi.fn() },
   Toast: { show: vi.fn() },
-  safeErrorData: vi.fn((error) => error)
+  SafeErrorData: vi.fn((error) => error)
 }));
 
 const mockAxios = {
@@ -22,12 +23,16 @@ const mockAxios = {
 };
 vi.stubGlobal('axios', mockAxios);
 
-describe('SitewiseCopier.vue', () => {
+describe('Neo: SiteWiseCopier.vue', () => {
 
   const dataProps = loadFakeData('site-wise-copier.txt');
   const props = {};
   for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
+      if (key === 'dataAllSites') {
+          const sites = dataProps[key];
+          sites.push({id: 2, name: 'Secondary Site'}); // Add another site to avoid filtering out everything
+          props[key] = JSON.stringify(sites);
+      } else if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
           props[key] = JSON.stringify(dataProps[key]);
       } else {
           props[key] = String(dataProps[key]);
@@ -35,7 +40,7 @@ describe('SitewiseCopier.vue', () => {
   }
 
   it('renders correctly', () => {
-    const wrapper = shallowMount(SitewiseCopier, { props });
+    const wrapper = shallowMount(SiteWiseCopier, { props });
     
     // Check if site select is rendered
     const select = wrapper.find('select');
@@ -43,15 +48,15 @@ describe('SitewiseCopier.vue', () => {
     expect(select.findAll('option').length).toBeGreaterThan(1); // Default + sites
     
     // Check if child component is rendered (stub)
-    expect(wrapper.findComponent({ name: 'site-wise' }).exists()).toBe(true);
+    expect(wrapper.findComponent({ name: 'SiteWiseData' }).exists()).toBe(true);
   });
 
   it('fetches data when site selected', async () => {
-    const wrapper = shallowMount(SitewiseCopier, { 
+    const wrapper = shallowMount(SiteWiseCopier, { 
         props,
         global: {
             stubs: {
-                'site-wise': {
+                'SiteWiseData': {
                     template: '<div />',
                     methods: {
                         setData: vi.fn(),
@@ -72,11 +77,11 @@ describe('SitewiseCopier.vue', () => {
   
   it('handles copy action', async () => {
       const mockSetSiteData = vi.fn();
-      const wrapper = shallowMount(SitewiseCopier, { 
+      const wrapper = shallowMount(SiteWiseCopier, { 
           props,
           global: {
               stubs: {
-                  'site-wise': {
+                  'SiteWiseData': {
                       template: '<div />',
                       methods: {
                           setData: vi.fn(),
@@ -89,6 +94,7 @@ describe('SitewiseCopier.vue', () => {
       
       // Trigger actionAdd
       await wrapper.vm.doAction('add', [], [{id:1, selected:true}], [1]);
+      await flushPromises();
       
       expect(mockAxios.post).toHaveBeenCalled();
       expect(mockSetSiteData).toHaveBeenCalled();

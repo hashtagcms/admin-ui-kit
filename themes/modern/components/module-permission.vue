@@ -37,7 +37,7 @@
                 type="checkbox"
                 id="selectAll"
                 class="w-6 h-6 text-blue-600 bg-white border-gray-300 rounded-lg focus:ring-blue-500 focus:ring-offset-2 transition-all cursor-pointer shadow-sm"
-                @click="selectAll()"
+                @change="selectAll()"
               />
             </div>
             <label for="selectAll" class="text-lg font-extrabold text-gray-800 cursor-pointer select-none">
@@ -60,7 +60,7 @@
             >
               <div class="flex items-center gap-4">
                 <input
-                  @click="selectMe(module)"
+                  @change="selectMe(module)"
                   class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 transition-all cursor-pointer shadow-sm"
                   type="checkbox"
                   v-model="module.selected"
@@ -93,7 +93,7 @@
                 <div class="flex items-center justify-between p-4 sm:pl-14 sm:pr-6 hover:bg-blue-50/30 transition-all">
                   <div class="flex items-center gap-3">
                     <input
-                      @click="selectMe(child, module)"
+                      @change="selectMe(child, module)"
                       class="w-4 h-4 text-blue-500 bg-white border-gray-300 rounded-md focus:ring-blue-500 transition-all cursor-pointer shadow-sm"
                       type="checkbox"
                       v-model="child.selected"
@@ -147,211 +147,204 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, onBeforeUnmount, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import Form from "../../../helpers/form";
 import { Toast, SafeJsonParse } from "../../../helpers/common";
 import { EventBus } from "../../../helpers/event-bus";
 
-export default {
-  mounted() {
-    this.form.cmsModuleData = this.allModules;
-    this.form.userId = this.userModules.id;
-    this.showSuperAdmin();
-    EventBus.on("on-paste", (data) => {
-      this.handlePaste(data);
+const props = defineProps([
+  "dataCmsModules",
+  "dataUserModules",
+  "dataControllerName",
+  "dataBackUrl",
+  "dataIsSuperAdmin",
+]);
+
+const instance = getCurrentInstance();
+
+// State
+const userModules = ref(SafeJsonParse(props.dataUserModules, []));
+const form = reactive(new Form({
+  cmsModuleData: [],
+  userId: 0,
+}));
+const selectAllModule = ref(false);
+const superAdmin = ref(false);
+const errorMessage = ref("");
+
+// Computed
+const allModules = computed(() => {
+  const uMods = userModules.value.cmsmodules || [];
+  const mods = SafeJsonParse(props.dataCmsModules, []);
+  
+  function findModule(currentModule) {
+    if (uMods.length > 0) {
+      const found = uMods.find((m) => m.module_id.toString() === currentModule.id.toString());
+      return found === undefined ? false : found;
+    }
+    return false;
+  }
+
+  const filtered = [];
+  if (mods.length > 0) {
+    for (let i = 0; i < mods.length; i++) {
+      const current = mods[i];
+      const found = findModule(current);
+      current.selected = !!found;
+      current.readonly = found && found.readonly === 1;
+      
+      if (current.parent_id === 0 && current.child && current.child.length > 0) {
+        for (let c = 0; c < current.child.length; c++) {
+          const child = current.child[c];
+          const foundChild = findModule(child);
+          child.selected = !!foundChild;
+          child.readonly = foundChild && foundChild.readonly === 1;
+        }
+      }
+      if (current.parent_id === 0) {
+        filtered.push(current);
+      }
+    }
+  }
+  return filtered;
+});
+
+const permissionSaveUrl = computed(() => {
+  return AdminConfig.admin_path(props.dataControllerName + "/saveModulePermissions");
+});
+
+const csrfToken = computed(() => {
+  return window.HashtagCms?.csrfToken || window.Laravel?.csrfToken;
+});
+
+// Methods
+const hasChild = (data) => data.child && data.child.length > 0;
+const isParent = (data) => data.parent_id === 0;
+
+const selectMe = (current, parentModule, forcedSelectAll = null) => {
+  let shouldSelect = current.selected;
+
+  if (forcedSelectAll !== null) {
+    shouldSelect = forcedSelectAll;
+    current.selected = shouldSelect;
+  }
+
+  if (current.child && current.child.length > 0) {
+    current.child.forEach((c) => {
+      c.selected = shouldSelect;
+      if (!shouldSelect) {
+        c.readonly = false;
+      }
     });
-  },
-  props: [
-    "dataCmsModules",
-    "dataUserModules",
-    "dataControllerName",
-    "dataBackUrl",
-    "dataIsSuperAdmin",
-  ],
-  data() {
-    return {
-      userModules: SafeJsonParse(this.dataUserModules, []),
-      form: new Form({
-        cmsModuleData: [],
-        userId: 0,
-      }),
-      selectAllModule: false,
-      superAdmin: false,
-      errorMessage: "",
-    };
-  },
-  computed: {
-    allModules() {
-      let userModules = this.userModules.cmsmodules;
+  }
 
-      let modules = SafeJsonParse(this.dataCmsModules, []);
-      //console.log(modules);
-      let filterModules = [];
-      if (modules.length > 0) {
-        for (let i = 0; i < modules.length; i++) {
-          let current = modules[i];
-          let found = findModule(current);
-          current.selected = found ? true : false;
-          current.readonly = found.readonly === 1;
-          if (current.parent_id === 0 && current.child.length > 0) {
-            for (let c = 0; c < current.child.length; c++) {
-              let child = current.child[c];
-              let foundChild = findModule(child);
-              child.selected = foundChild ? true : false;
-              child.readonly = foundChild.readonly === 1;
-            }
-          }
-          if (current.parent_id === 0) {
-            filterModules.push(current);
-          }
-        }
-      }
-      return filterModules;
+  if (shouldSelect !== true) {
+    current.readonly = false;
+  }
 
-      function findModule(currentModule) {
-        if (userModules.length > 0) {
-          let found = userModules.find(function (current) {
-            return current.module_id.toString() === currentModule.id.toString();
-          });
+  if (parentModule) {
+    const isAnySelected = parentModule.child.find((c) => c.selected === true);
+    if (shouldSelect || isAnySelected) {
+      parentModule.selected = true;
+    }
+  }
 
-          return found === undefined ? false : found;
-        }
-        return false;
-      }
-    },
-    permissionSaveUrl() {
-      return AdminConfig.admin_path(
-        this.dataControllerName + "/saveModulePermissions",
-      );
-    },
-    csrfToken() {
-      return window.HashtagCms?.csrfToken || window.Laravel?.csrfToken;
-    },
-  },
-  methods: {
-    handlePaste(data) {
-      let pastedData = SafeJsonParse(data, {});
-      this.form.cmsModuleData.forEach((item, index) => {
-        let id = item.id;
-        let status = isCheckBoxSelected(id);
-        if (status.selected) {
-          item.selected = true;
-          item.readonly = status.readonly;
-        }
-        if (item.child.length > 0) {
-          item.child.forEach((childItem, childIndex) => {
-            let childId = childItem.id;
-            let statusChild = isCheckBoxSelected(childId);
-            if (statusChild.selected) {
-              childItem.selected = true;
-              childItem.readonly = statusChild.readonly;
-            }
-          });
+  if (shouldSelect === false) {
+    selectAllModule.value = false;
+  }
+};
+
+const handlePaste = (data) => {
+  const pastedData = SafeJsonParse(data, {});
+  
+  function isCheckBoxSelected(id) {
+    const ele = document.getElementById("check_" + id);
+    const readonlyEle = document.getElementById("check_readonly_" + id);
+    if (ele && ele.checked) {
+      return { selected: true, readonly: readonlyEle ? readonlyEle.checked : false };
+    }
+    return { selected: false, readonly: false };
+  }
+
+  form.cmsModuleData.forEach((item) => {
+    const status = isCheckBoxSelected(item.id);
+    if (status.selected) {
+      item.selected = true;
+      item.readonly = status.readonly;
+    }
+    if (item.child && item.child.length > 0) {
+      item.child.forEach((childItem) => {
+        const statusChild = isCheckBoxSelected(childItem.id);
+        if (statusChild.selected) {
+          childItem.selected = true;
+          childItem.readonly = statusChild.readonly;
         }
       });
-
-      function isCheckBoxSelected(id) {
-        for (let key in pastedData) {
-          let ele = document.getElementById("check_" + id);
-          let readonlyEle = document.getElementById("check_readonly_" + id);
-          if (ele && ele.checked) {
-            return { selected: true, readonly: readonlyEle.checked };
-          }
-        }
-        return { selected: false, readonly: false };
-      }
-    },
-    hasChild(data) {
-      return data.child && data.child.length > 0;
-    },
-    isParent(data) {
-      return data.parent_id === 0;
-    },
-    selectReadOnly(current, event, isChild = false) {
-      let isChecked = event.target.checked;
-      if (current.selected !== true) {
-        current.selected = isChecked;
-      }
-      //current.readonly = (isChecked) ? 1 : 0;
-      if (isChild === true) {
-        //selected parent
-      }
-    },
-    selectAll() {
-      let shouldSelect = this.selectAllModule === false;
-
-      for (let i = 0; i < this.form.cmsModuleData.length; i++) {
-        let current = this.form.cmsModuleData[i];
-        current.selected = shouldSelect;
-
-        this.selectMe(current, undefined, shouldSelect);
-      }
-    },
-    selectMe(current, parentModule, forcedSelectAll = null) {
-      let shouldSelect = current.selected === false; //show previous state
-
-      //if forcing
-      if (forcedSelectAll !== null) {
-        shouldSelect = forcedSelectAll;
-      }
-
-      if (current.child && current.child.length > 0) {
-        current.child.map(function (c) {
-          c.selected = shouldSelect;
-          //reset readonly
-          if (!shouldSelect) {
-            c.readonly = false;
-          }
-        });
-      }
-
-      if (shouldSelect !== true) {
-        current.readonly = false;
-      }
-
-      //check if parent should be selected
-      if (parentModule) {
-        let isAnySelected = parentModule.child.find(function (current) {
-          //console.log("current.selected === true", current.selected === true)
-          return current.selected === true;
-        });
-
-        if (shouldSelect || isAnySelected) {
-          parentModule.selected = true;
-        }
-      }
-
-      //Check if one or more is unchecked. reset select all tab
-      if (shouldSelect === false) {
-        this.selectAllModule = false;
-      }
-    },
-    showSuperAdmin() {
-      if (
-        this.dataIsSuperAdmin.toString() === "1" ||
-        this.dataIsSuperAdmin.toString() === "true"
-      ) {
-        this.superAdmin = true;
-      }
-    },
-    saveData() {
-      this.form
-        .post(this.permissionSaveUrl, false)
-        .then((response) => this.afterFormSaved(response))
-        .catch((response) => this.afterFormSaved(response));
-    },
-    afterFormSaved(response) {
-      if (response.isSaved === true) {
-        Toast.show(this, "Saved Successfully. ");
-      } else {
-        Toast.show(this, "There is some error.");
-      }
-    },
-    goBack() {
-      window.location = this.dataBackUrl;
-    },
-  },
+    }
+  });
 };
+
+const selectReadOnly = (current, event, isChild = false) => {
+  const isChecked = event.target.checked;
+  if (current.selected !== true) {
+    current.selected = isChecked;
+  }
+};
+
+const selectAll = () => {
+  const shouldSelect = selectAllModule.value;
+  form.cmsModuleData.forEach((current) => {
+    current.selected = shouldSelect;
+    selectMe(current, undefined, shouldSelect);
+  });
+};
+
+const showSuperAdminLogic = () => {
+  if (props.dataIsSuperAdmin.toString() === "1" || props.dataIsSuperAdmin.toString() === "true") {
+    superAdmin.value = true;
+  }
+};
+
+const afterFormSaved = (response) => {
+  const isSuccess = response.isSaved === true || response.status === 200;
+  const message = response.message || (isSuccess ? "Permissions updated successfully!" : "There was an error saving permissions.");
+  const type = isSuccess ? "success" : "error";
+
+  Toast.show(instance.proxy, message, 3000, type);
+  
+  if (!isSuccess) {
+    errorMessage.value = message;
+  } else {
+    errorMessage.value = "";
+  }
+};
+
+const saveData = () => {
+  errorMessage.value = "";
+  form
+    .post(permissionSaveUrl.value, false)
+    .then((response) => afterFormSaved(response))
+    .catch((error) => {
+      const response = error.response?.data || { isSaved: false, message: error.message };
+      afterFormSaved(response);
+    });
+};
+
+const goBack = () => {
+  window.location = props.dataBackUrl;
+};
+
+// Lifecycle
+onMounted(() => {
+  form.cmsModuleData = allModules.value;
+  form.userId = userModules.value.id;
+  showSuperAdminLogic();
+  EventBus.on("on-paste", handlePaste);
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("on-paste", handlePaste);
+});
 </script>

@@ -23,77 +23,62 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { EventBus } from "../../../helpers/event-bus";
 import { SafeJsonParse } from "../../../helpers/common";
 import DownloadButton from "./downloads.vue";
 import HcPagination from "../ui-kit/HcPagination.vue";
 
-export default {
-  name: "Pagination",
-  components: {
-    "download-button": DownloadButton,
-    HcPagination
-  },
-  mounted() {
-    this.updatePageParams();
-    let $this = this;
-    EventBus.on("pagination-on-delete", function () {
-      $this.decreaseCounter();
-    });
-  },
-  props: [
-    "dataPaginator",
-    "dataFirstItem",
-    "dataLastItem",
-    "dataTotal",
-    "dataControllerName",
-    "dataNextLabel",
-    "dataPreviousLabel",
-    "dataShowDownload",
-  ],
-  data() {
-    return {
-      totalCount: parseInt(this.dataTotal),
-      lastItem: parseInt(this.dataLastItem),
-      controllerName: this.dataControllerName,
-      paginator: SafeJsonParse(this.dataPaginator, {}),
-      pageLabel: {
-        "pagination.next": this.dataNextLabel,
-        "pagination.previous": this.dataPreviousLabel,
-      },
-      showDownload:
-        this.dataShowDownload === "true" || this.dataShowDownload === "1",
-    };
-  },
-  computed: {
-    showPagination() {
-      return this.paginator.last_page > 1;
-    },
-  },
-  methods: {
-    decreaseCounter() {
-      this.totalCount = this.totalCount - 1;
-      this.lastItem = this.lastItem - 1;
-    },
-    handlePageChange(page) {
-      // Find the URL for this page number in Laravel's links
-      // Usually Laravel provides links like [ {label: "1", url: "..."}, {label: "2", url: "..."}, ... ]
-      const pageLink = this.paginator.links.find(link => link.label == page);
-      if (pageLink && pageLink.url) {
-        window.location.href = pageLink.url;
-      } else {
-        // Fallback: manually construct URL or find by page number
-        const baseUrl = this.paginator.path;
-        const searchParams = new URLSearchParams(window.location.search);
-        searchParams.set('page', page);
-        window.location.href = `${baseUrl}?${searchParams.toString()}`;
-      }
-    },
-    updatePageParams() {
-      // This legacy method was used to fixup <a> tags, 
-      // with HcPagination we handle navigation via handlePageChange
-    },
-  },
+const props = defineProps([
+  "dataPaginator",
+  "dataFirstItem",
+  "dataLastItem",
+  "dataTotal",
+  "dataControllerName",
+  "dataNextLabel",
+  "dataPreviousLabel",
+  "dataShowDownload",
+]);
+
+const totalCount = ref(parseInt(props.dataTotal));
+const lastItem = ref(parseInt(props.dataLastItem));
+const controllerName = ref(props.dataControllerName);
+const paginator = ref(SafeJsonParse(props.dataPaginator, {}));
+const showDownload = ref(
+  props.dataShowDownload === "true" || props.dataShowDownload === "1"
+);
+
+const showPagination = computed(() => {
+  return paginator.value.last_page > 1;
+});
+
+const decreaseCounter = () => {
+  totalCount.value = totalCount.value - 1;
+  lastItem.value = lastItem.value - 1;
 };
+
+const handlePageChange = (page) => {
+  // Find the URL for this page number in Laravel's links
+  // Usually Laravel provides links like [ {label: "1", url: "..."}, {label: "2", url: "..."}, ... ]
+  const pageLink = paginator.value.links?.find((link) => link.label == page);
+  if (pageLink && pageLink.url) {
+    window.location.href = pageLink.url;
+  } else {
+    // Fallback: manually construct URL or find by page number
+    const baseUrl = paginator.value.path;
+    const searchParams = new URLSearchParams(window.location.search);
+    searchParams.set("page", page);
+    window.location.href = `${baseUrl}?${searchParams.toString()}`;
+  }
+};
+
+onMounted(() => {
+  EventBus.on("pagination-on-delete", decreaseCounter);
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("pagination-on-delete", decreaseCounter);
+});
 </script>
+

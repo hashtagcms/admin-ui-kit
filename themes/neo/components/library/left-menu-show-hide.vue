@@ -4,44 +4,47 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { LeftMenu } from "../../../../helpers/common";
 import { EventBus } from "../../../../helpers/event-bus";
 
-export default {
-  mounted() {
-    LeftMenu.init();
-    this.init();
-  },
-  props: ["dataIconCss", "dataIconCssOff"],
-  data() {
-    return {
-      visible: true,
-      currentCss: "",
-      css:
-        typeof this.dataIconCss == "undefined" || this.dataIconCss === ""
-          ? "fa fa-arrow-left hand"
-          : this.dataIconCss,
-      cssOff:
-        typeof this.dataIconCssOff == "undefined" || this.dataIconCssOff === ""
-          ? "fa fa-arrow-right hand"
-          : this.dataIconCssOff,
-    };
-  },
-  methods: {
-    init() {
-      this.currentCss = LeftMenu.isVisible() ? this.css : this.cssOff;
-      EventBus.on("left-menu-on-show", () => {
-        this.currentCss = this.css;
-      });
-      EventBus.on("left-menu-on-hide", () => {
-        this.currentCss = this.cssOff;
-      });
-    },
-    toggleMenu() {
-      this.visible = !this.visible;
-      LeftMenu.toggleShow();
-    },
-  },
+const props = defineProps(["dataIconCss", "dataIconCssOff"]);
+
+// State
+const visible = ref(true);
+const currentCss = ref("");
+const css = ref(props.dataIconCss || "fa fa-arrow-left hand");
+const cssOff = ref(props.dataIconCssOff || "fa fa-arrow-right hand");
+
+// Methods
+const toggleMenu = () => {
+  visible.value = !visible.value;
+  LeftMenu.toggleShow();
 };
+
+const onShow = () => {
+  currentCss.value = css.value;
+};
+
+const onHide = () => {
+  currentCss.value = cssOff.value;
+};
+
+const init = () => {
+  currentCss.value = LeftMenu.isVisible() ? css.value : cssOff.value;
+  EventBus.on("left-menu-on-show", onShow);
+  EventBus.on("left-menu-on-hide", onHide);
+};
+
+onMounted(() => {
+  LeftMenu.init();
+  init();
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("left-menu-on-show", onShow);
+  EventBus.off("left-menu-on-hide", onHide);
+});
 </script>
+

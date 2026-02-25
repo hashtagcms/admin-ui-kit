@@ -43,102 +43,107 @@
   </modal-box>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount } from "vue";
+import axios from "axios";
 import AdminConfig from "../../../helpers/admin-config";
 import ModalBox from "./library/modal-box.vue";
 import { EventBus } from "../../../helpers/event-bus";
-import fileUploader from "./file-uploader.vue";
+import FileUploader from "./file-uploader.vue";
 
-export default {
-  components: {
-    "modal-box": ModalBox,
-    "file-uploader": fileUploader,
-  },
-  props: ["dataModel", "dataModuleRelations", "dataId", "dataEditor"],
-  mounted() {
-    EventBus.on("gallery-image-uploaded", (response) => {
-      this.data = [...response.data, ...this.data];
+const props = defineProps(["dataModel", "dataModuleRelations", "dataId", "dataEditor"]);
+
+const imageModalBox = ref(null);
+
+// State
+const data = ref([]);
+const loading = ref(false);
+const searchKey = ref("");
+const editor = ref(props.dataEditor);
+const form = ref({ file: "" });
+
+// Computed
+const galleryCreate = AdminConfig.admin_path(
+  "gallery/create?return_url=" + encodeURIComponent(window.location.href)
+);
+
+// Methods
+const loadData = () => {
+  data.value = [];
+  loading.value = true;
+  const url = AdminConfig.admin_path("gallery/getAllImages");
+  axios
+    .get(url)
+    .then((res) => {
+      data.value = res.data;
+    })
+    .catch((err) => {
+      console.error(err);
+    })
+    .finally(() => {
+      loading.value = false;
     });
-  },
-  computed: {
-    galleryCreate() {
-      return AdminConfig.admin_path(
-        "gallery/create?return_url=" + encodeURIComponent(window.location.href),
-      );
-    },
-  },
-  data() {
-    return {
-      data: [],
-      loading: false,
-      searchKey: "",
-      editor: this.dataEditor,
-      form: {
-        file: "",
-      },
-    };
-  },
-  methods: {
-    loadData() {
-      this.data = [];
-      this.loading = true;
-      let url = AdminConfig.admin_path(`gallery/getAllImages`);
-      axios
-        .get(url)
-        .then((res) => {
-          this.data = res.data;
-        })
-        .catch((err) => {
-          console.log(err);
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    },
-    getImage(value) {
-      return AdminConfig.get_media(`${value}`);
-    },
-    insertContentToEditor(content) {
-      content = `<img src="${content}" />`;
-      if (this.editor) {
-        this.editor.insertContent(content);
-      }
-      this.close();
-    },
-    searchImages() {
-      if (this.searchKey.length > 0) {
-        this.data = [];
-        this.loading = true;
-        let url = AdminConfig.admin_path(
-          `gallery/searchImages/${this.searchKey}`,
-        );
-        axios
-          .get(url)
-          .then((res) => {
-            this.data = res.data;
-          })
-          .catch((err) => {
-            console.log(err);
-          })
-          .finally(() => {
-            this.loading = false;
-          });
-      } else {
-        this.loadData();
-      }
-    },
-    open(editor) {
-      this.loadData();
-      if (editor) {
-        this.editor = editor;
-      }
-      this.$refs.imageModalBox.open();
-      EventBus.emit("image-gallery-open");
-    },
-    close() {
-      this.$refs.imageModalBox.close();
-      EventBus.emit("image-gallery-close");
-    },
-  },
 };
+
+const getImage = (value) => AdminConfig.get_media(`${value}`);
+
+const insertContentToEditor = (content) => {
+  const contentHtml = `<img src="${content}" />`;
+  if (editor.value) {
+    editor.value.insertContent(contentHtml);
+  }
+  close();
+};
+
+const searchImages = () => {
+  if (searchKey.value.length > 0) {
+    data.value = [];
+    loading.value = true;
+    const url = AdminConfig.admin_path(`gallery/searchImages/${searchKey.value}`);
+    axios
+      .get(url)
+      .then((res) => {
+        data.value = res.data;
+      })
+      .catch((err) => {
+        console.error(err);
+      })
+      .finally(() => {
+        loading.value = false;
+      });
+  } else {
+    loadData();
+  }
+};
+
+const open = (ed) => {
+  loadData();
+  if (ed) {
+    editor.value = ed;
+  }
+  if (imageModalBox.value) imageModalBox.value.open();
+  EventBus.emit("image-gallery-open");
+};
+
+const close = () => {
+  if (imageModalBox.value) imageModalBox.value.close();
+  EventBus.emit("image-gallery-close");
+};
+
+const onImageUploaded = (response) => {
+  data.value = [...response.data, ...data.value];
+};
+
+// Lifecycle
+onMounted(() => {
+  EventBus.on("gallery-image-uploaded", onImageUploaded);
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("gallery-image-uploaded", onImageUploaded);
+});
+
+// Expose methods to parent
+defineExpose({ open, close });
 </script>
+

@@ -123,6 +123,22 @@ import { Humanize } from "@hashtagcms/admin-ui-kit";
 console.log(Humanize("hello_world")); // "Hello World"
 ```
 
+### `ACTION_MAP`
+Global mapping of UI actions to system permissions.
+
+```javascript
+import { ACTION_MAP } from "@hashtagcms/admin-ui-kit";
+// Maps 'settings' to 'edit', 'showinfo' to 'read', etc.
+```
+
+### `TabularViewActions`
+Decouples action logic from the `TabularView` component.
+
+```javascript
+import { TabularViewActions } from "@hashtagcms/admin-ui-kit";
+// Used internally by TabularView to handle delete, edit, and custom AJAX actions.
+```
+
 ### `MapAPI`
 Google Maps wrapper (re-exported from Admin SDK).
 

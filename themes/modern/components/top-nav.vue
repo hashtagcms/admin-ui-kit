@@ -59,80 +59,78 @@
   </nav>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import axios from "axios";
 import AdminConfig from "../../../helpers/admin-config";
 import GlobalSiteButton from "./global-site-button.vue";
-export default {
-  components: {
-    "global-site-button": GlobalSiteButton,
-  },
-  mounted() {
-    this.startHeartbeat();
-  },
-  beforeUnmount() {
-    if (this.heartbeatTimer) {
-      clearInterval(this.heartbeatTimer);
-    }
-  },
-  props: [
-    "dataUsername",
-    "dataSiteName",
-    "dataCurrentSite",
-    "dataSupportedSites",
-    "dataIsAdmin",
-    "dataSiteCombo",
-    "dataLogo",
-    "dataLogoHeight",
-  ],
-  computed: {
-    logo() {
-      return typeof this.dataLogo !== "undefined" && this.dataLogo !== ""
-        ? this.dataLogo
-        : AdminConfig.admin_asset("img/logo-transparent.png");
-    },
-    sessionLabel() {
-        return this.sessionStatus === 'active' ? 'Session Active' : 'Session Expired';
-    }
-  },
-  data() {
-    return {
-      siteName: this.dataSiteName || "hashtagcms.org",
-      userName: this.dataUsername,
-      isLoggedIn: !!(this.dataUsername && this.dataUsername !== ""),
-      siteCombo: !(
-        typeof this.dataSiteCombo == "undefined" ||
-        this.dataSiteCombo === "false"
-      ),
-      logoHeight:
-        typeof this.dataLogoHeight === "undefined" || this.dataLogoHeight === ""
-          ? 50
-          : this.dataLogoHeight,
-      sessionStatus: "active", // active, expired
-      heartbeatTimer: null,
-    };
-  },
-  methods: {
-    logout(event) {
-      document.getElementById("logout-form").submit();
-    },
-    async checkSession() {
-        try {
-            await axios.get(AdminConfig.admin_path("heartbeat"));
-            this.sessionStatus = "active";
-        } catch (error) {
-            // Laravel returns 401 for Unauthorized or 419 for Token Mismatch (CSRF/Session expiry)
-            if (error.response && [401, 419].includes(error.response.status)) {
-                this.sessionStatus = "expired";
-            }
-        }
-    },
-    startHeartbeat() {
-        // Check every 60 seconds
-        this.heartbeatTimer = setInterval(() => {
-            this.checkSession();
-        }, 60000);
-    }
-  },
+
+const props = defineProps([
+  "dataUsername",
+  "dataSiteName",
+  "dataCurrentSite",
+  "dataSupportedSites",
+  "dataIsAdmin",
+  "dataSiteCombo",
+  "dataLogo",
+  "dataLogoHeight",
+]);
+
+const siteName = ref(props.dataSiteName || "hashtagcms.org");
+const userName = ref(props.dataUsername);
+const isLoggedIn = ref(!!(props.dataUsername && props.dataUsername !== ""));
+const siteCombo = ref(
+  !(props.dataSiteCombo == "undefined" || props.dataSiteCombo === "false")
+);
+const logoHeight = ref(
+  props.dataLogoHeight == "undefined" || props.dataLogoHeight === ""
+    ? 50
+    : props.dataLogoHeight
+);
+const sessionStatus = ref("active"); // active, expired
+const heartbeatTimer = ref(null);
+
+const logo = computed(() => {
+  return props.dataLogo !== "undefined" && props.dataLogo !== ""
+    ? props.dataLogo
+    : AdminConfig.admin_asset("img/logo-transparent.png");
+});
+
+const sessionLabel = computed(() => {
+  return sessionStatus.value === "active" ? "Session Active" : "Session Expired";
+});
+
+const logout = () => {
+  document.getElementById("logout-form").submit();
 };
+
+const checkSession = async () => {
+  try {
+    await axios.get(AdminConfig.admin_path("heartbeat"));
+    sessionStatus.value = "active";
+  } catch (error) {
+    // Laravel returns 401 for Unauthorized or 419 for Token Mismatch (CSRF/Session expiry)
+    if (error.response && [401, 419].includes(error.response.status)) {
+      sessionStatus.value = "expired";
+    }
+  }
+};
+
+const startHeartbeat = () => {
+  // Check every 60 seconds
+  heartbeatTimer.value = setInterval(() => {
+    checkSession();
+  }, 60000);
+};
+
+onMounted(() => {
+  startHeartbeat();
+});
+
+onBeforeUnmount(() => {
+  if (heartbeatTimer.value) {
+    clearInterval(heartbeatTimer.value);
+  }
+});
 </script>
+

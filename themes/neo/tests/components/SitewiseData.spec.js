@@ -1,6 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import SitewiseData from '@hashtagcms/theme/neo/components/sitewise-data.vue';
+import SiteWiseData from '@hashtagcms/theme/neo/components/sitewise-data.vue';
 import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 // Mock dependencies
@@ -23,7 +23,7 @@ const mockAxios = {
 
 vi.stubGlobal('axios', mockAxios);
 
-describe('SitewiseData.vue', () => {
+describe('Neo: SiteWiseData.vue', () => {
 
   const dataProps = loadFakeData('site-wise.txt');
   const props = {};
@@ -36,14 +36,14 @@ describe('SitewiseData.vue', () => {
   }
 
   it('renders correctly with given props', () => {
-    const wrapper = shallowMount(SitewiseData, { props });
+    const wrapper = shallowMount(SiteWiseData, { props });
     expect(wrapper.find('.card-title').text()).toContain('Available Platforms');
     // Check if list items are rendered
     expect(wrapper.findAll('.list-group-item').length).toBeGreaterThan(0);
   });
 
   it('handles updates and checkbox selection', async () => {
-    const wrapper = shallowMount(SitewiseData, { props });
+    const wrapper = shallowMount(SiteWiseData, { props });
     const checkboxes = wrapper.findAll('input[type="checkbox"]');
     expect(checkboxes.length).toBeGreaterThan(0);
     

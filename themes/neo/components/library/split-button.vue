@@ -22,104 +22,119 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { SafeJsonParse } from "../../../../helpers/common";
 
-export default {
-  mounted() {
-    this.normalizeData();
-    //console.log(this.lists);
-  },
+const props = defineProps([
+  "dataOptions",
+  "dataSelected",
+  "dataParser",
+  "dataOnChange",
+  "dataBtnCss",
+]);
 
-  props: [
-    "dataOptions",
-    "dataSelected",
-    "dataParser",
-    "dataOnChange",
-    "dataBtnCss",
-  ],
-  data() {
-    return {
-      display: "",
-      formatter: this.dataParser,
-      lists: SafeJsonParse(this.dataOptions, []),
-      current: {},
-      selectedIndex:
-        typeof this.dataSelected == "undefined"
-          ? 0
-          : parseInt(this.dataSelected),
-      openCSS: "",
-      btnCss: typeof this.dataBtnCss == "undefined" ? "" : this.dataBtnCss,
-    };
-  },
-  computed: {
-    onChange() {
-      let method =
-        typeof this.dataOnChange == "undefined" ? null : this.dataOnChange;
-      if (typeof method == "string") {
-        return eval(method);
-      }
-      return method;
-    },
-  },
-  methods: {
-    toggleMenu() {
-      this.display = this.display === "" ? "display:block" : "";
-      if (this.display !== "") {
-        //this.openCSS = 'animated slideInDown';
-        this.bindDocumentClick();
-      }
-    },
-    isActive(item) {
-      if (this.current.value === item.value) {
-        return "dropdown-item active hand";
-      }
-      return "dropdown-item hand";
-    },
-    normalizeData() {
-      let formatter = this.formatter;
-      let arr = [];
-      this.lists.forEach(function (item, index) {
-        if (typeof formatter == "function") {
-          arr.push(formatter(item));
-        } else if (typeof index == "number") {
-          arr.push({ label: item, value: item });
-        }
-      });
+const emit = defineEmits(["change"]);
 
-      this.lists = arr;
-      this.current = this.lists[this.selectedIndex];
-    },
-    setCurrent(index) {
-      this.current = this.lists[index];
-      this.current.index = index;
+// Template Refs
+const dropdownMenu = ref(null);
 
-      if (this.onChange != null && typeof this.onChange == "function") {
-        this.onChange(this.current);
-      }
+// State
+const display = ref("");
+const formatter = ref(props.dataParser);
+const lists = ref(SafeJsonParse(props.dataOptions, []));
+const current = ref({});
+const selectedIndex = ref(props.dataSelected === undefined ? 0 : parseInt(props.dataSelected));
+const openCSS = ref("");
+const btnCss = ref(props.dataBtnCss || "");
 
-      this.$emit("change", this.current);
-    },
-    mangeShowHide(event) {
-      let element = this.$refs.dropdownMenu;
-      let target = event.target;
+// Computed
+const onChange = computed(() => {
+  const method = props.dataOnChange === undefined ? null : props.dataOnChange;
+  if (typeof method === "string") {
+    try {
+      // eslint-disable-next-line no-eval
+      return eval(method);
+    } catch (e) {
+      console.error("SplitButton: Error evaluating onChange method", e);
+      return null;
+    }
+  }
+  return method;
+});
 
-      if (element !== target && !element.contains(target)) {
-        this.display = "";
-        this.unBindDocumentClick();
-      }
-    },
-    bindDocumentClick() {
-      document.addEventListener("mouseup", this.mangeShowHide);
-    },
-    unBindDocumentClick() {
-      document.removeEventListener("mouseup", this.mangeShowHide);
-    },
-    setData(data) {
-      this.lists = [];
-      this.lists = data;
-      this.normalizeData();
-    },
-  },
+// Methods
+const isActive = (item) => {
+  if (current.value.value === item.value) {
+    return "dropdown-item active hand";
+  }
+  return "dropdown-item hand";
 };
+
+const normalizeData = () => {
+  const f = formatter.value;
+  const arr = [];
+  lists.value.forEach((item, index) => {
+    if (typeof f === "function") {
+      arr.push(f(item));
+    } else {
+      arr.push({ label: item, value: item });
+    }
+  });
+
+  lists.value = arr;
+  current.value = lists.value[selectedIndex.value] || {};
+};
+
+const mangeShowHide = (event) => {
+  const element = dropdownMenu.value;
+  const target = event.target;
+
+  if (element && element !== target && !element.contains(target)) {
+    display.value = "";
+    unBindDocumentClick();
+  }
+};
+
+const bindDocumentClick = () => {
+  document.addEventListener("mouseup", mangeShowHide);
+};
+
+const unBindDocumentClick = () => {
+  document.removeEventListener("mouseup", mangeShowHide);
+};
+
+const toggleMenu = () => {
+  display.value = display.value === "" ? "display:block" : "";
+  if (display.value !== "") {
+    bindDocumentClick();
+  }
+};
+
+const setCurrent = (index) => {
+  current.value = lists.value[index];
+  current.value.index = index;
+
+  if (onChange.value != null && typeof onChange.value === "function") {
+    onChange.value(current.value);
+  }
+
+  emit("change", current.value);
+};
+
+const setData = (data) => {
+  lists.value = data;
+  normalizeData();
+};
+
+defineExpose({ setData });
+
+onMounted(() => {
+  normalizeData();
+});
+
+onBeforeUnmount(() => {
+  unBindDocumentClick();
+});
 </script>
+

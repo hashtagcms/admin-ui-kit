@@ -55,104 +55,122 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { SafeJsonParse } from "../../../../helpers/common";
 
-export default {
-  mounted() {
-    this.normalizeData();
-    //console.log(this.lists);
-  },
-
-  props: [
+const props = defineProps([
     "dataOptions",
     "dataSelected",
     "dataParser",
     "dataOnChange",
     "dataBtnCss",
-  ],
-  data() {
-    return {
-      display: "",
-      formatter: this.dataParser,
-      lists: SafeJsonParse(this.dataOptions, []),
-      current: {},
-      selectedIndex:
-        typeof this.dataSelected == "undefined"
-          ? 0
-          : parseInt(this.dataSelected),
-      openCSS: "",
-      btnCss: typeof this.dataBtnCss == "undefined" ? "" : this.dataBtnCss,
-    };
-  },
-  computed: {
-    onChange() {
-      let method =
-        typeof this.dataOnChange == "undefined" ? null : this.dataOnChange;
-      if (typeof method == "string") {
-        return eval(method);
-      }
-      return method;
-    },
-  },
-  methods: {
-    toggleMenu() {
-      this.display = this.display === "" ? "display:block" : "";
-      if (this.display !== "") {
-        //this.openCSS = 'animated slideInDown';
-        this.bindDocumentClick();
-      }
-    },
-    isActive(item) {
-      if (this.current.value === item.value) {
-        return "bg-blue-50 text-blue-700 block px-4 py-2 text-sm font-semibold";
-      }
-      return "text-gray-700 hover:bg-gray-100 block px-4 py-2 text-sm transition-colors";
-    },
-    normalizeData() {
-      let formatter = this.formatter;
-      let arr = [];
-      this.lists.forEach(function (item, index) {
-        if (typeof formatter == "function") {
-          arr.push(formatter(item));
-        } else if (typeof index == "number") {
-          arr.push({ label: item, value: item });
+]);
+
+const emit = defineEmits(["change"]);
+
+const dropdownMenu = ref(null);
+const display = ref("");
+const formatter = ref(props.dataParser);
+const lists = ref(SafeJsonParse(props.dataOptions, []));
+const current = ref({});
+const selectedIndex = ref(
+    typeof props.dataSelected == "undefined"
+        ? 0
+        : parseInt(props.dataSelected)
+);
+const btnCss = ref(typeof props.dataBtnCss == "undefined" ? "" : props.dataBtnCss);
+
+const onChange = computed(() => {
+    let method = typeof props.dataOnChange == "undefined" ? null : props.dataOnChange;
+    if (typeof method == "string") {
+        try {
+            return eval(method);
+        } catch (e) {
+            console.error("Error evaluating onChange method:", e);
+            return null;
         }
-      });
+    }
+    return method;
+});
 
-      this.lists = arr;
-      this.current = this.lists[this.selectedIndex];
-    },
-    setCurrent(index) {
-      this.current = this.lists[index];
-      this.current.index = index;
-
-      if (this.onChange != null && typeof this.onChange == "function") {
-        this.onChange(this.current);
-      }
-
-      this.$emit("change", this.current);
-    },
-    mangeShowHide(event) {
-      let element = this.$refs.dropdownMenu;
-      let target = event.target;
-
-      if (element !== target && !element.contains(target)) {
-        this.display = "";
-        this.unBindDocumentClick();
-      }
-    },
-    bindDocumentClick() {
-      document.addEventListener("mouseup", this.mangeShowHide);
-    },
-    unBindDocumentClick() {
-      document.removeEventListener("mouseup", this.mangeShowHide);
-    },
-    setData(data) {
-      this.lists = [];
-      this.lists = data;
-      this.normalizeData();
-    },
-  },
+const isActive = (item) => {
+    if (current.value.value === item.value) {
+        return "bg-blue-50 text-blue-700 block px-4 py-2 text-sm font-semibold";
+    }
+    return "text-gray-700 hover:bg-gray-100 block px-4 py-2 text-sm transition-colors";
 };
+
+const normalizeData = () => {
+    let fmt = formatter.value;
+    let arr = [];
+    lists.value.forEach(function (item, index) {
+        if (typeof fmt == "function") {
+            arr.push(fmt(item));
+        } else if (typeof index == "number") {
+            arr.push({ label: item, value: item });
+        }
+    });
+
+    lists.value = arr;
+    current.value = lists.value[selectedIndex.value] || {};
+};
+
+const setCurrent = (index) => {
+    current.value = lists.value[index];
+    current.value.index = index;
+
+    if (onChange.value != null && typeof onChange.value == "function") {
+        onChange.value(current.value);
+    }
+
+    emit("change", current.value);
+    display.value = "";
+    unBindDocumentClick();
+};
+
+const mangeShowHide = (event) => {
+    let element = dropdownMenu.value;
+    let target = event.target;
+
+    if (element && element !== target && !element.contains(target)) {
+        display.value = "";
+        unBindDocumentClick();
+    }
+};
+
+const bindDocumentClick = () => {
+    document.addEventListener("mouseup", mangeShowHide);
+};
+
+const unBindDocumentClick = () => {
+    document.removeEventListener("mouseup", mangeShowHide);
+};
+
+const toggleMenu = () => {
+    display.value = display.value === "" ? "display:block" : "";
+    if (display.value !== "") {
+        bindDocumentClick();
+    }
+};
+
+const setData = (data) => {
+    lists.value = [];
+    lists.value = data;
+    normalizeData();
+};
+
+onMounted(() => {
+    normalizeData();
+});
+
+onBeforeUnmount(() => {
+    unBindDocumentClick();
+});
+
+defineExpose({
+    setData
+});
+
 </script>
+

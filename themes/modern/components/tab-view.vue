@@ -3,8 +3,9 @@
     <!-- Using HcTabs visual structure for consistency -->
     <div class="border-b border-gray-100 mb-6">
       <ul role="tablist" class="flex flex-nowrap overflow-x-auto no-scrollbar -mb-px">
-        <li v-for="tab in tabs" :key="getTabId(tab)" role="presentation" class="mr-6 flex-shrink-0">
+        <li v-for="(tab, index) in tabs" :key="getTabId(tab)" role="presentation" class="mr-6 flex-shrink-0">
           <a
+            ref="tabRefs"
             :href="getTabHref(tab)"
             @click.prevent="moveToTab(tab)"
             role="tab"
@@ -25,76 +26,127 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref, onMounted, watch, nextTick } from "vue";
 import { SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  name: 'TabView',
-  props: {
-    dataTabs: {
-      type: [Array, String],
-      required: true,
-      default: () => []
-    },
-    dataActiveTab: {
-      type: [String, Object],
-      default: null
-    },
-    dataBaseUrl: {
-      type: String,
-      default: ''
-    }
+const tabRefs = ref([]);
+
+
+const props = defineProps({
+  dataTabs: {
+    type: [Array, String],
+    required: true,
+    default: () => [],
   },
-  emits: ['tab-change'],
-  computed: {
-    tabs() {
-      return SafeJsonParse(this.dataTabs, []);
-    },
-    activeTab() {
-      return this.dataActiveTab;
-    },
-    baseUrl() {
-      return this.dataBaseUrl;
-    }
+  dataActiveTab: {
+    type: [String, Object],
+    default: null,
   },
-  methods: {
-    moveToTab(tab) {
-      const href = this.getTabHref(tab);
-      this.$emit('tab-change', tab);
-      if (href && href !== '#' && !href.startsWith('javascript')) {
-        window.location.href = href;
-      }
-    },
-    getTabId(tab) {
-      if (typeof tab === 'string') {
-        return tab.replace(/\s/g, '').toLowerCase();
-      }
-      return tab.id || (tab.label ? tab.label.replace(/\s/g, '').toLowerCase() : Math.random().toString(36).substr(2, 9));
-    },
-    getTabLabel(tab) {
-      return typeof tab === 'string' ? tab : tab.label;
-    },
-    getTabHref(tab) {
-      if (typeof tab === 'object' && tab.href) {
-        return tab.href;
-      }
-      if (this.baseUrl) {
-        return `${this.baseUrl}/${this.getTabId(tab)}`;
-      }
-      return `#${this.getTabId(tab)}`;
-    },
-    isActive(tab) {
-      const tabId = this.getTabId(tab);
-      const activeId = this.activeTab 
-        ? (typeof this.activeTab === 'string' 
-            ? this.activeTab.replace(/\s/g, '').toLowerCase()
-            : this.getTabId(this.activeTab))
-        : null;
-      return tabId === activeId;
-    }
+  dataBaseUrl: {
+    type: String,
+    default: "",
+  },
+});
+
+const emit = defineEmits(["tab-change"]);
+
+const tabs = computed(() => {
+  return SafeJsonParse(props.dataTabs, []);
+});
+
+const activeTab = computed(() => {
+  return props.dataActiveTab;
+});
+
+const baseUrl = computed(() => {
+  return props.dataBaseUrl;
+});
+
+const getTabId = (tab) => {
+  if (typeof tab === "string") {
+    return tab.replace(/\s/g, "").toLowerCase();
+  }
+  return (
+    tab.id ||
+    (tab.label
+      ? tab.label.replace(/\s/g, "").toLowerCase()
+      : Math.random().toString(36).substr(2, 9))
+  );
+};
+
+const getTabLabel = (tab) => {
+  return typeof tab === "string" ? tab : tab.label;
+};
+
+const getTabHref = (tab) => {
+  if (typeof tab === "object" && tab.href) {
+    return tab.href;
+  }
+  if (baseUrl.value) {
+    return `${baseUrl.value}/${getTabId(tab)}`;
+  }
+  return `#${getTabId(tab)}`;
+};
+
+const isActive = (tab) => {
+  const tabId = getTabId(tab);
+  const activeId = activeTab.value
+    ? typeof activeTab.value === "string"
+      ? activeTab.value.replace(/\s/g, "").toLowerCase()
+      : getTabId(activeTab.value)
+    : null;
+  return tabId === activeId;
+};
+
+const moveToTab = (tab) => {
+  const href = getTabHref(tab);
+  emit("tab-change", tab);
+  if (href && href !== "#" && !href.startsWith("javascript")) {
+    window.location.href = href;
   }
 };
+
+const scrollToActiveTab = () => {
+  nextTick(() => {
+    const activeIndex = tabs.value.findIndex((tab) => isActive(tab));
+    if (activeIndex === -1) return;
+
+    const el = tabRefs.value[activeIndex];
+    if (!el) return;
+
+    // Scroll only the tab bar horizontally — never affect the page's vertical scroll
+    const tabBar = el.closest('ul');
+    if (tabBar) {
+      const elLeft   = el.offsetLeft;
+      const elWidth  = el.offsetWidth;
+      const barWidth = tabBar.offsetWidth;
+      // Center the active tab within the scrollable strip
+      tabBar.scrollLeft = elLeft - barWidth / 2 + elWidth / 2;
+    }
+  });
+};
+
+watch(
+  () => props.dataActiveTab,
+  () => {
+    scrollToActiveTab();
+  }
+);
+
+watch(
+  () => tabs.value,
+  () => {
+    scrollToActiveTab();
+  },
+  { deep: true }
+);
+
+onMounted(() => {
+  scrollToActiveTab();
+});
 </script>
+
 
 <style scoped>
 .no-scrollbar::-webkit-scrollbar { display: none; }

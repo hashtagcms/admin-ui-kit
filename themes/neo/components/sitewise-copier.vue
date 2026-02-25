@@ -15,7 +15,7 @@
     </div>
   </div>
   <div class="row">
-    <site-wise
+    <SiteWiseData
       ref="siteWiseComponent"
       :data-message="dataMessage"
       :data-site-data="JSON.stringify(siteData)"
@@ -25,201 +25,161 @@
       :data-default-action-for-save="doAction"
       :data-alert-css="dataAlertCss"
     >
-    </site-wise>
+    </SiteWiseData>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import { Toast, Loader, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
 import SiteWiseData from "./sitewise-data.vue";
 
-export default {
-  mounted() {
-    //console.log(this.allData);
-    //  console.log(this.allData.data[0]);
-    //console.log(this.cuurent);
-    // this.initData();
-  },
-  components: {
-    "site-wise": SiteWiseData,
-  },
-  created() {
-    //this.initData();
-  },
+const props = defineProps([
+  "dataAllSites",
+  "dataMessage",
+  "dataAllData",
+  "dataSiteData",
+  "dataCurrentKey",
+  "dataSiteId",
+  "dataAlertCss",
+  "dataControllerName",
+]);
 
-  props: [
-    "dataAllSites",
-    "dataMessage",
-    "dataAllData",
-    "dataSiteData",
-    "dataCurrentKey",
-    "dataSiteId",
-    "dataAlertCss",
-    "dataControllerName",
-  ],
-  data() {
-    return {
-      allSites: SafeJsonParse(this.dataAllSites, []),
-      siteData: SafeJsonParse(this.dataSiteData, []),
-      allData: SafeJsonParse(this.dataAllData, []),
-      currentKey: this.dataCurrentKey,
-      searchKey: "",
-      siteId: parseInt(this.dataSiteId),
-      currentSite: "",
-      controllerName:
-        typeof this.dataControllerName === "undefined"
-          ? "site"
-          : this.dataControllerName,
-    };
-  },
-  methods: {
-    showHdeLoader: function (show) {
-      if (show) {
-        Loader.show(this, "Please wait...");
-      } else {
-        Loader.hide(this);
-      }
-    },
-    saveNow(url, data) {
-      return new Promise((resolve, reject) => {
-        axios
-          .post(url, data)
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((error) => {
-            reject(SafeErrorData(error));
-          });
+const instance = getCurrentInstance();
+const siteWiseComponent = ref(null);
+
+// State
+const siteId = ref(parseInt(props.dataSiteId));
+const allSites = ref(SafeJsonParse(props.dataAllSites, []).filter((s) => s.id !== siteId.value));
+const siteData = ref(SafeJsonParse(props.dataSiteData, []));
+const allData = ref(SafeJsonParse(props.dataAllData, []));
+const currentKey = ref(props.dataCurrentKey);
+const currentSite = ref("");
+const controllerName = ref(typeof props.dataControllerName === "undefined" ? "site" : props.dataControllerName);
+
+// Methods
+const showHdeLoader = (show) => {
+  if (show) {
+    Loader.show(instance.proxy, "Please wait...");
+  } else {
+    Loader.hide(instance.proxy);
+  }
+};
+
+const getLabel = (data) => {
+  let label = "";
+  if (data.name || data.alias) {
+    label = data.name || data.alias;
+  } else if (data.lang) {
+    label = typeof data.lang.name === "undefined" ? "" : data.lang.name;
+  }
+  return label;
+};
+
+const populateData = (data) => {
+  allData.value = data;
+  if (siteWiseComponent.value) {
+    siteWiseComponent.value.setData("data", data);
+  }
+};
+
+const getBySite = () => {
+  if (currentSite.value !== "") {
+    const what = currentKey.value;
+    const url = AdminConfig.admin_path(`${controllerName.value}/getBySite/${currentSite.value}/${what}`);
+    showHdeLoader(true);
+    axios
+      .get(url)
+      .then((response) => {
+        populateData(response.data);
+      })
+      .catch((error) => {
+        console.error("getBySite error:", SafeErrorData(error));
+      })
+      .finally(() => {
+        showHdeLoader(false);
       });
+  } else {
+    populateData([]);
+  }
+};
+
+const actionAdd = (allDataArr, selectedData, ids) => {
+  console.log("copying now...");
+  const postData = {
+    fromSite: {
+      site_id: currentSite.value,
+      data: selectedData,
     },
-    getLabel(data) {
-      let label = "";
-      if (data.name || data.alias) {
-        label = data.name || data.alias;
-      } else if (data.lang) {
-        label = typeof data.lang.name == "undefined" ? "" : data.lang.name;
-      }
-      return label;
-    },
-    populateData(data) {
-      this.allData = data;
-      //console.log("this.$refs.siteWiseComponent ",this.$refs.siteWiseComponent);
-      this.$refs.siteWiseComponent.setData("data", data);
-    },
-    getBySite() {
-      if (this.currentSite !== "") {
-        let what = this.currentKey;
-        let url = AdminConfig.admin_path(
-          this.controllerName + "/getBySite/" + this.currentSite + "/" + what,
-        );
-        this.showHdeLoader(true);
-        axios
-          .get(url)
-          .then((response) => {
-            this.populateData(response.data);
-          })
-          .catch((error) => {
-            console.error('getBySite error:', SafeErrorData(error));
-          })
-          .finally(() => {
-            this.showHdeLoader(false);
-          });
+    toSite: { site_id: siteId.value },
+    type: currentKey.value,
+  };
+  showHdeLoader(true);
+  const url = AdminConfig.admin_path(`${controllerName.value}/copySettings`);
+  axios
+    .post(url, postData)
+    .then((response) => {
+      const data = response.data;
+      if (data.inserted === false) {
+        Toast.show(instance.proxy, data.message || "Nothing happened.", 5000);
       } else {
-        this.populateData([]);
-      }
-    },
-    actionAdd(allData, seletedData, ids) {
-      console.log("copying now...");
-      //console.log(allData, seletedData, ids);
-      //get all from
-      let $this = this;
-      let postData = {
-        fromSite: {
-          site_id: this.currentSite,
-          data: seletedData,
-        },
-        toSite: { site_id: this.siteId },
-        type: this.currentKey,
-      };
-      this.showHdeLoader(true);
-      let url = AdminConfig.admin_path(this.controllerName + "/copySettings");
-      axios
-        .post(url, postData)
-        .then((response) => {
-          console.log(response);
-          feedback(response);
-        })
-        .catch((error) => {
-          console.error('actionAdd error:', SafeErrorData(error));
-        })
-        .finally(() => {
-          this.showHdeLoader(false);
-        });
-
-      function feedback(response) {
-        let data = response.data;
-        //console.log("data.inserted ",data.inserted);
-        if (data.inserted === false) {
-          Toast.show($this, data.message || "Nothing happened.", 5000);
-        } else {
-          let ignored = data.ignored;
-          let copied = data.copied;
-          $this.$refs.siteWiseComponent.setSiteData(data.siteData);
-
-          //Showing some manners - giving feedback
-          let msg = `${copied.length} Copied and ${ignored.length} ignored. Open console for details`;
-          Toast.show($this, msg, 7000);
-          console.info("Copied: ", copied);
-          console.info("Ignored: ", ignored);
+        const ignored = data.ignored;
+        const copied = data.copied;
+        if (siteWiseComponent.value) {
+          siteWiseComponent.value.setSiteData(data.siteData);
         }
+        const msg = `${copied.length} Copied and ${ignored.length} ignored. Open console for details`;
+        Toast.show(instance.proxy, msg, 7000);
+        console.info("Copied: ", copied);
+        console.info("Ignored: ", ignored);
       }
-    },
-    actionRemove(allData, seletedData, ids) {
-      let site_id = seletedData.length > 0 ? seletedData[0].site_id : null;
+    })
+    .catch((error) => {
+      console.error("actionAdd error:", SafeErrorData(error));
+    })
+    .finally(() => {
+      showHdeLoader(false);
+    });
+};
 
-      if (site_id === null) {
-        return false;
+const actionRemove = (allDataArr, selectedData, ids) => {
+  const s_id = selectedData.length > 0 ? selectedData[0].site_id : null;
+  if (s_id === null) return false;
+
+  const postData = {
+    site_id: s_id,
+    ids: ids,
+    type: currentKey.value,
+  };
+
+  const url = AdminConfig.admin_path(`${controllerName.value}/removeSettings`);
+  showHdeLoader(true);
+  axios
+    .post(url, postData)
+    .then((response) => {
+      const data = response.data;
+      if (data.deleted === 0) {
+        Toast.show(instance.proxy, "Sorry!, Somehow it's not deleted.", 5000);
       }
-
-      let $this = this;
-      let postData = {
-        site_id: site_id,
-        ids: ids,
-        type: this.currentKey,
-      };
-
-      let url = AdminConfig.admin_path(this.controllerName + "/removeSettings");
-      this.showHdeLoader(true);
-      axios
-        .post(url, postData)
-        .then((response) => {
-          feedback(response);
-        })
-        .catch((error) => {
-          console.error('actionRemove error:', SafeErrorData(error));
-        })
-        .finally(() => {
-          this.showHdeLoader(false);
-        });
-
-      function feedback(response) {
-        //console.log(response);
-        let data = response.data;
-        if (data.deleted === 0) {
-          Toast.show($this, "Sorry!, Somehow it's not deleted.", 5000);
-        }
-        $this.$refs.siteWiseComponent.setSiteData(data.siteData);
+      if (siteWiseComponent.value) {
+        siteWiseComponent.value.setSiteData(data.siteData);
       }
-    },
-    doAction(action, allData, seletedData, ids) {
-      if (action === "add") {
-        this.actionAdd(allData, seletedData, ids);
-      } else {
-        this.actionRemove(allData, seletedData, ids);
-      }
-    },
-  },
+    })
+    .catch((error) => {
+      console.error("actionRemove error:", SafeErrorData(error));
+    })
+    .finally(() => {
+      showHdeLoader(false);
+    });
+};
+
+const doAction = (action, allDataArr, selectedData, ids) => {
+  if (action === "add") {
+    actionAdd(allDataArr, selectedData, ids);
+  } else {
+    actionRemove(allDataArr, selectedData, ids);
+  }
 };
 </script>
+

@@ -1,8 +1,5 @@
-import { AdminConfig, CleanForUrl } from "@hashtagcms/admin-sdk";
-
-// Global AdminConfig instance wrapper if needed, or valid assuming window.AdminConfig is set.
-// But better to use the class to be safe if window.AdminConfig isn't ready.
-const adminConfig = new AdminConfig();
+import adminConfig from "./admin-config";
+import { CleanForUrl } from "./common";
 
 export const EditorHelper = (function () {
   let makeRichEditor = (selector, settings) => {

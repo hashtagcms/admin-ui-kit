@@ -81,7 +81,7 @@
   <div class="row mt-3">
     <div class="col col-9">
       <div class="row homepage-modules">
-        <div v-for="hook in hooks" :ref="'panel_' + hook.info.id" class="col-4">
+        <div v-for="hook in hooks" :ref="setPanelRef(hook.info.id)" class="col-4">
           <div class="non-selectable shadow-sm card mb-3">
             <div
               class="card-header hook-header"
@@ -91,7 +91,7 @@
                 ><span
                   :class="'fa hand fa-expand'"
                   title="Expand/Contract"
-                  @click="onlyMe(hook.info.id, $event)"
+                  @click="onlyMe(hook.info.id)"
                 ></span>
                 &nbsp;<span
                   class="fa fa-minus hand"
@@ -107,9 +107,10 @@
               >
             </div>
             <div
-              :ref="'hook_panel_' + hook.info.id"
+              :ref="setHookPanelRef(hook.info.id)"
               class="card-body hook_modules js_modules"
             >
+
               <ul
                 :data-hook-id="hook.info.id"
                 class="list-group list-group-flush modules-list js_modules js_hook_modules"
@@ -329,727 +330,538 @@
   <info-popup ref="infoPopup"></info-popup>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, nextTick, getCurrentInstance } from "vue";
+import axios from "axios";
 import AdminConfig from "../../../helpers/admin-config";
-
 import { Toast, Modal, Loader, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
 import Sortable from "sortablejs";
 import InfoPopup from "./info-popup.vue";
 import ModalBox from "./library/modal-box.vue";
 
-export default {
-  components: {
-    "info-popup": InfoPopup,
-    "modal-box": ModalBox,
-  },
-  mounted() {
-    /*console.log("siteInfo", this.siteInfo);
-        console.log("allModules", this.allModules);
-        console.log("categoryModules", this.categoryModules);
-        console.log("categoryInfo", this.categoryInfo);
-        console.log("themeInfo", this.themeInfo);
-        */
+const props = defineProps([
+  "dataCategories",
+  "dataMicrosites",
+  "dataPlatforms",
+  "dataSiteId",
+  "dataMicrositeId",
+  "dataCategoryId",
+  "dataPlatformId",
+  "dataSiteInfo",
+  "dataHookInfo",
+  "dataAllModules",
+  "dataCategoryModules",
+  "dataCategoryInfo",
+  "dataThemeInfo",
+  "dataUserRights",
+  "dataIsModuleReadonly",
+  "dataAllSites",
+]);
 
-    this.init();
-  },
-  created() {
-    //this.initData();
-  },
+const instance = getCurrentInstance();
 
-  props: [
-    "dataCategories",
-    "dataMicrosites",
-    "dataPlatforms",
-    "dataSiteId",
-    "dataMicrositeId",
-    "dataCategoryId",
-    "dataPlatformId",
-    "dataSiteInfo",
-    "dataHookInfo",
-    "dataAllModules",
-    "dataCategoryModules",
-    "dataCategoryInfo",
-    "dataThemeInfo",
-    "dataUserRights",
-    "dataIsModuleReadonly",
-    "dataAllSites",
-  ],
-  computed: {
-    hasSiteMoreThanOne() {
-      //return true;
-      return this.allSites.length > 1;
-    },
-    hasMicrosites() {
-      //return true;
-      return this.microsites.length > 0;
-    },
-    hasPlatformMoreThanOne() {
-      //return true;
-      return this.platforms.length > 1;
-    },
-    hasTheme() {
-      return this.themeInfo && this.themeInfo["id"];
-    },
-    saveButtonCss() {
-      let disabled = this.enableDisableSave() === true ? "" : " disabled";
-      return "btn btn-success btn-form-submit" + disabled;
-    },
-    canEdit() {
-      return (
-        this.userRights.indexOf("edit") >= 0 && this.isModuleReadonly === false
-      );
-    },
-    canDelete() {
-      return (
-        this.userRights.indexOf("delete") >= 0 &&
-        this.isModuleReadonly === false
-      );
-    },
-    modalCss() {
-      /*  if (this.hasSiteMoreThanOne && this.hasPlatformMoreThanOne) {
-                return "modal-lg";
-            }*/
-      return "modal-lg";
-    },
-    fromCategories() {
-      return this.categoriesData[this.fromData.site_id] || [];
-    },
-    toCategories() {
-      return this.categoriesData[this.toData.site_id] || [];
-    },
-    hasError() {
-      return this.errors.length > 0;
-    },
-    filterModules() {
-      let key = this.searchKey;
-      if (key !== "" && key != null) {
-        key = key.toLowerCase();
-        return this.allModules.filter((current) => {
-          let alias = current.alias.toLowerCase();
-          let name = current.name.toLowerCase();
-          let id = current.id;
-          if (
-            id.toString() === key ||
-            alias.includes(key) ||
-            name.includes(key)
-          ) {
-            return true;
-          }
-        });
-      } else {
-        this.searchKey = "";
-        // console.log("data", this.allData.data);
-        return this.allModules;
-      }
-    },
-  },
-  data() {
-    return {
-      categoriesData: {},
-      categories: SafeJsonParse(this.dataCategories, []),
-      microsites: SafeJsonParse(this.dataMicrosites, []),
-      platforms: SafeJsonParse(this.dataPlatforms, []),
-      siteId:
-        typeof this.dataSiteId == "undefined" || this.dataSiteId === ""
-          ? 1
-          : parseInt(this.dataSiteId),
-      microSiteId:
-        typeof this.dataMicrositeId == "undefined" ||
-        this.dataMicrositeId === ""
-          ? 0
-          : parseInt(this.dataMicrositeId),
-      platformId:
-        typeof this.dataPlatformId == "undefined" || this.dataPlatformId === ""
-          ? 1
-          : parseInt(this.dataPlatformId),
-      categoryId:
-        typeof this.dataCategoryId == "undefined" || this.dataCategoryId === ""
-          ? 0
-          : parseInt(this.dataCategoryId),
-      siteInfo: SafeJsonParse(this.dataSiteInfo, []),
-      hookInfo: SafeJsonParse(this.dataHookInfo, []),
-      allModules: SafeJsonParse(this.dataAllModules, []),
-      categoryModules: SafeJsonParse(this.dataCategoryModules, []),
-      categoryInfo: SafeJsonParse(this.dataCategoryInfo, []),
-      themeInfo: SafeJsonParse(this.dataThemeInfo, []),
-      hooks: [],
-      hooksInfoCache: {},
-      moduleInfoCache: {},
-      noHookFound: false,
-      errors: [],
-      enableSave: false,
-      searchKey: "",
-      applicableForAllPlatforms: false,
-      fromData: { site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 },
-      toData: { site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 },
-      isWorking: false,
-      sortObj: { draggable: null },
-      userRights: SafeJsonParse(this.dataUserRights, []),
-      isModuleReadonly: this.dataIsModuleReadonly === "1" ? true : false,
-      allSites: SafeJsonParse(this.dataAllSites, []),
-      copyForAllPlatforms: false,
-    };
-  },
-  methods: {
-    init() {
-      if (this.categories.length === 0) {
-        this.addErrorMessage("No category found!");
-      }
-      if (this.categoryInfo.length === 0) {
-        this.addErrorMessage(
-          "There is a mismatch in site default category. Please fix that.",
-        );
-      }
-      //console.log('this.themeInfo["id"] ', this.themeInfo["id"])
-      if (this.hasTheme) {
-        this.parseTheme();
-        this.populateModules();
-        this.enableSorting();
-        this.makeCategories();
-      } else {
-        let path = AdminConfig.admin_path("category/settings", {
-          platform_id: this.platformId,
-        });
-        this
-          .addErrorMessage(`This category/platform/theme is not available in category_site table.
-                         You need to drag and drop in <a href='${path}'>category settings</a>.`);
-        this.addErrorMessage(`Dont' forget the set the theme there.`);
-      }
-    },
-    makeCategories() {
-      let totalSites = this.allSites.length;
-      if (totalSites > 0) {
-        for (let i = 0; i < totalSites; i++) {
-          let current = this.allSites[i];
-          this.categoriesData[current.id] = current.category;
-        }
-      }
-      this.setDefaultFromTo();
-    },
-    setDefaultFromTo() {
-      let totalSites = this.allSites.length;
-      if (totalSites > 0) {
-        this.fromData.site_id = this.allSites[0].id;
-        this.toData.site_id = this.siteId; //current site id
-      } else {
-        this.fromData.site_id = this.siteId; //current site
-        this.toData.site_id = this.siteId;
-      }
+// Template Refs
+const infoPopup = ref(null);
+const copyBox = ref(null);
+const deleteBox = ref(null);
+const savePanel = ref(null);
+const hookPanels = reactive({});
+const panels = reactive({});
 
-      this.fromData.platform_id = this.platformId;
-      this.toData.platform_id = this.platformId;
-      this.toData.category_id = this.categoryId;
-    },
-    saveNow(url, data) {
-      Loader.show(this);
-      return new Promise((resolve, reject) => {
-        axios
-          .post(url, data)
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((error) => {
-            reject(SafeErrorData(error));
-          })
-          .finally(() => {
-            Loader.hide(this);
-          });
-      });
-    },
-    getWhere() {
-      let where = {
-        site_id: this.siteId,
-        microsite_id: this.microSiteId,
-        platform_id: this.platformId,
-        category_id: this.categoryId,
-      };
-      return where;
-    },
-    saveModules() {
-      if (this.enableDisableSave() === false) {
-        return false;
-      }
-      //Save in DB
-      let $this = this;
-      //let currentData = (action == "add") ? this.allData.data : this.siteData;
-      let postParams = {};
-
-      //loop through all hooks
-      let allHooks = document.querySelectorAll(".js_hook_modules");
-      let datas = [];
-      allHooks.forEach(function (current) {
-        let allModules = current.querySelectorAll("li.js_item");
-        let hook_id = current.getAttribute("data-hook-id");
-        //console.log("hook_id: ", hook_id, allModules, allModules.length);
-        if (allModules.length > 0) {
-          let modules = [];
-          for (let i = 0; i < allModules.length; i++) {
-            //console.log(allModules[i]);
-            let currentModule = allModules[i];
-            let module_id = currentModule.getAttribute("data-module-id");
-            modules.push({ module_id: module_id, position: i + 1 });
-          }
-
-          let data = { hook_id: hook_id, modules: modules };
-          datas.push(data);
-        }
-        //console.log(datas);
-      });
-
-      if (datas.length > 0) {
-        let where = $this.getWhere();
-        postParams.data = datas;
-        postParams.where = where;
-        postParams.applicableForAllPlatforms = false;
-        this.saveNow(
-          AdminConfig.admin_path("homepage/saveSettings"),
-          postParams,
-        )
-          .then(function (res) {
-            //console.log(res);
-            Toast.show($this, "Saved...");
-            $this.enableDisableSave(false);
-          })
-          .catch(function (res) {
-            $this.showError(res);
-          });
-      }
-    },
-    populateModules() {
-      //Display module on init
-      let $this = this;
-      let modules = this.categoryModules;
-
-      if (modules.length > 0) {
-        for (let i = 0; i < modules.length; i++) {
-          let current = modules[i];
-          let hook = $this.getHookInfoCache(current.hook_id);
-          try {
-            let moduleInfo = $this.getModuleInfo(current.module_id);
-            this.addModule(hook.hookIndex, moduleInfo);
-          } catch (e) {
-            console.error("@populateModules: " + e.message);
-            $this.showError("@populateModules: " + e.message);
-          }
-        }
-      } else {
-        console.info("There is no module added for this category.");
-        Toast.show(
-          this,
-          "There is no module added for this category. Drag from the right panel to the left boxes. ",
-          5000,
-        );
-      }
-    },
-    parseTheme() {
-      //console.log("this.themeInfo.length ",this.themeInfo);
-      if (this.hasTheme) {
-        let $this = this;
-        let theme = this.themeInfo;
-        let skeleton = theme.skeleton;
-        let regx_ske = /(%{cms.+}%)/gim; //find cms key
-        let conventions = skeleton.match(regx_ske);
-        let modules = {};
-        if (conventions && conventions.length > 0) {
-          let regx_m = /(cms.+})/;
-          let realIndex = 0;
-          conventions.forEach(function (current, index) {
-            let strcms = current.replace("%{cms.", "");
-            strcms = strcms.replace("}%", "");
-            let cms_arr = strcms.split(".");
-            let conventionType = cms_arr[0]; //can be hook or can be module;
-            let conventionName = cms_arr[1];
-
-            if (conventionType === "hook") {
-              let hookInfo = $this.getHookInfo(conventionName);
-              if (hookInfo !== null) {
-                $this.addHook({
-                  name: conventionName,
-                  modules: [],
-                  info: hookInfo,
-                });
-                $this.setHookInfoCache(hookInfo.id, {
-                  info: hookInfo,
-                  hookIndex: realIndex,
-                });
-                realIndex++;
-              } else {
-                console.error(
-                  "@parseTheme " +
-                    conventionName +
-                    ". You need to add in your site",
-                );
-              }
-            }
-            if (conventionType === "module") {
-            }
-          });
-        } else {
-          this.addErrorMessage(
-            `There is no hook defined in for this theme (${this.themeInfo.name}})`,
-          );
-        }
-      } else {
-        this.addErrorMessage("There is no theme available for this category");
-      }
-    },
-    addErrorMessage(message) {
-      this.errors.push({ message: message });
-    },
-    findModuleIndex(hookIndex, module) {
-      if (this.getHook(hookIndex) !== null) {
-        let modules = this.getHook(hookIndex).modules;
-        let found = modules.findIndex(function (current) {
-          return module.id === current.id;
-        });
-        return found;
-      }
-      return -1;
-    },
-    removeModules(idOrWhere, byType = "module_id", hookId = null) {
-      let $this = this;
-      let where;
-      if (Object.prototype.toString.call(idOrWhere) === "[object Object]") {
-        where = idOrWhere; // where is passed by param
-      } else {
-        where = this.getWhere();
-        where[byType] = parseInt(idOrWhere);
-      }
-
-      //hook and module
-      if (hookId !== null) {
-        where["hook_id"] = parseInt(hookId);
-        //remove from the hook->module array
-        let hookInfo = this.getHookInfoCache(hookId);
-        let module = this.getModuleInfo(idOrWhere);
-        let moduleIndex = this.findModuleIndex(hookInfo.hookIndex, module);
-        //remove module - refactor it
-        this.getHook(hookInfo.hookIndex).modules.splice(moduleIndex, 1);
-      }
-      let postParams = {};
-      postParams.where = where;
-      postParams.applicableForAllPlatforms = this.applicableForAllPlatforms;
-      this.enableDisableSave(true);
-
-      //Disable auto save on remove
-      /*return this.saveNow(AdminConfig.admin_path("homepage/removeModules"), postParams).then(function (res) {
-                console.log(res);
-                //Toast.show($this, res.message);
-                Toast.show($this, "Removed...");
-
-            }).catch(function (res) {
-                $this.showError(res, true);
-            });*/
-    },
-    addModule(hookIndex, module) {
-      //console.log("1: addModule ", hookIndex, module);
-      let found = this.findModuleIndex(hookIndex, module);
-
-      if (found === -1) {
-        let hook = this.getHook(hookIndex);
-        hook.modules.push(module);
-
-        //$this.refreshRightSide();
-        return hook.modules.length;
-      }
-
-      return false;
-    },
-    refreshRightSide() {
-      this.allModules.push(this.allModules[0]);
-      this.allModules.pop();
-    },
-    highlightEagerDrop(addRemove = "add") {
-      let js_hook_modules = document.querySelectorAll(".js_hook_modules");
-      js_hook_modules.forEach(function (current) {
-        current.classList[addRemove]("module-drop-eager");
-        current.closest("div.js_modules").classList[addRemove]("p-0", "m-0");
-      });
-    },
-    setHookInfoCache(hookId, data) {
-      return (this.hooksInfoCache[hookId] = data);
-    },
-    getHookInfoCache(hookId) {
-      return this.hooksInfoCache[hookId];
-    },
-    getHookInfo(hookValue, byKey = "alias") {
-      let hooks = this.hookInfo;
-
-      for (let i = 0; i < hooks.length; i++) {
-        let current = hooks[i];
-        if (current[byKey] === hookValue) {
-          return current;
-        }
-      }
-      return null;
-    },
-    addHook(data) {
-      this.hooks.push(data);
-    },
-    getHook(hookIndex) {
-      return this.hooks[hookIndex] || null;
-    },
-    getModuleInfo(module_id) {
-      if (this.moduleInfoCache[module_id]) {
-        return this.moduleInfoCache[module_id];
-      }
-      let found = null;
-      for (let i = 0; i < this.allModules.length; i++) {
-        let current = this.allModules[i];
-        if (current.id.toString() === module_id.toString()) {
-          this.moduleInfoCache[module_id] = current;
-          found = current;
-          break;
-        }
-      }
-      return found;
-    },
-    enableDragging() {
-      if (!this.canEdit) {
-        return false;
-      }
-      let $this = this;
-
-      //Right Side module
-      let draggableModules = document.getElementById("draggableModules");
-      this.sortObj.draggable = Sortable.create(draggableModules, {
-        animation: 200,
-        draggable: ".js_item",
-        group: {
-          name: "modulesBox" /*,
-                    pull: 'clone',
-                    revertClone: true*/,
-        },
-        sort: false,
-        ghostClass: "js_modules",
-        onEnd: function (/**Event*/ evt) {
-          let to = evt.to;
-          let item = evt.item; // dragged HTMLElement
-
-          let hookId = to.getAttribute("data-hook-id");
-          let moduleId = item.getAttribute("data-module-id");
-
-          if (hookId) {
-            let hookInfo = $this.getHookInfoCache(hookId);
-            //console.log(hookInfo);
-            let moduleInfo = $this.getModuleInfo(moduleId);
-
-            let isAdded = $this.addModule(hookInfo.hookIndex, moduleInfo);
-
-            //remove original dropped, because it is populated by reactive hook->modules
-            item.parentNode.removeChild(item);
-
-            $this.highlightEagerDrop("remove");
-
-            //we can send feedback
-            if (isAdded === false) {
-              Toast.show($this, "Module is already added in this hook...");
-            }
-          }
-
-          //Enable Drag
-
-          $this.enableDisableSave(true);
-        },
-        onStart: function (/**Event*/ evt) {
-          //console.log("on start");
-          $this.highlightEagerDrop("add");
-        },
-      });
-    },
-    enableSorting() {
-      if (!this.canEdit) {
-        return false;
-      }
-      let $this = this;
-      this.$nextTick(function () {
-        let list = document.querySelectorAll(".js_modules");
-        list.forEach(function (current) {
-          Sortable.create(current, {
-            animation: 200,
-            filter: ".js_delete",
-            group: {
-              name: "droppable",
-              put: "modulesBox",
-            },
-            onFilter: function (evt) {
-              let item = evt.item,
-                ctrl = evt.target;
-              let parent = item.parentNode;
-              let hookId = parent.getAttribute("data-hook-id");
-              let id = item.getAttribute("data-module-id");
-
-              if (Sortable.utils.is(ctrl, ".js_delete")) {
-                // Click on remove button
-                $this.removeModules(id, "module_id", hookId);
-              }
-            },
-            onUpdate: function (/**Event*/ evt) {
-              //console.log("@onUpdate: ", evt);
-              $this.enableDisableSave(true);
-              //reindex
-            },
-          });
-        });
-
-        $this.enableDragging(true);
-      });
-    },
-    deleteAllModuleFromHook(hookId) {
-      let hookInfo = this.getHookInfoCache(hookId);
-      let hook = this.getHook(hookInfo.hookIndex);
-      hook.modules = [];
-      this.removeModules(hookId, "hook_id");
-    },
-    hasAnyModulesInAHook(hook) {
-      return typeof hook.modules != "undefined" && hook.modules.length > 0;
-    },
-    enableDisableSave(val) {
-      if (val === undefined) {
-        return this.enableSave;
-      }
-      this.enableSave = val;
-    },
-    showHideDeleteAlert(isShow) {
-      if (isShow) {
-        Modal.open(this, "deleteBox");
-      } else {
-        Modal.close(this, "deleteBox");
-      }
-    },
-    deleteAllFromCategory() {
-      this.showHideDeleteAlert(false);
-
-      let allHooks = this.hooks;
-      for (let i = 0; i < allHooks.length; i++) {
-        allHooks[i].modules = [];
-      }
-      this.removeModules(this.categoryId, "category_id");
-    },
-    showHideCopyAlert(isShow = true) {
-      if (isShow) {
-        this.setDefaultFromTo();
-        Modal.open(this, "copyBox");
-      } else {
-        Modal.close(this, "copyBox");
-      }
-    },
-    copyDataFromCategory() {
-      this.isWorking = true;
-      let $this = this;
-      let fromData = this.fromData;
-      let toData = this.toData;
-      let data = {
-        fromData,
-        toData,
-      };
-      let url = AdminConfig.admin_path("homepage/copyData");
-      this.saveNow(url, data)
-        .then(function (res) {
-          //console.log(res)
-          if (res.data.error) {
-            Toast.show($this, res.data.message, 5000);
-          } else if (res.data.success) {
-            $this.showHideCopyAlert(false);
-            Toast.show($this, "Copied. Reloading...");
-            window.location.href = window.location.href;
-          }
-          $this.isWorking = false;
-        })
-        .catch(function (res) {
-          $this.showHideCopyAlert(false);
-          $this.isWorking = false;
-          $this.showError(res);
-        });
-    },
-    setWorking() {},
-    isValidModule(module) {
-      let isValid =
-        module != null && typeof module != "undefined" && module.id > 0;
-      if (isValid === false) {
-        console.error(
-          "There is some error in db entries for this category. " +
-            "This can be fixed by deleting all modules and drag and drop again.",
-        );
-      }
-      return isValid;
-    },
-    fetchNewData() {
-      let where = this.getWhere();
-      delete where.site_id;
-      if (where.microsite_id === 0) {
-        delete where.microsite_id;
-      }
-      let url = "homepage/ui";
-      window.location.href = AdminConfig.admin_path(url, where);
-    },
-    showInfo(type, id) {
-      this.$refs.infoPopup.showInfo(type, id);
-    },
-    showHideHookPanel(id) {
-      //console.log(id, this.$refs["hook_panel_"+id]);
-      let target = this.$refs["hook_panel_" + id][0];
-      if (target.className.indexOf("hide") === -1) {
-        target.classList.add("hide");
-      } else {
-        target.classList.remove("hide");
-      }
-    },
-    onlyMe(id, evt) {
-      let $this = this;
-
-      let target = this.$refs["panel_" + id][0];
-      if (target.className.indexOf("fixed") === -1) {
-        hideAllHooks(true);
-        //show current and fixed it
-        target.classList.remove("hide");
-        target.classList.add("fixed");
-        //evt.target.classList.add("fa-compress");
-      } else {
-        hideAllHooks(false);
-      }
-
-      function hideAllHooks(shouldHide) {
-        let savePanel = $this.$refs.savePanel;
-
-        //hide old one
-        for (let i = 0; i < $this.hooks.length; i++) {
-          let current = $this.hooks[i];
-          let current_ele = $this.$refs["panel_" + current.info.id][0];
-
-          if (shouldHide === true) {
-            current_ele.classList.add("hide");
-            current_ele.classList.remove("fixed");
-          } else {
-            current_ele.classList.remove("hide");
-            current_ele.classList.remove("fixed");
-          }
-        }
-
-        if (shouldHide === true) {
-          savePanel.classList.add("hide");
-        } else {
-          savePanel.classList.remove("hide");
-        }
-      }
-    },
-    showError(response, reload = false) {
-      let message = "";
-      if (typeof response == "string") {
-        message = response;
-      } else {
-        message =
-          response && response["data"] && response["data"]["message"]
-            ? response.data.message
-            : "Unknown error!";
-      }
-      Toast.show(this, message, 5000);
-      if (reload) {
-        setTimeout(() => {
-          window.location.reload();
-        }, 1000);
-      }
-    },
-  },
+const setHookPanelRef = (id) => (el) => {
+  if (el) hookPanels[id] = el;
 };
+const setPanelRef = (id) => (el) => {
+  if (el) panels[id] = el;
+};
+
+// State
+const categoriesData = reactive({});
+const categories = ref(SafeJsonParse(props.dataCategories, []));
+const microsites = ref(SafeJsonParse(props.dataMicrosites, []));
+const platforms = ref(SafeJsonParse(props.dataPlatforms, []));
+const siteId = ref(
+  props.dataSiteId === undefined || props.dataSiteId === "" ? 1 : parseInt(props.dataSiteId)
+);
+const microSiteId = ref(
+  props.dataMicrositeId === undefined || props.dataMicrositeId === "" ? 0 : parseInt(props.dataMicrositeId)
+);
+const platformId = ref(
+  props.dataPlatformId === undefined || props.dataPlatformId === "" ? 1 : parseInt(props.dataPlatformId)
+);
+const categoryId = ref(
+  props.dataCategoryId === undefined || props.dataCategoryId === "" ? 0 : parseInt(props.dataCategoryId)
+);
+const siteInfo = ref(SafeJsonParse(props.dataSiteInfo, []));
+const hookInfo = ref(SafeJsonParse(props.dataHookInfo, []));
+const allModules = ref(SafeJsonParse(props.dataAllModules, []));
+const categoryModules = ref(SafeJsonParse(props.dataCategoryModules, []));
+const categoryInfo = ref(SafeJsonParse(props.dataCategoryInfo, []));
+const themeInfo = ref(SafeJsonParse(props.dataThemeInfo, []));
+const hooks = ref([]);
+const hooksInfoCache = reactive({});
+const moduleInfoCache = reactive({});
+const noHookFound = ref(false);
+const errors = ref([]);
+const enableSave = ref(false);
+const searchKey = ref("");
+const applicableForAllPlatforms = ref(false);
+const fromData = reactive({ site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 });
+const toData = reactive({ site_id: 0, microsite_id: 0, platform_id: 0, category_id: 0 });
+const isWorking = ref(false);
+const sortObj = reactive({ draggable: null });
+const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+const isModuleReadonly = ref(props.dataIsModuleReadonly === "1");
+const allSites = ref(SafeJsonParse(props.dataAllSites, []));
+const copyForAllPlatforms = ref(false);
+
+const modalCss = "modal-lg";
+
+// Computed
+const hasSiteMoreThanOne = computed(() => allSites.value.length > 1);
+const hasMicrosites = computed(() => microsites.value.length > 0);
+const hasPlatformMoreThanOne = computed(() => platforms.value.length > 1);
+const hasTheme = computed(() => themeInfo.value && themeInfo.value.id);
+const canEdit = computed(() => userRights.value.indexOf("edit") >= 0 && isModuleReadonly.value === false);
+const canDelete = computed(() => userRights.value.indexOf("delete") >= 0 && isModuleReadonly.value === false);
+
+const fromCategories = computed(() => categoriesData[fromData.site_id] || []);
+const toCategories = computed(() => categoriesData[toData.site_id] || []);
+const hasError = computed(() => errors.value.length > 0);
+
+const saveButtonCss = computed(() => {
+  const disabled = enableSave.value === true ? "" : " disabled";
+  return "btn btn-success btn-form-submit" + disabled;
+});
+
+const filterModules = computed(() => {
+  let key = searchKey.value;
+  if (key !== "" && key != null) {
+    key = key.toLowerCase();
+    return allModules.value.filter((current) => {
+      const alias = current.alias.toLowerCase();
+      const name = current.name.toLowerCase();
+      const id = current.id;
+      return id.toString() === key || alias.includes(key) || name.includes(key);
+    });
+  } else {
+    return allModules.value;
+  }
+});
+
+// Helper Methods
+const getHookInfo = (hookValue, byKey = "alias") => {
+  const hks = hookInfo.value;
+  for (let i = 0; i < hks.length; i++) {
+    if (hks[i][byKey] === hookValue) return hks[i];
+  }
+  return null;
+};
+
+const getHook = (hookIndex) => hooks.value[hookIndex] || null;
+
+const addErrorMessage = (message) => {
+  errors.value.push({ message });
+};
+
+const showError = (response, reload = false) => {
+  let message = "";
+  if (typeof response === "string") {
+    message = response;
+  } else {
+    message = response?.data?.message || "Unknown error!";
+  }
+  Toast.show(instance.proxy, message, 5000);
+  if (reload) {
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  }
+};
+
+const showInfo = (type, id) => {
+  if (infoPopup.value) infoPopup.value.showInfo(type, id);
+};
+
+const getWhere = () => ({
+  site_id: siteId.value,
+  microsite_id: microSiteId.value,
+  platform_id: platformId.value,
+  category_id: categoryId.value,
+});
+
+const enableDisableSave = (val) => {
+  if (val === undefined) return enableSave.value;
+  enableSave.value = val;
+};
+
+const findModuleIndex = (hookIndex, module) => {
+  const hk = getHook(hookIndex);
+  if (hk !== null) {
+    return hk.modules.findIndex((current) => module.id === current.id);
+  }
+  return -1;
+};
+
+const getModuleInfo = (module_id) => {
+  if (moduleInfoCache[module_id]) return moduleInfoCache[module_id];
+  let found = null;
+  for (let i = 0; i < allModules.value.length; i++) {
+    if (allModules.value[i].id.toString() === module_id.toString()) {
+      moduleInfoCache[module_id] = allModules.value[i];
+      found = allModules.value[i];
+      break;
+    }
+  }
+  return found;
+};
+
+const addModule = (hookIndex, module) => {
+  const found = findModuleIndex(hookIndex, module);
+  if (found === -1) {
+    const hk = getHook(hookIndex);
+    hk.modules.push(module);
+    return hk.modules.length;
+  }
+  return false;
+};
+
+const removeModules = (idOrWhere, byType = "module_id", hookId = null) => {
+  let where;
+  if (Object.prototype.toString.call(idOrWhere) === "[object Object]") {
+    where = idOrWhere;
+  } else {
+    where = getWhere();
+    where[byType] = parseInt(idOrWhere);
+  }
+
+  if (hookId !== null) {
+    where["hook_id"] = parseInt(hookId);
+    const hkInfo = hooksInfoCache[hookId];
+    const module = getModuleInfo(idOrWhere);
+    const moduleIndex = findModuleIndex(hkInfo.hookIndex, module);
+    if (moduleIndex !== -1) {
+      getHook(hkInfo.hookIndex).modules.splice(moduleIndex, 1);
+    }
+  }
+  enableDisableSave(true);
+};
+
+const highlightEagerDrop = (addRemove = "add") => {
+  const js_hook_modules = document.querySelectorAll(".js_hook_modules");
+  js_hook_modules.forEach((current) => {
+    current.classList[addRemove]("module-drop-eager");
+    current.closest("div.js_modules").classList[addRemove]("p-0", "m-0");
+  });
+};
+
+const enableDragging = () => {
+  if (!canEdit.value) return false;
+
+  const draggableModules = document.getElementById("draggableModules");
+  sortObj.draggable = Sortable.create(draggableModules, {
+    animation: 200,
+    draggable: ".js_item",
+    group: { name: "modulesBox" },
+    sort: false,
+    ghostClass: "js_modules",
+    onEnd: (evt) => {
+      const { to, item } = evt;
+      const hookId = to.getAttribute("data-hook-id");
+      const moduleId = item.getAttribute("data-module-id");
+
+      if (hookId) {
+        const hkInfo = hooksInfoCache[hookId];
+        const moduleInfo = getModuleInfo(moduleId);
+        const isAdded = addModule(hkInfo.hookIndex, moduleInfo);
+
+        if (item.parentNode) item.parentNode.removeChild(item);
+        highlightEagerDrop("remove");
+
+        if (isAdded === false) {
+          Toast.show(instance.proxy, "Module is already added in this hook...");
+        }
+      }
+      enableDisableSave(true);
+    },
+    onStart: () => {
+      highlightEagerDrop("add");
+    },
+  });
+};
+
+const enableSorting = () => {
+  if (!canEdit.value) return false;
+  nextTick(() => {
+    const list = document.querySelectorAll(".js_modules");
+    list.forEach((current) => {
+      Sortable.create(current, {
+        animation: 200,
+        filter: ".js_delete",
+        group: { name: "droppable", put: "modulesBox" },
+        onFilter: (evt) => {
+          const { item, target } = evt;
+          const parent = item.parentNode;
+          const hookId = parent.getAttribute("data-hook-id");
+          const id = item.getAttribute("data-module-id");
+
+          if (Sortable.utils.is(target, ".js_delete")) {
+            removeModules(id, "module_id", hookId);
+          }
+        },
+        onUpdate: () => {
+          enableDisableSave(true);
+        },
+      });
+    });
+    enableDragging();
+  });
+};
+
+const parseTheme = () => {
+  if (hasTheme.value) {
+    const theme = themeInfo.value;
+    const skeleton = theme.skeleton;
+    const regx_ske = /(%{cms.+}%)/gim;
+    const conventions = skeleton.match(regx_ske);
+    if (conventions && conventions.length > 0) {
+      let realIndex = 0;
+      conventions.forEach((current) => {
+        let strcms = current.replace("%{cms.", "").replace("}%", "");
+        const cms_arr = strcms.split(".");
+        const conventionType = cms_arr[0];
+        const conventionName = cms_arr[1];
+
+        if (conventionType === "hook") {
+          const hkInfo = getHookInfo(conventionName);
+          if (hkInfo !== null) {
+            hooks.value.push({
+              name: conventionName,
+              modules: [],
+              info: hkInfo,
+            });
+            hooksInfoCache[hkInfo.id] = { info: hkInfo, hookIndex: realIndex };
+            realIndex++;
+          } else {
+            console.error(`@parseTheme ${conventionName}. You need to add in your site`);
+          }
+        }
+      });
+    } else {
+      addErrorMessage(`There is no hook defined in for this theme (${theme.name})`);
+    }
+  } else {
+    addErrorMessage("There is no theme available for this category");
+  }
+};
+
+const populateModules = () => {
+  const mods = categoryModules.value;
+  if (mods.length > 0) {
+    mods.forEach((current) => {
+      const hk = hooksInfoCache[current.hook_id];
+      try {
+        const moduleInfo = getModuleInfo(current.module_id);
+        if (moduleInfo) {
+          addModule(hk.hookIndex, moduleInfo);
+        }
+      } catch (e) {
+        console.error(`@populateModules: ${e.message}`);
+        showError(`@populateModules: ${e.message}`);
+      }
+    });
+  } else {
+    Toast.show(instance.proxy, "There is no module added for this category. Drag from the right panel to the left boxes. ", 5000);
+  }
+};
+
+const setDefaultFromTo = () => {
+  if (allSites.value.length > 0) {
+    fromData.site_id = allSites.value[0].id;
+    toData.site_id = siteId.value;
+  } else {
+    fromData.site_id = siteId.value;
+    toData.site_id = siteId.value;
+  }
+  fromData.platform_id = platformId.value;
+  toData.platform_id = platformId.value;
+  toData.category_id = categoryId.value;
+};
+
+const makeCategories = () => {
+  if (allSites.value.length > 0) {
+    allSites.value.forEach((current) => {
+      categoriesData[current.id] = current.category;
+    });
+  }
+  setDefaultFromTo();
+};
+
+const init = () => {
+  if (categories.value.length === 0) {
+    addErrorMessage("No category found!");
+  }
+  if (categoryInfo.value.length === 0) {
+    addErrorMessage("There is a mismatch in site default category. Please fix that.");
+  }
+  if (hasTheme.value) {
+    parseTheme();
+    populateModules();
+    enableSorting();
+    makeCategories();
+  } else {
+    const path = AdminConfig.admin_path("category/settings", { platform_id: platformId.value });
+    addErrorMessage(`This category/platform/theme is not available in category_site table. You need to drag and drop in <a href='${path}'>category settings</a>.`);
+    addErrorMessage("Dont' forget the set the theme there.");
+  }
+};
+
+const saveNow = (url, data) => {
+  Loader.show(instance.proxy);
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, data)
+      .then((response) => resolve(response))
+      .catch((error) => reject(SafeErrorData(error)))
+      .finally(() => Loader.hide(instance.proxy));
+  });
+};
+
+const saveModules = () => {
+  if (enableDisableSave() === false) return false;
+  const allHooks = document.querySelectorAll(".js_hook_modules");
+  const datas = [];
+  allHooks.forEach((current) => {
+    const allMods = current.querySelectorAll("li.js_item");
+    const hook_id = current.getAttribute("data-hook-id");
+    if (allMods.length > 0) {
+      const modules = Array.from(allMods).map((m, i) => ({
+        module_id: m.getAttribute("data-module-id"),
+        position: i + 1,
+      }));
+      datas.push({ hook_id, modules });
+    }
+  });
+
+  if (datas.length > 0) {
+    const postParams = {
+      data: datas,
+      where: getWhere(),
+      applicableForAllPlatforms: false,
+    };
+    saveNow(AdminConfig.admin_path("homepage/saveSettings"), postParams)
+      .then(() => {
+        Toast.show(instance.proxy, "Saved...");
+        enableDisableSave(false);
+      })
+      .catch((err) => showError(err));
+  }
+};
+
+const fetchNewData = () => {
+  const where = getWhere();
+  delete where.site_id;
+  if (where.microsite_id === 0) delete where.microsite_id;
+  window.location.href = AdminConfig.admin_path("homepage/ui", where);
+};
+
+const showHideHookPanel = (id) => {
+  const target = hookPanels[id];
+  if (target) {
+    target.classList.toggle("hide");
+  }
+};
+
+const onlyMe = (id) => {
+  const target = panels[id];
+  if (!target) return;
+
+  const isFixed = target.classList.contains("fixed");
+
+  const hideAllHooks = (shouldHide) => {
+    hooks.value.forEach((hook) => {
+      const el = panels[hook.info.id];
+      if (el) {
+        if (shouldHide) {
+          el.classList.add("hide");
+          el.classList.remove("fixed");
+        } else {
+          el.classList.remove("hide");
+          el.classList.remove("fixed");
+        }
+      }
+    });
+
+    if (savePanel.value) {
+      if (shouldHide) savePanel.value.classList.add("hide");
+      else savePanel.value.classList.remove("hide");
+    }
+  };
+
+  if (!isFixed) {
+    hideAllHooks(true);
+    target.classList.remove("hide");
+    target.classList.add("fixed");
+  } else {
+    hideAllHooks(false);
+  }
+};
+
+const deleteAllModuleFromHook = (hookId) => {
+  const hkInfo = hooksInfoCache[hookId];
+  const hook = getHook(hkInfo.hookIndex);
+  hook.modules = [];
+  removeModules(hookId, "hook_id");
+};
+
+const showHideDeleteAlert = (isShow) => {
+  if (isShow) Modal.open(instance.proxy, "deleteBox");
+  else Modal.close(instance.proxy, "deleteBox");
+};
+
+const deleteAllFromCategory = () => {
+  showHideDeleteAlert(false);
+  hooks.value.forEach((hk) => {
+    hk.modules = [];
+  });
+  removeModules(categoryId.value, "category_id");
+};
+
+const showHideCopyAlert = (isShow = true) => {
+  if (isShow) {
+    setDefaultFromTo();
+    Modal.open(instance.proxy, "copyBox");
+  } else {
+    Modal.close(instance.proxy, "copyBox");
+  }
+};
+
+const copyDataFromCategory = () => {
+  isWorking.value = true;
+  const data = { fromData, toData };
+  const url = AdminConfig.admin_path("homepage/copyData");
+  saveNow(url, data)
+    .then((res) => {
+      if (res.data.error) {
+        Toast.show(instance.proxy, res.data.message, 5000);
+      } else if (res.data.success) {
+        showHideCopyAlert(false);
+        Toast.show(instance.proxy, "Copied. Reloading...");
+        window.location.reload();
+      }
+      isWorking.value = false;
+    })
+    .catch((err) => {
+      showHideCopyAlert(false);
+      isWorking.value = false;
+      showError(err);
+    });
+};
+
+const hasAnyModulesInAHook = (hook) => hook.modules && hook.modules.length > 0;
+
+onMounted(() => {
+  init();
+});
 </script>
+

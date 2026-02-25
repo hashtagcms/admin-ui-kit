@@ -15,79 +15,68 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
 import SplitButton from "./library/split-button.vue";
-
 import SecureLS from "secure-ls";
 
-export default {
-  components: {
-    "split-button": SplitButton,
-  },
-  props: ["dataSites", "dataCurrentSite", "dataSupportedSites", "dataIsAdmin"],
-  mounted() {
-    this.init();
-  },
-  data() {
-    return {
-      sites: SafeJsonParse(this.dataSites, []),
-      currentSite:
-        typeof this.dataCurrentSite == "undefined"
-          ? 1
-          : parseInt(this.dataCurrentSite),
-      supportedSite: SafeJsonParse(this.dataSupportedSites, []),
-    };
-  },
-  methods: {
-    init(force = false) {
-      let $this = this;
-      //$this.sites = [{name:"Please wait...", id:0}];
-      let ls = new SecureLS();
-      let allSites = ls.get("allSites");
+const props = defineProps(["dataSites", "dataCurrentSite", "dataSupportedSites", "dataIsAdmin"]);
 
-      if (allSites.length === 0 || force === true) {
-        let siteController = AdminConfig.admin_path(`site/getSitesForUsers`);
-        axios
-          .get(siteController, { withCredentials: false })
-          .then(function (response) {
-            $this.sites = response.data;
+const sites = ref(SafeJsonParse(props.dataSites, []));
+const currentSite = ref(
+  props.dataCurrentSite == "undefined"
+    ? 1
+    : parseInt(props.dataCurrentSite)
+);
+const supportedSite = ref(SafeJsonParse(props.dataSupportedSites, []));
 
-            ls.set("allSites", JSON.stringify($this.sites));
-            //  $this.$refs.site_combo.setData($this.sites);
-          })
-          .catch(function (error) {
-            console.log(error);
-          });
-      } else {
-        $this.sites = SafeJsonParse(allSites, []);
-      }
-    },
-    hasSites() {
-      //has language greater than one
-      return this.sites != null && this.sites.length > 1;
-    },
-    parseSite: function (row) {
-      // console.log("parseSite");
-      //console.log(row);
-      return { label: row.name, value: row.id };
-    },
-    setSite(data) {
-      let ajaxController = AdminConfig.admin_path(
-        `ajax/setSiteId/${this.currentSite}`,
-      );
-      axios
+const init = (force = false) => {
+  let ls = new SecureLS();
+  let allSites = ls.get("allSites");
+
+  if (allSites.length === 0 || force === true) {
+    let siteController = AdminConfig.admin_path(`site/getSitesForUsers`);
+    axios
+      .get(siteController, { withCredentials: false })
+      .then(function (response) {
+        sites.value = response.data;
+
+        ls.set("allSites", JSON.stringify(sites.value));
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  } else {
+    sites.value = SafeJsonParse(allSites, []);
+  }
+};
+
+const hasSites = () => {
+    return sites.value != null && sites.value.length > 1;
+};
+
+const parseSite = (row) => {
+    return { label: row.name, value: row.id };
+};
+
+const setSite = () => {
+    let ajaxController = AdminConfig.admin_path(
+        `ajax/setSiteId/${currentSite.value}`
+    );
+    axios
         .get(ajaxController)
         .then(function (response) {
-          //console.log(response);
-          //window.location.reload();
-          window.location.href = window.location.pathname;
+            window.location.href = window.location.pathname;
         })
         .catch(function (error) {
-          console.log(error);
+            console.log(error);
         });
-    },
-  },
 };
+
+onMounted(() => {
+    init();
+});
 </script>
+

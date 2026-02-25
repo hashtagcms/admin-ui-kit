@@ -32,45 +32,33 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
 import CopyPaste from "./library/copy-paste.vue";
-import LeftMenuShowHide from "./library/left-menu-show-hide.vue";
+import LeftMenuToggle from "./library/left-menu-show-hide.vue";
 
-export default {
-  components: {
-    "copy-paste": CopyPaste,
-    "left-menu-toggle": LeftMenuShowHide,
-  },
-  mounted() {},
-  props: [
-    "dataTitle",
-    "dataBackUrl",
-    "dataBackTitle",
-    "dataShowCopy",
-    "dataShowPaste",
-    "dataCopyPasteAutoInit",
-    "dataShowExpand",
-  ],
-  computed: {
-    showBackButton() {
-      return typeof this.dataBackUrl !== "undefined";
-    },
-    showExpand() {
-      return typeof this.dataShowExpand !== "undefined";
-    },
-  },
-  data() {
-    return {
-      title: this.dataTitle,
-      backUrl: this.dataBackUrl,
-      backTitle:
-        typeof this.dataBackTitle === "undefined" ? "Back" : this.dataBackTitle,
-    };
-  },
-  methods: {
-    goBack() {
-      window.location.href = this.backUrl;
-    },
-  },
+const props = defineProps([
+  "dataTitle",
+  "dataBackUrl",
+  "dataBackTitle",
+  "dataShowCopy",
+  "dataShowPaste",
+  "dataCopyPasteAutoInit",
+  "dataShowExpand",
+]);
+
+// State
+const title = ref(props.dataTitle);
+const backUrl = ref(props.dataBackUrl);
+const backTitle = ref(typeof props.dataBackTitle === "undefined" ? "Back" : props.dataBackTitle);
+
+// Computed
+const showBackButton = computed(() => typeof props.dataBackUrl !== "undefined");
+const showExpand = computed(() => typeof props.dataShowExpand !== "undefined");
+
+// Methods
+const goBack = () => {
+  window.location.href = backUrl.value;
 };
 </script>
+

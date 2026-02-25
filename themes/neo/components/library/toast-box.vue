@@ -1,53 +1,57 @@
 <template>
-  <div class="toasterHolder jsToast shadow" v-show="showMe">
+  <div class="toasterHolder jsToast shadow" v-show="showMe" ref="toastElement">
     <div class="toasterContent">
       {{ message }}
     </div>
   </div>
 </template>
 
-<script>
-export default {
-  mounted() {},
-  data() {
-    return {
-      showMe: false,
-      message: "Toast Content",
-      intervalId: 0,
-    };
-  },
-  methods: {
-    show(message = "", timeout = 3000, position) {
-      this.hide();
-      let $this = this;
-      this.showMe = true;
-      this.message = message !== "" ? message : "";
-      this.$nextTick(function () {
-        this.align(position);
-      });
+<script setup>
+import { ref, nextTick, onBeforeUnmount } from "vue";
 
-      this.intervalId = setTimeout(function () {
-        $this.hide();
-      }, timeout);
-    },
-    hide() {
-      this.showMe = false;
-      if (this.intervalId) {
-        clearInterval(this.intervalId);
-      }
-    },
-    align(position) {
-      let left =
-        position !== undefined
-          ? position.left
-          : window.innerWidth / 2 - this.$el.offsetWidth / 2;
-      let top =
-        position !== undefined
-          ? position.top
-          : window.innerHeight / 2 - this.$el.offsetHeight / 2 + window.scrollY;
-      this.$el.style.top = top + "px";
-      this.$el.style.left = left + "px";
-    },
-  },
+// State
+const showMe = ref(false);
+const message = ref("Toast Content");
+const intervalId = ref(0);
+const toastElement = ref(null);
+
+// Methods
+const align = (position) => {
+  if (!toastElement.value) return;
+  const left = position !== undefined
+    ? position.left
+    : window.innerWidth / 2 - toastElement.value.offsetWidth / 2;
+  const top = position !== undefined
+    ? position.top
+    : window.innerHeight / 2 - toastElement.value.offsetHeight / 2 + window.scrollY;
+  toastElement.value.style.top = `${top}px`;
+  toastElement.value.style.left = `${left}px`;
 };
+
+const hide = () => {
+  showMe.value = false;
+  if (intervalId.value) {
+    clearTimeout(intervalId.value);
+  }
+};
+
+const show = (msg = "", timeout = 3000, position) => {
+  hide();
+  showMe.value = true;
+  message.value = msg !== "" ? msg : "";
+  nextTick(() => {
+    align(position);
+  });
+
+  intervalId.value = setTimeout(() => {
+    hide();
+  }, timeout);
+};
+
+defineExpose({ show, hide });
+
+onBeforeUnmount(() => {
+  hide();
+});
 </script>
+

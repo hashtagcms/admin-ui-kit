@@ -36,65 +36,66 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted, onBeforeUnmount, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { EventBus } from "../../../helpers/event-bus";
 import { Toast, SafeJsonParse } from "../../../helpers/common";
 import ModalBox from "./library/modal-box.vue";
 
-export default {
-  components: {
-    "modal-box": ModalBox,
-  },
-  mounted() {
-    this.verifyAction();
-  },
-  props: ["dataPlatforms"],
-  data() {
-    return {
-      modelCss: "modal",
-      showHide: true,
-      platforms: SafeJsonParse(this.dataPlatforms, []),
-      currentPlatform: "",
-      currentTarget: null,
-    };
-  },
-  methods: {
-    verifyAction: function () {
-      let $this = this;
-      EventBus.on("list-view-pre-edit", function (current) {
-        $this.currentTarget = current;        
-        $this.open();
-      });
-    },
-    editNow() {
-      let platform_id = this.currentPlatform;
-      if (platform_id === "") {
-        Toast.show(this, "Please select a platform");
+const props = defineProps(["dataPlatforms"]);
+const instance = getCurrentInstance();
+
+const platformbox = ref(null);
+const modelCss = ref("modal");
+const showHide = ref(true);
+const platforms = ref(SafeJsonParse(props.dataPlatforms, []));
+const currentPlatform = ref("");
+const currentTarget = ref(null);
+
+const editNow = () => {
+    let platform_id = currentPlatform.value;
+    if (platform_id === "") {
+        Toast.show(instance.proxy, "Please select a platform");
         return false;
-      }
-      let target = this.currentTarget;
-      console.log("target ",target);
-      let id = target.getAttribute("data-rowid");
-      window.location = AdminConfig.admin_path(
-        `category/edit/${id}/${platform_id}`,
-      );
-    },
-    open() {
-      // console.log(this.platforms);
-      if (this.platforms.length > 1) {
-        this.$refs.platformbox.open();
-      } else {
-        this.currentPlatform = this.platforms[0].id;
-        this.editNow();
-      }
-    },
-    close() {
-      this.$refs.platformbox.close();
-    },
-    hideSpinner() {
-      EventBus.emit("list-view-hide-spinner", this);
-    },
-  },
+    }
+    let target = currentTarget.value;
+    console.log("target ", target);
+    let id = target.getAttribute("data-rowid");
+    window.location = AdminConfig.admin_path(
+        `category/edit/${id}/${platform_id}`
+    );
 };
+
+const open = () => {
+    if (platforms.value.length > 1) {
+        platformbox.value?.open();
+    } else if (platforms.value.length === 1) {
+        currentPlatform.value = platforms.value[0].id;
+        editNow();
+    }
+};
+
+const close = () => {
+    platformbox.value?.close();
+};
+
+const hideSpinner = () => {
+    EventBus.emit("list-view-hide-spinner", instance.proxy);
+};
+
+const onListViewPreEdit = (current) => {
+    currentTarget.value = current;        
+    open();
+};
+
+onMounted(() => {
+    EventBus.on("list-view-pre-edit", onListViewPreEdit);
+});
+
+onBeforeUnmount(() => {
+    EventBus.off("list-view-pre-edit", onListViewPreEdit);
+});
+
 </script>
+

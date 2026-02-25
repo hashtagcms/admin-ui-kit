@@ -1,2 +1,2 @@
-import { Dashboard } from '@hashtagcms/admin-sdk';
+import { Dashboard } from '../../../helpers';
 window.Dashboard = Dashboard;

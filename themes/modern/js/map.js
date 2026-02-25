@@ -1,2 +1,2 @@
-import { MapAPI } from '@hashtagcms/admin-sdk';
+import { MapAPI } from '../../../helpers';
 window.MapApi = new MapAPI();

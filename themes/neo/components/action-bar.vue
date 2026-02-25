@@ -83,7 +83,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import CmsModuleDropdown from "./cms-module-dropdown.vue";
 import LanguageButton from "./language-button.vue";
@@ -91,141 +92,110 @@ import SearchBar from "./search-bar.vue";
 import { Toast, SafeJsonParse } from "../../../helpers/common";
 import Humanize from "../../../helpers/humanize";
 
-export default {
-  components: {
-    "cms-module-dropdown": CmsModuleDropdown,
-    "language-button": LanguageButton,
-    "search-bar": SearchBar,
-  },
-  mounted() {
-    this.shouldShowSearchPanel();
-    //console.log(this.dataShowSearch);
-  },
-  props: [
-    "dataSelectedParams",
-    "dataControllerName",
-    "dataControllerTitle",
-    "dataFields",
-    "dataActionFields",
-    "dataLanguages",
-    "dataSelectedLanguage",
-    "dataMoreActions",
-    "dataShowAdd",
-    "dataHasLangMethod",
-    "dataCmsModules",
-    "dataShowSearch",
-    "dataShowBack",
-    "dataLayoutType",
-  ],
-  computed: {
-    backURL() {
-      return AdminConfig.admin_path(this.controllerName);
-    },
-    layoutIcon() {
-      return this.layoutType === "grid" ? "fa fa-th-list" : "fa fa-table";
-    },
-    showAddButtonBasedOnAction() {
-      return this.actionFields.indexOf("edit") !== -1;
-    },
-  },
-  data() {
-    return {
-      canAdd: true,
-      showSearchButton: !(
-        typeof this.dataShowSearch === "undefined" ||
-        this.dataShowSearch === "" ||
-        this.dataShowSearch === "false"
-      ),
-      showSearchPanel: false,
-      isActive: "btn btn-outline-secondary",
-      searchAnim: "",
-      moreActionButtons: SafeJsonParse(this.dataMoreActions, []),
-      showAdd:
-        typeof this.dataShowAdd === "undefined" || this.dataShowAdd === "true",
-      hasLangMethod: !(
-        typeof this.dataHasLangMethod === "undefined" ||
-        this.dataHasLangMethod === "false"
-      ),
-      cmsModules: SafeJsonParse(this.dataCmsModules, {}),
-      selectedParams:
-        typeof this.dataSelectedParams === "undefined"
-          ? ""
-          : this.dataSelectedParams,
-      controllerName:
-        typeof this.dataControllerName === "undefined"
-          ? ""
-          : this.dataControllerName,
-      controllerTitle:
-        typeof this.dataControllerTitle === "undefined"
-          ? ""
-          : this.dataControllerTitle,
-      fields:
-        typeof this.dataFields === "undefined" || this.dataFields === ""
-          ? []
-          : this.dataFields,
-      actionFields:
-        typeof this.dataActionFields === "undefined" ||
-        this.dataActionFields === ""
-          ? []
-          : this.dataActionFields,
-      showBack: this.dataShowBack === "true",
-      layoutType:
-        typeof this.dataLayoutType === "undefined" || this.dataLayoutType === ""
-          ? "table"
-          : this.dataLayoutType,
-    };
-  },
-  methods: {
-    changeLayout() {
-      Toast.show(this, "Please wait. Changing listing style for you...", 5000);
-      this.layoutType = this.layoutType === "table" ? "grid" : "table";
-      if ("URLSearchParams" in window) {
-        let searchParams = new URLSearchParams(window.location.search);
-        searchParams.set("layout", this.layoutType);
-        window.location.search = searchParams.toString();
-      }
-    },
-    getAction(val) {
-      if (val.indexOf("http") === 0) {
-        return val;
-      }
-      return AdminConfig.admin_path(val);
-    },
-    maintainActiveSearch(animate = true) {
-      this.isActive =
-        this.showSearchPanel === true
-          ? "btn btn-success"
-          : "btn btn-outline-secondary";
-      this.searchAnim =
-        this.showSearchPanel === true && animate == true
-          ? "animated flipInX"
-          : "";
-    },
-    showHideSearch() {
-      this.showSearchPanel = !this.showSearchPanel;
-      this.maintainActiveSearch();
-    },
-    shouldShowSearchPanel() {
-      if (this.selectedParams !== "") {
-        const params = SafeJsonParse(this.selectedParams, {});
-        if (params.q) {
-          this.showSearchPanel = true;
-        }
-        this.maintainActiveSearch(false);
-      }
-    },
-    addNew() {
-      if (this.controllerName !== "") {
-        var controller_url = AdminConfig.admin_path(this.controllerName);
-        window.location.href = controller_url + "/create";
-      }
-    },
-    getButtonType(row) {
-      return !row.as || row.as === "button" ? "button" : row.as;
-    },
-    getTitle: function (text) {
-      return Humanize(text);
-    },
-  },
+const props = defineProps([
+  "dataSelectedParams",
+  "dataControllerName",
+  "dataControllerTitle",
+  "dataFields",
+  "dataActionFields",
+  "dataLanguages",
+  "dataSelectedLanguage",
+  "dataMoreActions",
+  "dataShowAdd",
+  "dataHasLangMethod",
+  "dataCmsModules",
+  "dataShowSearch",
+  "dataShowBack",
+  "dataLayoutType",
+]);
+
+const instance = getCurrentInstance();
+
+// State
+const canAdd = ref(true);
+const showSearchButton = ref(
+  !(
+    typeof props.dataShowSearch === "undefined" ||
+    props.dataShowSearch === "" ||
+    props.dataShowSearch === "false"
+  )
+);
+const showSearchPanel = ref(false);
+const isActive = ref("btn btn-outline-secondary");
+const searchAnim = ref("");
+const moreActionButtons = ref(SafeJsonParse(props.dataMoreActions, []));
+const showAdd = ref(typeof props.dataShowAdd === "undefined" || props.dataShowAdd === "true");
+const hasLangMethod = ref(
+  !(typeof props.dataHasLangMethod === "undefined" || props.dataHasLangMethod === "false")
+);
+const cmsModules = ref(SafeJsonParse(props.dataCmsModules, {}));
+const selectedParams = ref(typeof props.dataSelectedParams === "undefined" ? "" : props.dataSelectedParams);
+const controllerName = ref(typeof props.dataControllerName === "undefined" ? "" : props.dataControllerName);
+const controllerTitle = ref(typeof props.dataControllerTitle === "undefined" ? "" : props.dataControllerTitle);
+const fields = ref(typeof props.dataFields === "undefined" || props.dataFields === "" ? [] : props.dataFields);
+const actionFields = ref(
+  typeof props.dataActionFields === "undefined" || props.dataActionFields === "" ? [] : props.dataActionFields
+);
+const showBack = ref(props.dataShowBack === "true");
+const layoutType = ref(
+  typeof props.dataLayoutType === "undefined" || props.dataLayoutType === "" ? "table" : props.dataLayoutType
+);
+
+// Computed
+const backURL = computed(() => AdminConfig.admin_path(controllerName.value));
+const layoutIcon = computed(() => (layoutType.value === "grid" ? "fa fa-th-list" : "fa fa-table"));
+const showAddButtonBasedOnAction = computed(() => actionFields.value.indexOf("edit") !== -1);
+
+// Methods
+const maintainActiveSearch = (animate = true) => {
+  isActive.value = showSearchPanel.value === true ? "btn btn-success" : "btn btn-outline-secondary";
+  searchAnim.value = showSearchPanel.value === true && animate === true ? "animated flipInX" : "";
 };
+
+const showHideSearch = () => {
+  showSearchPanel.value = !showSearchPanel.value;
+  maintainActiveSearch();
+};
+
+const shouldShowSearchPanel = () => {
+  if (selectedParams.value !== "") {
+    const params = SafeJsonParse(selectedParams.value, {});
+    if (params.q) {
+      showSearchPanel.value = true;
+    }
+    maintainActiveSearch(false);
+  }
+};
+
+const changeLayout = () => {
+  Toast.show(instance, "Please wait. Changing listing style for you...", 5000);
+  layoutType.value = layoutType.value === "table" ? "grid" : "table";
+  if ("URLSearchParams" in window) {
+    let sParams = new URLSearchParams(window.location.search);
+    sParams.set("layout", layoutType.value);
+    window.location.search = sParams.toString();
+  }
+};
+
+const getAction = (val) => {
+  if (val.indexOf("http") === 0) {
+    return val;
+  }
+  return AdminConfig.admin_path(val);
+};
+
+const addNew = () => {
+  if (controllerName.value !== "") {
+    const controller_url = AdminConfig.admin_path(controllerName.value);
+    window.location.href = `${controller_url}/create`;
+  }
+};
+
+const getButtonType = (row) => (!row.as || row.as === "button" ? "button" : row.as);
+const getTitle = (text) => Humanize(text);
+
+onMounted(() => {
+  shouldShowSearchPanel();
+});
 </script>
+

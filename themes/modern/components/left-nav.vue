@@ -156,156 +156,171 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { LeftMenu, SafeJsonParse } from "../../../helpers/common";
 import { EventBus } from "../../../helpers/event-bus";
 
-export default {
-  name: "LeftNav",
-  props: [
-    "dataList",
-    "dataControllerName",
-    "dataModulesAllowed",
-    "dataIsAdmin",
-    "dataHashtagcmsVersion",
-  ],
-  data() {
-    return {
-      allData: SafeJsonParse(this.dataList, []),
-      modulesAllowed: SafeJsonParse(this.dataModulesAllowed, []),
-      expandedMenus: [],
-      isCollapsed: false,
-      hoveredMenu: null,
-      hoveredMenuTop: 0,
-      hoverTimeout: null,
-      tooltipText: '',
-      tooltipVisible: false,
-      tooltipX: 0,
-      tooltipY: 0
-    };
-  },
-  mounted() {
-    window.addEventListener('mousemove', this.updateTooltipPosition);
-    // Sync with global state
-    this.isCollapsed = LeftMenu.isCollapsed();
-    
-    // Auto-expand menus that have active children on page load (only if not collapsed)
-    if (!this.isCollapsed) {
-        this.allData.forEach(current => {
-          if (this.isActive(current.controller_name, current)) {
-            this.expandedMenus.push(current.id);
-          }
-        });
-    }
+const props = defineProps([
+  "dataList",
+  "dataControllerName",
+  "dataModulesAllowed",
+  "dataIsAdmin",
+  "dataHashtagcmsVersion",
+]);
 
-    // Listen for global collapse events
-    EventBus.on("left-menu-on-collapse", () => {
-        this.isCollapsed = true;
-        this.expandedMenus = []; // Collapse all when minimizing
-    });
-    EventBus.on("left-menu-on-expand", () => {
-        this.isCollapsed = false;
-    });
-  },
-  beforeUnmount() {
-    window.removeEventListener('mousemove', this.updateTooltipPosition);
-  },
-  computed: {
-    linkForHashtag() {
-        return `https://www.hashtagcms.org/?utm_src=${window.location.host}`;
-    },
-    activeHoveredMenu() {
-      if (!this.hoveredMenu) return null;
-      return this.allData.find(m => m.id === this.hoveredMenu);
-    }
-  },
-  methods: {
-    updateTooltipPosition(e) {
-      if (this.tooltipVisible) {
-        this.tooltipX = e.clientX;
-        this.tooltipY = e.clientY;
-      }
-    },
-    handleLinkHover(e, text) {
-      if(this.isCollapsed) {
-          this.tooltipText = text;
-          this.tooltipVisible = true;
-          this.tooltipX = e.clientX;
-          this.tooltipY = e.clientY;
-      }
-    },
-    handleLinkLeave() {
-      this.tooltipVisible = false;
-    },
-    handleMouseEnter(id, event) {
-        if (!this.isCollapsed) return;
-        this.cancelLeave();
-        this.hoveredMenu = id;
-        
-        // Calculate top position ensuring it doesn't go off-screen
-        const rect = event.currentTarget.getBoundingClientRect();
-        let top = rect.top;
-        
-        // Basic viewport check could be added here if needed
-        this.hoveredMenuTop = top;
-    },
-    handleMouseLeave() {
-        this.hoverTimeout = setTimeout(() => {
-            this.hoveredMenu = null;
-        }, 150);
-    },
-    cancelLeave() {
-        if (this.hoverTimeout) {
-            clearTimeout(this.hoverTimeout);
-            this.hoverTimeout = null;
-        }
-    },
-    toggleCollapse() {
-        this.isCollapsed = LeftMenu.toggleCollapse();
-    },
-    toggleSubmenu(menuId, event) {
-      event.preventDefault();
-      if (this.isCollapsed) return;
+const allData = ref(SafeJsonParse(props.dataList, []));
+const modulesAllowed = ref(SafeJsonParse(props.dataModulesAllowed, []));
+const expandedMenus = ref([]);
+const isCollapsed = ref(false);
+const hoveredMenu = ref(null);
+const hoveredMenuTop = ref(0);
+const hoverTimeout = ref(null);
+const tooltipText = ref("");
+const tooltipVisible = ref(false);
+const tooltipX = ref(0);
+const tooltipY = ref(0);
 
-      const index = this.expandedMenus.indexOf(menuId);
-      if (index > -1) {
-        this.expandedMenus.splice(index, 1);
-      } else {
-        this.expandedMenus.push(menuId);
-      }
-    },
-    getIconClasses(iconCss, isChild = false) {
-      const classes = iconCss.trim();
-      const hasFA = classes.includes('fa-') || classes.startsWith('fa ');
-      const baseSize = isChild ? 'text-[10px]' : (this.isCollapsed ? 'text-lg' : 'text-sm');
-      
-      if (hasFA && !classes.includes(' fa ') && !classes.startsWith('fa ')) {
-        return ['fa', classes, baseSize];
-      }
-      return [classes, baseSize];
-    },
-    getIconLabel(data) {
-      return data.icon_css === "" || !data.icon_css
-        ? data.controller_name.charAt(0).toUpperCase()
-        : "";
-    },
-    isActive(controller_name, data) {
-      if (this.dataControllerName === controller_name) {
-        return true;
-      }
-      if (data && data.child && data.child.length > 0) {
-        let controllerName = this.dataControllerName;
-        return data.child.find(c => c.controller_name === controllerName);
-      }
-      return false;
-    },
-    hasChild(data) {
-      return data && data.child && data.child.length > 0;
-    },
-    getHref(data) {
-      return AdminConfig.admin_path(data.controller_name);
-    }
-  },
+const linkForHashtag = computed(() => {
+  return `https://www.hashtagcms.org/?utm_src=${window.location.host}`;
+});
+
+const activeHoveredMenu = computed(() => {
+  if (!hoveredMenu.value) return null;
+  return allData.value.find((m) => m.id === hoveredMenu.value);
+});
+
+const updateTooltipPosition = (e) => {
+  if (tooltipVisible.value) {
+    tooltipX.value = e.clientX;
+    tooltipY.value = e.clientY;
+  }
 };
+
+const handleLinkHover = (e, text) => {
+  if (isCollapsed.value) {
+    tooltipText.value = text;
+    tooltipVisible.value = true;
+    tooltipX.value = e.clientX;
+    tooltipY.value = e.clientY;
+  }
+};
+
+const handleLinkLeave = () => {
+  tooltipVisible.value = false;
+};
+
+const cancelLeave = () => {
+  if (hoverTimeout.value) {
+    clearTimeout(hoverTimeout.value);
+    hoverTimeout.value = null;
+  }
+};
+
+const handleMouseEnter = (id, event) => {
+  if (!isCollapsed.value) return;
+  cancelLeave();
+  hoveredMenu.value = id;
+
+  // Calculate top position ensuring it doesn't go off-screen
+  const rect = event.currentTarget.getBoundingClientRect();
+  hoveredMenuTop.value = rect.top;
+};
+
+const handleMouseLeave = () => {
+  hoverTimeout.value = setTimeout(() => {
+    hoveredMenu.value = null;
+  }, 150);
+};
+
+const toggleCollapse = () => {
+  isCollapsed.value = LeftMenu.toggleCollapse();
+};
+
+const toggleSubmenu = (menuId, event) => {
+  event.preventDefault();
+  if (isCollapsed.value) return;
+
+  const index = expandedMenus.value.indexOf(menuId);
+  if (index > -1) {
+    expandedMenus.value.splice(index, 1);
+  } else {
+    expandedMenus.value.push(menuId);
+  }
+};
+
+const getIconClasses = (iconCss, isChild = false) => {
+  const classes = iconCss.trim();
+  const hasFA = classes.includes("fa-") || classes.startsWith("fa ");
+  const baseSize = isChild
+    ? "text-[10px]"
+    : isCollapsed.value
+    ? "text-lg"
+    : "text-sm";
+
+  if (hasFA && !classes.includes(" fa ") && !classes.startsWith("fa ")) {
+    return ["fa", classes, baseSize];
+  }
+  return [classes, baseSize];
+};
+
+const getIconLabel = (data) => {
+  return data.icon_css === "" || !data.icon_css
+    ? data.controller_name.charAt(0).toUpperCase()
+    : "";
+};
+
+const isActive = (controller_name, data) => {
+  if (props.dataControllerName === controller_name) {
+    return true;
+  }
+  if (data && data.child && data.child.length > 0) {
+    let controllerName = props.dataControllerName;
+    return data.child.find((c) => c.controller_name === controllerName);
+  }
+  return false;
+};
+
+const hasChild = (data) => {
+  return data && data.child && data.child.length > 0;
+};
+
+const getHref = (data) => {
+  return AdminConfig.admin_path(data.controller_name);
+};
+
+const onCollapse = () => {
+  isCollapsed.value = true;
+  expandedMenus.value = [];
+};
+const onExpand = () => {
+  isCollapsed.value = false;
+};
+
+onMounted(() => {
+  window.addEventListener("mousemove", updateTooltipPosition);
+  // Sync with global state
+  isCollapsed.value = LeftMenu.isCollapsed();
+
+  // Auto-expand menus that have active children on page load (only if not collapsed)
+  if (!isCollapsed.value) {
+    allData.value.forEach((current) => {
+      if (isActive(current.controller_name, current)) {
+        expandedMenus.value.push(current.id);
+      }
+    });
+  }
+
+  // Listen for global collapse events
+  EventBus.on("left-menu-on-collapse", onCollapse);
+  EventBus.on("left-menu-on-expand", onExpand);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener("mousemove", updateTooltipPosition);
+  EventBus.off("left-menu-on-collapse", onCollapse);
+  EventBus.off("left-menu-on-expand", onExpand);
+});
 </script>
+

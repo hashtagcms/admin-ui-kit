@@ -13,8 +13,26 @@ import {
   LeftMenu,
   TitleCase,
   SafeJsonParse,
-  SafeErrorData
+  SafeErrorData,
+  Store,
+  CleanForUrl
 } from "@hashtagcms/admin-sdk";
+
+/**
+ * Maps UI actions to system permissions
+ * @type {Object}
+ */
+const ACTION_MAP = {
+  "edit": "edit",
+  "delete": "delete",
+  "publish": "publish",
+  "approve": "approve",
+  "settings": "edit",
+  "showinfo": "read",
+  "info": "read",
+  "create": "add",
+  "add": "add"
+};
 
 // Initialize SDK LeftMenu with EventBus
 if (LeftMenu && typeof LeftMenu.init === 'function') {
@@ -90,7 +108,10 @@ export {
   LeftMenu,
   TitleCase,
   SafeJsonParse,
-  SafeErrorData
+  SafeErrorData,
+  Store,
+  CleanForUrl,
+  ACTION_MAP
 };
 
 /**
@@ -99,11 +120,23 @@ export {
  *
  */
 export class Toast {
+  static getRoot(vm) {
+    if (!vm) return null;
+    return vm.$root || (vm.proxy && vm.proxy.$root) || (vm.root && vm.root.proxy) || vm;
+  }
   static show(vm, message = "", timeout = 3000, options) {
-    vm.$root.$refs.globalToaster.show(message, timeout, options);
+    const root = this.getRoot(vm);
+    if (root && root.$refs && root.$refs.globalToaster) {
+      root.$refs.globalToaster.show(message, timeout, options);
+    } else {
+      console.warn("Toast.show: globalToaster not found. root:", root);
+    }
   }
   static hide(vm) {
-    vm.$root.$refs.globalToaster.hide();
+    const root = this.getRoot(vm);
+    if (root && root.$refs && root.$refs.globalToaster) {
+      root.$refs.globalToaster.hide();
+    }
   }
 }
 
@@ -113,11 +146,23 @@ export class Toast {
  *
  */
 export class Loader {
+  static getRoot(vm) {
+    if (!vm) return null;
+    return vm.$root || (vm.proxy && vm.proxy.$root) || (vm.root && vm.root.proxy) || vm;
+  }
   static show(vm, message = null, position = null) {
-    vm.$root.$refs.globalLoader.show(message, position);
+    const root = this.getRoot(vm);
+    if (root && root.$refs && root.$refs.globalLoader) {
+      root.$refs.globalLoader.show(message, position);
+    } else {
+      console.warn("Loader.show: globalLoader not found. root:", root);
+    }
   }
   static hide(vm) {
-    vm.$root.$refs.globalLoader.hide();
+    const root = this.getRoot(vm);
+    if (root && root.$refs && root.$refs.globalLoader) {
+      root.$refs.globalLoader.hide();
+    }
   }
 }
 
@@ -127,25 +172,49 @@ export class Loader {
  *
  */
 export class Modal {
+  static getRoot(vm) {
+    if (!vm) return null;
+    return vm.$root || (vm.proxy && vm.proxy.$root) || (vm.root && vm.root.proxy) || vm;
+  }
   static show(vm, message = "", position, callback, timeout) {
-    vm.$root.$refs.globalModalBox.show(message, position, callback, timeout);
+    const root = this.getRoot(vm);
+    if (root && root.$refs && root.$refs.globalModalBox) {
+      root.$refs.globalModalBox.show(message, position, callback, timeout);
+    } else {
+      console.warn("Modal.show: globalModalBox not found. root:", root);
+    }
   }
   static hide(vm) {
-    vm.$root.$refs.globalModalBox.hide();
+    const root = this.getRoot(vm);
+    if (root && root.$refs && root.$refs.globalModalBox) {
+      root.$refs.globalModalBox.hide();
+    }
   }
   static open(vm = null, modalRef = null, callback = null) {
     if (vm != null && modalRef != null) {
-      vm.$refs[modalRef].open(callback);
+      const instance = vm.proxy || vm;
+      if (instance && instance.$refs && instance.$refs[modalRef]) {
+        instance.$refs[modalRef].open(callback);
+      } else if (vm.refs && vm.refs[modalRef]) {
+        vm.refs[modalRef].open(callback);
+      } else {
+        console.warn(`Modal.open: ref '${modalRef}' not found.`);
+      }
     }
   }
   static close(vm = null, modalRef = null) {
     if (vm != null && modalRef != null) {
-      vm.$refs[modalRef].hide();
+      const instance = vm.proxy || vm;
+      if (instance && instance.$refs && instance.$refs[modalRef]) {
+        instance.$refs[modalRef].hide();
+      } else if (vm.refs && vm.refs[modalRef]) {
+        vm.refs[modalRef].hide();
+      } else {
+        console.warn(`Modal.close: ref '${modalRef}' not found.`);
+      }
     }
   }
 }
 
-
-
-
-
+/** Some UI Alignments */
+export const CheckBoxAlignment = { position: 'relative', top: '-5px', left: '3px' };

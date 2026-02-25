@@ -27,7 +27,7 @@
                 {{ language.name }} - {{ language.iso_code }}
               </option>
             </select>
-            <div class="text text-danger">{{ this.errors.sourceLang }}</div>
+            <div class="text text-danger">{{ errors.sourceLang }}</div>
           </div>
         </div>
         <div>
@@ -48,7 +48,7 @@
                 {{ language.name }} - {{ language.iso_code }}
               </option>
             </select>
-            <div class="text text-danger">{{ this.errors.targetLang }}</div>
+            <div class="text text-danger">{{ errors.targetLang }}</div>
           </div>
         </div>
 
@@ -68,7 +68,7 @@
                 {{ langTable.name }}
               </option>
             </select>
-            <div class="text text-danger">{{ this.errors.tables }}</div>
+            <div class="text text-danger">{{ errors.tables }}</div>
           </div>
         </div>
         <div class="row">
@@ -97,75 +97,71 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import Form from "../../../helpers/form";
 import { Toast, SafeJsonParse } from "../../../helpers/common";
-export default {
-  mounted() {},
-  props: ["dataLanguages", "dataLanguageTables"],
-  data() {
-    return {
-      languages: SafeJsonParse(this.dataLanguages, []),
-      languageTables: SafeJsonParse(this.dataLanguageTables, []),
-      messages: [],
-      form: new Form({
-        tables: [],
-        sourceLang: "",
-        targetLang: "",
-      }),
-      errors: {},
-      saveUrl: "language/translateNow",
-      errorMessage: "",
-    };
-  },
-  methods: {
-    getCss(row) {
-      return row.status === 0 ? "text text-danger" : "text text-success";
-    },
-    showError(res) {
-      //console.log("res");
-      //console.log(res);
-      for (let i in res.errors) {
-        if (res.errors.hasOwnProperty(i)) {
-          this.errors[i] = res.errors[i][0];
-        }
-      }
 
-      this.errorMessage = res.message;
-    },
-    hideErrorMessage(event) {
-      let name = event.target.getAttribute("name");
-      this.errors[name] = "";
-      if (this.errorMessage !== "") {
-        this.errorMessage = "";
-      }
-    },
-    onSuccess(response) {
-      console.log(response);
-      //console.log("response.isSaved ",response.isSaved);
-      if (response.isSaved === 0) {
-        Toast.show(this, response.message);
-        this.errorMessage = {};
-        this.errorMessage = response.message;
-      } else {
-        this.errorMessage = "";
-        //Toast.show(this, response.message, 5000);
-        this.messages = response.message;
-      }
-    },
-    saveNow() {
-      let $this = this;
-      let url = AdminConfig.admin_path(this.saveUrl);
+const props = defineProps(["dataLanguages", "dataLanguageTables"]);
 
-      this.form
-        .post(url)
-        .then((response) => this.onSuccess(response))
-        .catch((response) => this.showError(response));
+const instance = getCurrentInstance();
 
-      return false;
-    },
-  },
+// State
+const languages = ref(SafeJsonParse(props.dataLanguages, []));
+const languageTables = ref(SafeJsonParse(props.dataLanguageTables, []));
+const messages = ref([]);
+const form = reactive(
+  new Form({
+    tables: [],
+    sourceLang: "",
+    targetLang: "",
+  })
+);
+const errors = reactive({});
+const saveUrl = ref("language/translateNow");
+const errorMessage = ref("");
+
+// Methods
+const getCss = (row) => {
+  return row.status === 0 ? "text text-danger" : "text text-success";
+};
+
+const showError = (res) => {
+  for (let i in res.errors) {
+    if (Object.prototype.hasOwnProperty.call(res.errors, i)) {
+      errors[i] = res.errors[i][0];
+    }
+  }
+  errorMessage.value = res.message;
+};
+
+const hideErrorMessage = (event) => {
+  const name = event.target.getAttribute("name");
+  errors[name] = "";
+  if (errorMessage.value !== "") {
+    errorMessage.value = "";
+  }
+};
+
+const onSuccess = (response) => {
+  console.log(response);
+  if (response.isSaved === 0) {
+    Toast.show(instance, response.message);
+    errorMessage.value = response.message;
+  } else {
+    errorMessage.value = "";
+    messages.value = response.message;
+  }
+};
+
+const saveNow = () => {
+  const url = AdminConfig.admin_path(saveUrl.value);
+  form
+    .post(url)
+    .then((response) => onSuccess(response))
+    .catch((response) => showError(response));
+  return false;
 };
 </script>
+

@@ -365,225 +365,188 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, getCurrentInstance } from "vue";
 import { Toast, PasteFromClipboard, IsJson, SafeJsonParse } from "../../../helpers/common";
 import Form from "../../../helpers/form";
 
-export default {
-  mounted() {
-    if (this.dataActionPerformed === "edit") {
-      this.setFormData(this.formData);
-    } else {
-      this.form.site_id = this.dataSiteId;
+const props = defineProps([
+  "dataControllerName",
+  "dataBackUrl",
+  "dataSite",
+  "dataResults",
+  "dataActionPerformed",
+  "dataDataTypes",
+  "dataDataTypesInfo",
+  "dataFormAction",
+  "dataSiteId",
+]);
+
+const instance = getCurrentInstance();
+
+// State
+const sFont = { "font-size": "14px" };
+const fluidCol = { width: "100%" };
+const allQueryDataTypes = [
+  { name: "param", value: "param" },
+  { name: "data", value: "data" },
+];
+const conventional = ref(false);
+const formData = ref(SafeJsonParse(props.dataResults, []));
+const siteData = ref(SafeJsonParse(props.dataSite, []));
+const showExtraData = reactive({});
+const allDataTypes = ref(SafeJsonParse(props.dataDataTypes, []));
+const allMethodTypes = [
+  { name: "GET", value: "GET" },
+  { name: "POST", value: "POST" },
+];
+
+const form = reactive(
+  new Form({
+    id: 0,
+    name: "",
+    icon_css: "",
+    alias: "",
+    view_name: "",
+    cache_group: "",
+    data_type: "",
+    method_type: "",
+    data_handler: "",
+    data_key_map: "",
+    query_statement: "",
+    query_as: "",
+    description: "",
+    site_id: 1,
+    is_seo_module: 0,
+    individual_cache: 0,
+    shared: 0,
+    update_inAllSites: 0,
+    is_mandatory: 0,
+    service_params: "",
+    actionPerformed: props.dataActionPerformed,
+    backURL: props.dataBackUrl,
+    headers: "",
+    live_edit: 0,
+    linked_module: "",
+  })
+);
+
+const errors = ref({});
+const errorMessage = ref("");
+const dataTypesInfo = ref(SafeJsonParse(props.dataDataTypesInfo, []));
+const saveURL = ref(props.dataFormAction);
+
+// Computed
+const showQueryForm = computed(() => form.data_type.toLowerCase().indexOf("queryservice") > -1);
+const showServiceForm = computed(() => form.data_type.toLowerCase().indexOf("service") > -1);
+const showAllUpdateSection = computed(
+  () => props.dataActionPerformed === "edit" && siteData.value.length > 1
+);
+
+// Methods
+const setFormData = (data) => {
+  const formEle = document.querySelector("#addEditFrm");
+  for (let a in data) {
+    const val = data[a];
+    if (Object.prototype.hasOwnProperty.call(form, a) && typeof form[a] !== "function") {
+      form[a] = val;
     }
-  },
-  props: [
-    "dataControllerName",
-    "dataBackUrl",
-    "dataSite",
-    "dataResults",
-    "dataActionPerformed",
-    "dataDataTypes",
-    "dataDataTypesInfo",
-    "dataFormAction",
-    "dataSiteId",
-  ],
-  data() {
-    return {
-      sFont: {
-        "font-size": "14px",
-      },
-      fluidCol: {
-        width: "100%",
-      },
-      allQueryDataTypes: [
-        { name: "param", value: "param" },
-        { name: "data", value: "data" },
-      ],
-      conventional: false,
-      formData: SafeJsonParse(this.dataResults, []),
-      siteData: SafeJsonParse(this.dataSite, []),
-      showExtraData: {},
-      allDataTypes: SafeJsonParse(this.dataDataTypes, []),
-      allMethodTypes: [
-        { name: "GET", value: "GET" },
-        { name: "POST", value: "POST" },
-      ],
-      form: new Form({
-        id: 0,
-        name: "",
-        icon_css: "",
-        alias: "",
-        view_name: "",
-        cache_group: "",
-        data_type: "",
-        method_type: "",
-        data_handler: "",
-        data_key_map: "",
-        query_statement: "",
-        query_as: "",
-        description: "",
-        site_id: 1,
-        is_seo_module: 0,
-        individual_cache: 0,
-        shared: 0,
-        update_inAllSites: 0,
-        is_mandatory: 0,
-        service_params: "",
-        actionPerformed: this.dataActionPerformed,
-        backURL: this.dataBackUrl,
-        headers: "",
-        live_edit: 0,
-        linked_module: "",
-      }),
-      errors: {},
-      cacheData: {},
-      sortable: null,
-      sortingInterval: -1,
-      errorMessage: "",
-      dataTypesInfo: SafeJsonParse(this.dataDataTypesInfo, []),
-      saveURL: this.dataFormAction,
-    };
-  },
-  computed: {
-    showQueryForm: function () {
-      return this.form.data_type.toLowerCase().indexOf("queryservice") > -1;
-    },
-    showServiceForm: function () {
-      return this.form.data_type.toLowerCase().indexOf("service") > -1;
-    },
-    showAllUpdateSection: function () {
-      return this.dataActionPerformed === "edit" && this.siteData.length > 1;
-    },
-  },
-  methods: {
-    fillCopiedData() {
-      PasteFromClipboard()
-        .then((res) => {
-          if (IsJson(this.form.name)) {
-            this.setFormData(SafeJsonParse(this.form.name, {}));
-          }
-        })
-        .catch((res) => {
-          console.log("unable to paste");
-        });
-    },
-    goConventional(arg) {
-      //wanted to go conventional
-      if (this.conventional === false) {
-        let name = this.form.name;
-        this.form.title = name;
-        this.form.alias = ("MODULE_" + name.toUpperCase()).replace(/\s/g, "_");
-        this.form.view_name = name.toLowerCase().replace(/\s/g, "-");
+
+    const ele = formEle ? formEle[a] || document.getElementById(a) : document.getElementById(a);
+    if (ele) {
+      const eleType = ele.type;
+      if ((eleType === "checkbox" || eleType === "radio") && eleType !== "submit") {
+        form[a] = val === 1;
       }
-    },
-    setFormData(data) {
-      let data_length = Object.keys(data).length;
-      let form = document.querySelector("#addEditFrm");
-      for (let a in data) {
-        //setting document values
-        let val = data[a];
-        //setting form values;
-        if (
-          typeof this.form[a] !== "undefined" &&
-          typeof this.form[a] !== "function"
-        ) {
-          this.form[a] = val;
-        }
-
-        let ele = form[a] || document.getElementById(a);
-
-        if (ele) {
-          let eleType = ele.type;
-          // to make it visible for checkbox and radio
-          if (
-            (eleType === "checkbox" || eleType === "radio") &&
-            eleType !== "submit"
-          ) {
-            this.form[a] = val === 1;
-          }
-        }
-      }
-    },
-    checkForService(dataType) {
-      let self = this;
-      this.showExtraData["show"] =
-        dataType !== "" &&
-        (dataType.indexOf("Service") > -1 || dataType.indexOf("service") > -1);
-    },
-    createModule() {
-      let $this = this;
-
-      preCheck(this);
-
-      this.form
-        .post(this.saveURL)
-        .then((response) => {
-          this.resetForm(response);
-        })
-        .catch((response) => {
-          this.showError(response);
-        });
-
-      function preCheck() {
-        $this.form.is_seo_module = $this.form.is_seo_module
-          ? $this.form.is_seo_module
-          : 0;
-        $this.form.individual_cache = $this.form.individual_cache
-          ? $this.form.individual_cache
-          : 0;
-        $this.form.update_inAllSites = $this.form.update_inAllSites
-          ? $this.form.update_inAllSites
-          : 0;
-        $this.form.is_mandatory = $this.form.is_mandatory
-          ? $this.form.is_mandatory
-          : 0;
-        $this.form.service_params = $this.form.service_params
-          ? $this.form.service_params
-          : "";
-        $this.form.shared = $this.form.shared ? $this.form.shared : 0;
-        $this.form.live_edit = $this.form.live_edit ? $this.form.live_edit : 0;
-      }
-    },
-    showError(res) {
-      for (let i in res.errors) {
-        if (res.errors.hasOwnProperty(i)) {
-          this.errors[i] = res.errors[i][0];
-        }
-      }
-
-      this.errorMessage = res.message;
-    },
-    hideErrorMessage(event) {
-      let name = event.target.getAttribute("name");
-      this.errors[name] = "";
-
-      if (this.errorMessage !== "") {
-        this.errorMessage = "";
-      }
-    },
-    resetForm(response) {
-      //console.log("response.isSaved ",response.isSaved);
-      if (!isTrue(response.isSaved)) {
-        this.errorMessage = {};
-        Toast.show(this, "There is some error...");
-        this.errorMessage = response.message;
-      } else {
-        this.errorMessage = "";
-
-        let action = this.dataActionPerformed.toUpperCase();
-
-        Toast.show(this, "Saved...");
-
-        if (isTrue(response.isSaved)) {
-          window.location.href = response.backURL;
-        }
-      }
-
-      function isTrue(isSaved) {
-        return isSaved.toString() === "true" || isSaved.toString() === "1";
-      }
-    },
-  },
+    }
+  }
 };
+
+const fillCopiedData = () => {
+  PasteFromClipboard()
+    .then(() => {
+      if (IsJson(form.name)) {
+        setFormData(SafeJsonParse(form.name, {}));
+      }
+    })
+    .catch((err) => {
+      console.error("unable to paste", err);
+    });
+};
+
+const goConventional = () => {
+  if (conventional.value === false) {
+    const name = form.name;
+    form.alias = `MODULE_${name.toUpperCase()}`.replace(/\s/g, "_");
+    form.view_name = name.toLowerCase().replace(/\s/g, "-");
+  }
+};
+
+const checkForService = (dataType) => {
+  showExtraData.show =
+    dataType !== "" && (dataType.indexOf("Service") > -1 || dataType.indexOf("service") > -1);
+};
+
+const showError = (res) => {
+  errors.value = {};
+  if (res.errors) {
+    for (let i in res.errors) {
+      if (Object.prototype.hasOwnProperty.call(res.errors, i)) {
+        errors.value[i] = res.errors[i][0];
+      }
+    }
+  }
+  errorMessage.value = res.message;
+};
+
+const resetForm = (response) => {
+  const isTrue = (val) => val.toString() === "true" || val.toString() === "1";
+  if (!isTrue(response.isSaved)) {
+    Toast.show(instance, "There is some error...");
+    errorMessage.value = response.message;
+  } else {
+    errorMessage.value = "";
+    Toast.show(instance, "Saved...");
+    if (isTrue(response.isSaved)) {
+      window.location.href = response.backURL;
+    }
+  }
+};
+
+const createModule = () => {
+  // Pre-check logic
+  form.is_seo_module = form.is_seo_module ? form.is_seo_module : 0;
+  form.individual_cache = form.individual_cache ? form.individual_cache : 0;
+  form.update_inAllSites = form.update_inAllSites ? form.update_inAllSites : 0;
+  form.is_mandatory = form.is_mandatory ? form.is_mandatory : 0;
+  form.service_params = form.service_params ? form.service_params : "";
+  form.shared = form.shared ? form.shared : 0;
+  form.live_edit = form.live_edit ? form.live_edit : 0;
+
+  form
+    .post(saveURL.value)
+    .then((response) => {
+      resetForm(response);
+    })
+    .catch((response) => {
+      showError(response);
+    });
+};
+
+const hideErrorMessage = (event) => {
+  const name = event.target.getAttribute("name");
+  if (name) errors.value[name] = "";
+  if (errorMessage.value !== "") {
+    errorMessage.value = "";
+  }
+};
+
+onMounted(() => {
+  if (props.dataActionPerformed === "edit") {
+    setFormData(formData.value);
+  } else {
+    form.site_id = props.dataSiteId;
+  }
+});
 </script>
+

@@ -17,81 +17,81 @@
   </div>
 </template>
 
-<script>
-import { Store } from "@hashtagcms/admin-sdk";
-import { SafeJsonParse } from "../../../../helpers/common";
+<script setup>
+import { ref, computed } from "vue";
+import { Store, SafeJsonParse } from "../../../../helpers/common";
 
-export default {
-  mounted() {},
-  props: [
-    "dataInfo",
-    "dataColorIndex",
-    "dataSubTitle",
-    "dataTitle",
-    "dataIconCss",
-    "dataLink",
-  ],
-  data() {
-    return {
-      info: SafeJsonParse(this.dataInfo, null),
-      subTitle:
-        typeof this.dataSubTitle !== "undefined" ? this.dataSubTitle : "",
-      iconCss: this.dataIconCss,
-      link: typeof this.dataLink == "undefined" ? "" : this.dataLink,
-    };
-  },
-  computed: {
-    content() {
-      return this.info !== null
-        ? this.info.name || this.info.title
-        : this.dataTitle;
-    },
-    icon() {
-      if (
-        (typeof this.iconCss == "undefined" || this.iconCss === "") &&
-        this.info !== null
-      ) {
-        return this.info.icon_css || this.info.iconCss;
-      } else {
-        return this.iconCss;
-      }
-    },
-  },
-  methods: {
-    getIconText() {
-      return this.info?.icon_css || typeof this.iconCss === "undefined"
-        ? this.content
-            .replace(/[^a-zA-Z- ]/g, "")
-            .match(/\b\w/g)
-            .join("")
-        : "";
-    },
-    getColor: function () {
-      let n = !this.dataColorIndex
-        ? this.getSerialNumber()
-        : this.dataColorIndex;
-      return "color-" + n;
-    },
-    getRandom(min = 1, max = 10) {
-      //not in used
-      min = parseInt(min);
-      max = parseInt(max);
-      return Math.floor(Math.random() * (max - min)) + min;
-    },
-    getSerialNumber() {
-      if (Store.fetch("counter") === undefined) {
-        Store.store("counter", 1);
-      }
+const props = defineProps([
+  "dataInfo",
+  "dataColorIndex",
+  "dataSubTitle",
+  "dataTitle",
+  "dataIconCss",
+  "dataLink",
+]);
 
-      let counter = Store.fetch("counter");
+// State
+const info = ref(SafeJsonParse(props.dataInfo, null));
+const subTitle = ref(typeof props.dataSubTitle !== "undefined" ? props.dataSubTitle : "");
+const iconCss = ref(props.dataIconCss);
+const link = ref(props.dataLink === undefined ? "" : props.dataLink);
 
-      if (counter > 10) {
-        counter = 1;
-      }
-      Store.store("counter", counter + 1);
+// Computed
+const content = computed(() => {
+  return info.value !== null ? info.value.name || info.value.title : props.dataTitle;
+});
 
-      return counter;
-    },
-  },
+const icon = computed(() => {
+  if ((iconCss.value === undefined || iconCss.value === "") && info.value !== null) {
+    return info.value.icon_css || info.value.iconCss;
+  }
+  return iconCss.value;
+});
+
+// Methods
+const getIconText = () => {
+  if (info.value?.icon_css || iconCss.value === undefined) {
+    return content.value
+      .replace(/[^a-zA-Z- ]/g, "")
+      .match(/\b\w/g)
+      .join("");
+  }
+  return "";
+};
+
+const getSerialNumber = () => {
+  if (Store.fetch("counter") === undefined) {
+    Store.store("counter", 1);
+  }
+
+  let counter = Store.fetch("counter");
+
+  if (counter > 10) {
+    counter = 1;
+  }
+  Store.store("counter", counter + 1);
+
+  return counter;
+};
+
+const getColor = () => {
+  let n = props.dataColorIndex;
+  if (!n) {
+    const str = content.value || "";
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    n = (Math.abs(hash) % 10) + 1;
+  }
+  return `color-${n}`;
+};
+
+const getRandom = (min = 1, max = 10) => {
+  // not in used
+  const parsedMin = parseInt(min);
+  const parsedMax = parseInt(max);
+  return Math.floor(Math.random() * (parsedMax - parsedMin)) + parsedMin;
 };
 </script>
+

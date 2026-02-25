@@ -18,13 +18,13 @@
 
       <div class="p-8 space-y-4 flex-1 flex flex-col">
         <div v-if="total > 0" class="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <label class="inline-flex items-center gap-2 cursor-pointer group text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <label class="inline-flex items-center cursor-pointer group text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
               <input
                 type="checkbox"
                 class="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 transition-all font-black"
                 @click="selectAllData('table', $event.target)"
               />
-              <span class="group-hover:text-blue-600 transition-colors">Select All Pool</span>
+              <span class="group-hover:text-blue-600 transition-colors" style="position: relative; top: -5px; left: 7px;">Select All Pool</span>
             </label>
 
             <!-- Search Field -->
@@ -44,7 +44,15 @@
             <input type="checkbox" v-model="data.selected" class="w-5 h-5 rounded border-gray-200 text-blue-600 focus:ring-blue-500 transition-all cursor-pointer shadow-sm" />
             <div class="flex flex-col gap-0.5">
                 <span class="text-xs font-black text-gray-500 group-hover:text-gray-900 transition-colors">{{ getLabel(data) }}</span>
-                <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Entry ID: {{ data.id }}</span>
+                <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
+                  <span>ID: {{ data.id }}</span>
+                  <span v-if="data.module">
+                    &bullet; Module Alias: {{ data.module.alias }}
+                  </span>
+                  <span v-if="data.platform_id">
+                    &bullet; Platform ID: {{ data.platform_id }}
+                  </span>
+                </span>                
             </div>
           </li>
         </ul>
@@ -77,22 +85,30 @@
 
       <div class="p-8 space-y-4 flex-1 flex flex-col">
         <div v-if="selectedTotal > 0">
-            <label class="inline-flex items-center gap-2 cursor-pointer group text-[10px] font-black text-gray-400 uppercase tracking-widest">
+            <label class="inline-flex items-center cursor-pointer group text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none">
               <input
                 type="checkbox"
                 class="w-4 h-4 rounded border-gray-300 text-red-600 focus:ring-red-500 transition-all font-black"
                 @click="selectAllData('sitewise', $event.target)"
               />
-              <span class="group-hover:text-red-600 transition-colors">Deselect All Attached</span>
-            </label>
+              <span class="group-hover:text-red-600 transition-colors" style="position: relative; top: -5px; left: 7px;">Deselect All Attached</span>
+            </label>            
         </div>
 
         <ul class="flex-1 divide-y divide-gray-50 min-h-[300px] max-h-[500px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200 pr-2">
-          <li v-for="(data, index) in siteData" :key="data.id" class="py-3 flex items-center gap-4 transition-colors hover:bg-gray-50/50 rounded-xl group px-3">
-            <input type="checkbox" v-model="data.selected" class="w-5 h-5 rounded border-gray-200 text-green-600 focus:ring-green-500 transition-all cursor-pointer shadow-sm" />
+          <li v-for="(sData, index) in siteData" :key="sData.id" class="py-3 flex items-center gap-4 transition-colors hover:bg-gray-50/50 rounded-xl group px-3">
+            <input type="checkbox" v-model="sData.selected" class="w-5 h-5 rounded border-gray-200 text-green-600 focus:ring-green-500 transition-all cursor-pointer shadow-sm" />
             <div class="flex flex-col gap-0.5">
-                <span class="text-xs font-black text-gray-700 group-hover:text-green-700 transition-colors">{{ getLabelForSite(data) }}</span>
-                <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest">Link ID: {{ data.id }}</span>
+                <span class="text-xs font-black text-gray-700 group-hover:text-green-700 transition-colors">{{ getLabelForSite(sData) }}</span>
+                <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
+                  <span>ID: {{ sData.id }}</span> 
+                   <span v-if="sData.module">
+                    &bullet; Module Alias: {{ sData.module.alias }}
+                  </span>
+                  <span v-if="sData.platform_id">
+                    &bullet; Platform ID: {{ sData.platform_id }}
+                  </span>               
+                </span>
             </div>
           </li>
         </ul>
@@ -101,249 +117,175 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import { Loader, Toast, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  mounted() {
-    //console.log(this.siteData);
-    //  console.log(this.allData.data[0]);
-    //console.log(this.cuurent);
-    // this.initData();
-  },
-  created() {
-    //this.initData();
-  },
+const props = defineProps([
+  "dataMessage",
+  "dataAllData",
+  "dataSiteData",
+  "dataCurrentKey",
+  "dataSiteId",
+  "dataDefaultActionForSave",
+  "dataAlertCss",
+  "dataControllerName",
+]);
 
-  props: [
-    "dataMessage",
-    "dataAllData",
-    "dataSiteData",
-    "dataCurrentKey",
-    "dataSiteId",
-    "dataDefaultActionForSave",
-    "dataAlertCss",
-    "dataControllerName",
-  ],
-  data() {
-    return {
-      siteData: SafeJsonParse(this.dataSiteData, []),
-      allData: SafeJsonParse(this.dataAllData, []),
-      currentKey: this.dataCurrentKey,
-      searchKey: "",
-      siteId: parseInt(this.dataSiteId),
-      message: typeof this.dataMessage == "undefined" ? "" : this.dataMessage,
-      defaultActionForSave:
-        typeof this.dataDefaultActionForSave === "undefined"
-          ? "saveSettings"
-          : this.dataDefaultActionForSave,
-      alertCss:
-        typeof this.dataAlertCss == "undefined" || this.dataAlertCss === ""
-          ? "alert alert-info"
-          : this.dataAlertCss,
-      controllerName:
-        typeof this.dataControllerName === "undefined"
-          ? "site"
-          : this.dataControllerName,
-    };
-  },
-  computed: {
-    title() {
-      return this.allData.label;
-    },
-    total() {
-      return this.allData.data ? this.allData.data.length : 0;
-    },
-    selectedTotal() {
-      return this.siteData == null ? 0 : this.siteData.length;
-    },
-    showSearch() {
-      //return true;
-      return this.allData.data && this.allData.data.length > 10;
-    },
-  },
-  methods: {
-    saveNow(url, data) {
-      Loader.show(this, "Please wait. Making Changes...");
-      return new Promise((resolve, reject) => {
-        axios
-          .post(url, data)
-          .then((response) => {
-            resolve(response);
-          })
-          .catch((error) => {
-            reject(SafeErrorData(error));
-          })
-          .finally(() => {
-            Loader.hide(this);
-          });
-      });
-    },
-    doAction(action = "add") {
-      let $this = this;
-      //if action is add use left data to copy/reference to the right side
-      let currentData = action === "add" ? this.allData.data : this.siteData;
-      let ids = [];
-      let selectedArr = [];
+const instance = getCurrentInstance();
 
-      if (currentData && currentData.length > 0) {
-        currentData.forEach(function (current) {
-          if (current.selected === true) {
-            ids.push(current.id);
-            selectedArr.push(current);
-          }
-        });
+// State
+const siteData = ref(SafeJsonParse(props.dataSiteData, []));
+const allData = ref(SafeJsonParse(props.dataAllData, []));
+const currentKey = ref(props.dataCurrentKey);
+const searchKey = ref("");
+const siteId = ref(parseInt(props.dataSiteId));
+const message = ref(typeof props.dataMessage === "undefined" ? "" : props.dataMessage);
+const defaultActionForSave = ref(typeof props.dataDefaultActionForSave === "undefined" ? "saveSettings" : props.dataDefaultActionForSave);
+const alertCss = ref(typeof props.dataAlertCss === "undefined" || props.dataAlertCss === "" ? "alert alert-info" : props.dataAlertCss);
+const controllerName = ref(typeof props.dataControllerName === "undefined" ? "site" : props.dataControllerName);
 
-        //if action is method/function. means it is being called from another component
-        if (typeof this.defaultActionForSave === "function") {
-          this.defaultActionForSave(action, currentData, selectedArr, ids);
-          return false;
-        }
+// Computed
+const title = computed(() => allData.value.label);
+const total = computed(() => (allData.value.data ? allData.value.data.length : 0));
+const selectedTotal = computed(() => (siteData.value == null ? 0 : siteData.value.length));
+const showSearch = computed(() => allData.value.data && allData.value.data.length > 10);
 
-        if (ids.length > 0) {
-          let postParams = {};
-          postParams.key = this.currentKey;
-          postParams.ids = ids;
-          postParams.site_id = this.siteId;
-          postParams.action = action;
-          this.saveNow(
-            AdminConfig.admin_path(
-              this.controllerName + "/" + this.defaultActionForSave,
-            ),
-            postParams,
-          )
-            .then(function (res) {
-              feedback(res);
-            })
-            .catch(function (res) {
-              console.error("error: ", res);
-              Toast.show(
-                $this,
-                res?.data?.message || "I don't know what went wrong.",
-                5000,
-              );
-            });
-        }
-      }
-
-      function hasInArr(element, onwhat, value) {
-        return element[onwhat] === value;
-      }
-      //console.log(ids);
-      function feedback(res) {
-        console.log(res);
-        if (action === "add") {
-          //console.log("adding");
-          //console.log(selectedArr);
-          selectedArr.forEach(function (current) {
-            let id = current.id;
-
-            let found = $this.siteData.findIndex(function (c) {
-              return c.id === id;
-            });
-
-            if (found === -1) {
-              $this.siteData.push(current);
-            }
-          });
-        } else {
-          //remove from right side
-          selectedArr.forEach(function (current) {
-            let id = current.id;
-
-            let found = $this.siteData.findIndex(function (c) {
-              return c.id === id;
-            });
-
-            if (found !== -1) {
-              $this.siteData.splice(found, 1);
-            }
-          });
-        }
-      }
-    },
-    selectAllData(dataType, holder) {
-      let $this = this;
-      let currentData =
-        dataType === "table" ? this.allData.data : this.siteData;
-      let selected = holder.checked;
-      if (currentData && currentData.length > 0) {
-        currentData.forEach(function (current) {
-          //$this.$set(current, "selected", selected);
-          current.selected = selected;
-        });
-      }
-    },
-    getLabel(data) {
-      let label = "";
-      if (data.lang) {
-        label = typeof data.lang.name == "undefined" ? "" : data.lang.name;
-      } else {
-        label = data.name || data.alias || "";
-      }
-      return label;
-    },
-    getLabelForSite(data) {
-      //console.log(data);
-
-      if (typeof data.name != "undefined" || typeof data.alias != "undefined") {
-        return data.name || data.alias;
-      } else if (data.lang) {
-        return typeof data.lang.name == "undefined" ? "" : data.lang.name;
-      }
-
-      //Lang data can be found from the source too. Borrow it from left side if right side does not have it.
-      //fallback - get from source/left side data  compare id or link_rewrite
-
-      if (this.allData.data && this.allData.data.length > 0) {
-        let index = this.allData.data.findIndex(function (current) {
-          return (
-            current.id === data.id ||
-            (typeof data.link_rewrite != "undefined" &&
-              data.link_rewrite === current.link_rewrite)
-          );
-        });
-
-        return index === -1 ? "" : this.getLabel(this.allData.data[index]);
-      }
-
-      return "";
-    },
-    filterData() {
-      let $this = this;
-
-      let data = [];
-
-      let key = this.searchKey;
-
-      if (key !== "" && key != null) {
-        key = key.toLowerCase();
-
-        return this.allData.data.filter(function (current) {
-          return (
-            $this.getLabel(current).toLowerCase().includes(key) ||
-            current.id === key
-          );
-        });
-      } else {
-        //console.log("data ", this.allData.data);
-        return this.allData.data;
-      }
-    },
-    setData(key, data) {
-      //this.allData[key] = data;
-      //console.log(key, data);
-      this.allData[key] = data;
-      //this.$set(this.allData, key, data);
-    },
-    setSiteData(data) {
-      //this.allData[key] = data;
-      this.siteData = {};
-      this.siteData = data;
-      //this.$set(this, 'siteData', data);
-    },
-  },
+// Methods
+const saveNow = (url, data) => {
+  Loader.show(instance.proxy, "Please wait. Making Changes...");
+  return new Promise((resolve, reject) => {
+    axios
+      .post(url, data)
+      .then((response) => resolve(response))
+      .catch((error) => reject(SafeErrorData(error)))
+      .finally(() => Loader.hide(instance.proxy));
+  });
 };
+
+const getLabel = (data) => {
+  let label = "";
+  if (data.lang) {
+    label = typeof data.lang.name === "undefined" ? "" : data.lang.name;
+  } else {
+    label = data.name || data.alias || "";
+  }
+  return label;
+};
+
+const getLabelForSite = (data) => {
+  if (typeof data.name !== "undefined" || typeof data.alias !== "undefined") {
+    return data.name || data.alias;
+  } else if (data.lang) {
+    return typeof data.lang.name === "undefined" ? "" : data.lang.name;
+  }
+
+  if (allData.value.data && allData.value.data.length > 0) {
+    const index = allData.value.data.findIndex((current) => {
+      return (
+        current.id === data.id ||
+        (typeof data.link_rewrite !== "undefined" && data.link_rewrite === current.link_rewrite)
+      );
+    });
+    return index === -1 ? "" : getLabel(allData.value.data[index]);
+  }
+  return "";
+};
+
+const filterData = () => {
+  let key = searchKey.value;
+  if (!allData.value.data) return [];
+  if (key !== "" && key != null) {
+    key = key.toLowerCase();
+    return allData.value.data.filter((current) => {
+      return getLabel(current).toLowerCase().includes(key) || current.id.toString() === key;
+    });
+  } else {
+    return allData.value.data;
+  }
+};
+
+const doAction = (action = "add") => {
+  const currentDataArr = action === "add" ? allData.value.data : siteData.value;
+  const ids = [];
+  const selectedArr = [];
+
+  if (currentDataArr && currentDataArr.length > 0) {
+    currentDataArr.forEach((current) => {
+      if (current.selected === true) {
+        ids.push(current.id);
+        selectedArr.push(current);
+      }
+    });
+
+    if (typeof defaultActionForSave.value === "function") {
+      defaultActionForSave.value(action, currentDataArr, selectedArr, ids);
+      return false;
+    }
+
+    if (ids.length > 0) {
+      const postParams = {
+        key: currentKey.value,
+        ids: ids,
+        site_id: siteId.value,
+        action: action,
+      };
+      saveNow(
+        AdminConfig.admin_path(`${controllerName.value}/${defaultActionForSave.value}`),
+        postParams
+      )
+        .then((res) => {
+          if (res.data && res.data.error) {
+            Toast.show(instance.proxy, res.data.message || "Operation failed", 5000);
+            return;
+          }
+          if (action === "add") {
+            selectedArr.forEach((current) => {
+              const found = siteData.value.findIndex((c) => c.id === current.id);
+              if (found === -1) {
+                siteData.value.push(current);
+              }
+            });
+          } else {
+            selectedArr.forEach((current) => {
+              const found = siteData.value.findIndex((c) => c.id === current.id);
+              if (found !== -1) {
+                siteData.value.splice(found, 1);
+              }
+            });
+          }
+        })
+        .catch((err) => {
+          console.error("error: ", err);
+          const message = err?.message || err?.data?.message || "Operation failed";
+          Toast.show(instance.proxy, message, 5000);
+        });
+    }
+  }
+};
+
+const selectAllData = (dataType, holder) => {
+  const currentDataArr = dataType === "table" ? allData.value.data : siteData.value;
+  const selected = holder.checked;
+  if (currentDataArr && currentDataArr.length > 0) {
+    currentDataArr.forEach((current) => {
+      current.selected = selected;
+    });
+  }
+};
+
+const setData = (key, val) => {
+  allData.value[key] = val;
+};
+
+const setSiteData = (val) => {
+  siteData.value = val;
+};
+
+defineExpose({
+  setData,
+  setSiteData,
+});
 </script>
+

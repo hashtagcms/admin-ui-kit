@@ -37,10 +37,9 @@ describe('Modern: SearchBar.vue', () => {
         } 
     });
     
-    // Set field to something with _date
-    await wrapper.setData({ searchParams: { f: 'created_at', q: '', o: '=' } });
-    wrapper.vm.changeInputText();
-    await wrapper.vm.$nextTick();
+    // Set field to something with _at or _date
+    const select = wrapper.find('select');
+    await select.setValue('created_at');
     
     expect(wrapper.find('input').attributes('type')).toBe('date');
   });

@@ -202,7 +202,7 @@
                   <span v-if="currentTheme === 'modern'" class="text-[10px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded font-mono font-bold">&lt;SitewiseData /&gt;</span>
               </div>
               <div :class="currentTheme === 'neo' ? 'row' : ''">
-                  <component :is="activeComponents.SitewiseData" v-bind="sitewiseDataProps" />
+                  <component :is="activeComponents.SiteWiseData" v-bind="sitewiseDataProps" />
               </div>
             </div>
 

@@ -6,7 +6,7 @@
             <div class="w-1.5 h-10 bg-blue-600 rounded-full shadow-lg shadow-blue-500/20"></div>
             <div>
                 <h4 class="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">{{ getTitle(controllerTitle) }}</h4>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1.5 opacity-70">{{this.cmsModules.sub_title || 'Resource Management Instance'}}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1.5 opacity-70">{{cmsModules.sub_title || 'Resource Management Instance'}}</p>
             </div>
         </div>
         
@@ -30,7 +30,7 @@
             </hc-button>
 
             <hc-button
-              v-for="actionButton in moreActionButtons"
+              v-for="actionButton in filteredMoreActionButtons"
               :key="actionButton.action"
               variant="secondary"
               outline
@@ -91,142 +91,164 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import CmsModuleDropdown from "./cms-module-dropdown.vue";
 import LanguageButton from "./language-button.vue";
 import SearchBar from "./search-bar.vue";
-import { Toast, SafeJsonParse } from "../../../helpers/common";
+import { Toast, SafeJsonParse, ACTION_MAP } from "../../../helpers/common";
 import Humanize from "../../../helpers/humanize";
 import HcButton from "../ui-kit/HcButton.vue";
 
-export default {
-  name: "ActionBar",
-  components: {
-    "cms-module-dropdown": CmsModuleDropdown,
-    "language-button": LanguageButton,
-    "search-bar": SearchBar,
-    HcButton
-  },
-  mounted() {
-    this.shouldShowSearchPanel();
-  },
-  props: [
-    "dataSelectedParams",
-    "dataControllerName",
-    "dataControllerTitle",
-    "dataFields",
-    "dataActionFields",
-    "dataLanguages",
-    "dataSelectedLanguage",
-    "dataMoreActions",
-    "dataShowAdd",
-    "dataHasLangMethod",
-    "dataCmsModules",
-    "dataShowSearch",
-    "dataShowBack",
-    "dataLayoutType",
-  ],
-  computed: {
-    backURL() {
-      return AdminConfig.admin_path(this.controllerName);
-    },
-    layoutIcon() {
-      return this.layoutType === "grid" ? "fa fa-th-list" : "fa fa-table";
-    },
-    showAddButtonBasedOnAction() {
-      return this.actionFields.indexOf("edit") !== -1;
-    },
-  },
-  data() {
-    return {
-      canAdd: true,
-      showSearchButton: !(
-        typeof this.dataShowSearch === "undefined" ||
-        this.dataShowSearch === "" ||
-        this.dataShowSearch === "false"
-      ),
-      showSearchPanel: false,
-      searchAnim: "",
-      moreActionButtons: SafeJsonParse(this.dataMoreActions, []),
-      showAdd:
-        typeof this.dataShowAdd === "undefined" || this.dataShowAdd === "true",
-      hasLangMethod: !(
-        typeof this.dataHasLangMethod === "undefined" ||
-        this.dataHasLangMethod === "false"
-      ),
-      cmsModules: SafeJsonParse(this.dataCmsModules, {}),
-      selectedParams:
-        typeof this.dataSelectedParams === "undefined"
-          ? ""
-          : this.dataSelectedParams,
-      controllerName:
-        typeof this.dataControllerName === "undefined"
-          ? ""
-          : this.dataControllerName,
-      controllerTitle:
-        typeof this.dataControllerTitle === "undefined"
-          ? ""
-          : this.dataControllerTitle,
-      fields:
-        typeof this.dataFields === "undefined" || this.dataFields === ""
-          ? []
-          : this.dataFields,
-      actionFields:
-        typeof this.dataActionFields === "undefined" ||
-        this.dataActionFields === ""
-          ? []
-          : this.dataActionFields,
-      showBack: this.dataShowBack === "true",
-      layoutType:
-        typeof this.dataLayoutType === "undefined" || this.dataLayoutType === ""
-          ? "table"
-          : this.dataLayoutType,
-    };
-  },
-  methods: {
-    changeLayout() {
-      const targetLayout = this.layoutType === "table" ? "grid" : "table";
-      Toast.show(this, `Changing layout to ${targetLayout}...`, 2000);
-      
-      if ("URLSearchParams" in window) {
+const props = defineProps([
+  "dataSelectedParams",
+  "dataControllerName",
+  "dataControllerTitle",
+  "dataFields",
+  "dataActionFields",
+  "dataLanguages",
+  "dataSelectedLanguage",
+  "dataMoreActions",
+  "dataShowAdd",
+  "dataHasLangMethod",
+  "dataCmsModules",
+  "dataShowSearch",
+  "dataShowBack",
+  "dataLayoutType",
+  "dataUserRights",
+]);
+
+const instance = getCurrentInstance();
+
+const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+const can = (rights) => {
+  return userRights.value.indexOf(rights) >= 0;
+};
+
+const showSearchButton = ref(!(
+  typeof props.dataShowSearch === "undefined" ||
+  props.dataShowSearch === "" ||
+  props.dataShowSearch === "false"
+));
+const showSearchPanel = ref(false);
+const searchAnim = ref("");
+
+
+
+const moreActionButtons = ref(SafeJsonParse(props.dataMoreActions, []));
+
+const filteredMoreActionButtons = computed(() => {
+    return moreActionButtons.value;
+});
+const showAdd = ref(
+  typeof props.dataShowAdd === "undefined" || props.dataShowAdd === "true"
+);
+const hasLangMethod = ref(!(
+  typeof props.dataHasLangMethod === "undefined" ||
+  props.dataHasLangMethod === "false"
+));
+const cmsModules = ref(SafeJsonParse(props.dataCmsModules, {}));
+const selectedParams = ref(
+  typeof props.dataSelectedParams === "undefined"
+    ? ""
+    : props.dataSelectedParams
+);
+const controllerName = ref(
+  typeof props.dataControllerName === "undefined"
+    ? ""
+    : props.dataControllerName
+);
+const controllerTitle = ref(
+  typeof props.dataControllerTitle === "undefined"
+    ? ""
+    : props.dataControllerTitle
+);
+const fields = ref(
+  typeof props.dataFields === "undefined" || props.dataFields === ""
+    ? []
+    : props.dataFields
+);
+const actionFields = ref(
+  typeof props.dataActionFields === "undefined" ||
+  props.dataActionFields === ""
+    ? []
+    : props.dataActionFields
+);
+const showBack = ref(props.dataShowBack === "true");
+const layoutType = ref(
+  typeof props.dataLayoutType === "undefined" || props.dataLayoutType === ""
+    ? "table"
+    : props.dataLayoutType
+);
+
+const backURL = computed(() => {    
+    return AdminConfig.admin_path(controllerName.value);
+});
+
+const layoutIcon = computed(() => {
+    return layoutType.value === "grid" ? "fa fa-th-list" : "fa fa-table";
+});
+
+const showAddButtonBasedOnAction = computed(() => {
+    const rights = userRights.value;
+    // If user has ONLY 'read' right, hide the Add button
+    if (rights.length === 1 && rights[0] === 'read') {
+        return false;
+    }
+    return true;
+});
+
+const changeLayout = () => {
+    const targetLayout = layoutType.value === "table" ? "grid" : "table";
+    Toast.show(instance.proxy, `Changing layout to ${targetLayout}...`, 2000);
+    
+    if ("URLSearchParams" in window) {
         let searchParams = new URLSearchParams(window.location.search);
         searchParams.set("layout", targetLayout);
         window.location.href = window.location.pathname + "?" + searchParams.toString();
-      } else {
+    } else {
         window.location.href = window.location.pathname + "?layout=" + targetLayout;
-      }
-    },
-    getAction(val) {
-      if (val.indexOf("http") === 0) {
-        return val;
-      }
-      return AdminConfig.admin_path(val);
-    },
-    showHideSearch() {
-      this.showSearchPanel = !this.showSearchPanel;
-      this.searchAnim = this.showSearchPanel ? "animated flipInX" : "";
-    },
-    shouldShowSearchPanel() {
-      if (this.selectedParams !== "") {
-        const params = SafeJsonParse(this.selectedParams, {});
-        if (params.q) {
-          this.showSearchPanel = true;
-        }
-      }
-    },
-    addNew() {
-      if (this.controllerName !== "") {
-        var controller_url = AdminConfig.admin_path(this.controllerName);
-        window.location.href = controller_url + "/create";
-      }
-    },
-    getButtonType(row) {
-      return !row.as || row.as === "button" ? "button" : row.as;
-    },
-    getTitle: function (text) {
-      return Humanize(text);
-    },
-  },
+    }
 };
+
+const getAction = (val) => {
+    if (val.indexOf("http") === 0) {
+        return val;
+    }
+    return AdminConfig.admin_path(val);
+};
+
+const showHideSearch = () => {
+    showSearchPanel.value = !showSearchPanel.value;
+    searchAnim.value = showSearchPanel.value ? "animated flipInX" : "";
+};
+
+const shouldShowSearchPanel = () => {
+    if (selectedParams.value !== "") {
+        const params = SafeJsonParse(selectedParams.value, {});
+        if (params.q) {
+            showSearchPanel.value = true;
+        }
+    }
+};
+
+const addNew = () => {
+    if (controllerName.value !== "") {
+        var controller_url = AdminConfig.admin_path(controllerName.value);
+        window.location.href = controller_url + "/create";
+    }
+};
+
+const getButtonType = (row) => {
+    return !row.as || row.as === "button" ? "button" : row.as;
+};
+
+const getTitle = (text) => {
+    return Humanize(text);
+};
+
+onMounted(() => {
+    shouldShowSearchPanel();
+});
 </script>

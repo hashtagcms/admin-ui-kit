@@ -32,8 +32,8 @@ Below is a comprehensive list of all UI components available in `@hashtagcms/adm
 - **[GlobalSiteButton](./components/global-site-button.md)**: Global site context switcher.
 - **[SiteButton](./components/site-button.md)**: Simple site selector.
 - **[SiteCloner](./components/site-cloner.md)**: Site replication tool.
-- **[SitewiseData](./components/sitewise-data.md)**: Resource distributor.
-- **[SitewiseCopier](./components/sitewise-copier.md)**: Copy site settings.
+- **[SiteWiseData](./components/sitewise-data.md)**: Resource distributor.
+- **[SiteWiseCopier](./components/sitewise-copier.md)**: Copy site settings.
 - **[LanguageButton](./components/language-button.md)**: Content language toggler.
 - **[LanguageCopier](./components/language-copier.md)**: Translations manager.
 

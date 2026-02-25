@@ -12,6 +12,7 @@
           :data-title="module.name"
           :data-sub-title="module.sub_title"
           :data-icon-css="module.icon_css"
+          :data-color-index="index + 1"
           class="h-full"
         >
         </info-box>
@@ -20,48 +21,36 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
-
 import InfoBox from "./library/info-box.vue";
 
-export default {
-  components: {
-    "info-box": InfoBox,
-  },
-  mounted() {
-    //console.log(this.modulesAllowed);
-    //
-  },
-  props: ["dataModules", "dataModulesAllowed", "dataIsAdmin"],
-  data() {
-    return {
-      modulesAllowed: SafeJsonParse(this.dataModulesAllowed, []),
-    };
-  },
-  computed: {
-    allModules() {
-      let modules = SafeJsonParse(this.dataModules, []);
-      return modules.child || [];
-    },
-  },
-  methods: {
-    getLink(current) {
-      return AdminConfig.admin_path(current.controller_name);
-    },
-    hasAccess(module_id) {
-      if (this.dataIsAdmin.toString() == "1") {
-        return true;
-      }
-      for (let i = 0; i < this.modulesAllowed.length; i++) {
-        let current = this.modulesAllowed[i];
-        if (current.module_id == module_id) {
-          return true;
-        }
-      }
-      return false;
-    },
-  },
+const props = defineProps(["dataModules", "dataModulesAllowed", "dataIsAdmin"]);
+
+const modulesAllowed = ref(SafeJsonParse(props.dataModulesAllowed, []));
+
+const allModules = computed(() => {
+  let modules = SafeJsonParse(props.dataModules, []);
+  return modules.child || [];
+});
+
+const getLink = (current) => {
+  return AdminConfig.admin_path(current.controller_name);
+};
+
+const hasAccess = (module_id) => {
+  if (props.dataIsAdmin.toString() == "1") {
+    return true;
+  }
+  for (let i = 0; i < modulesAllowed.value.length; i++) {
+    let current = modulesAllowed.value[i];
+    if (current.module_id == module_id) {
+      return true;
+    }
+  }
+  return false;
 };
 </script>
+

@@ -33,101 +33,105 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, nextTick, getCurrentInstance } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
-
 import Sortable from "sortablejs";
 import { Toast, SafeErrorData, SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  mounted() {
-    this.enableSorting();
-  },
+const props = defineProps(["dataAllModules", "dataControllerName"]);
 
-  props: ["dataAllModules", "dataControllerName"],
+const instance = getCurrentInstance();
 
-  data() {
-    return {
-      allData: SafeJsonParse(this.dataAllModules, []),
-      sortable: null,
-      sortingInterval: -1,
-      updateIndexUrl: AdminConfig.admin_path(
-        this.controllerName + "/updateIndex",
-      ),
-      activeIndex: null,
-    };
-  },
-  computed: {
-    controllerName() {
-      let cName =
-        typeof this.dataControllerName == "undefined"
-          ? ""
-          : this.dataControllerName.toLocaleLowerCase();
-      return cName.replace(/\s/g, "");
-    },
-  },
-  methods: {
-    hasChild(data) {
-      return data.child && data.child.length > 0;
-    },
-    toggleActive(index) {
-      this.activeIndex = this.activeIndex === index ? null : index;
-    },
-    enableSorting() {
-      this.$nextTick(function () {
-        if (this.sortable != null) {
-          this.sortable.destroy();
-        }
-        var el = document.getElementById("sortableField");
-        this.sortable = Sortable.create(el, {
-            animation: 300,
-            ghostClass: "bg-blue-50",
-            dragClass: "shadow-lg",
-            onEnd: this.sortingCallback
-        });
-      });
-    },
-    sortingCallback(evt) {
-      var $this = this;
-      var data = [];
-      const items = document.querySelectorAll(".parent");
-      
-      items.forEach((item, index) => {
-          const text = item.querySelector(".text-sm").innerText;
-          const found = this.allData.find(d => d.module_pid == 0 && d.name === text);
-          if (found) {
-              data.push({
-                  id: found.id,
-                  position: index,
-                  name: found.name
-              });
-          }
-      });
-      
-      this.updateIndex(data);
-    },
-    submit(requestType, url, data) {
-      return new Promise((resolve, reject) => {
-        axios[requestType](url, data)
-          .then((response) => {
-            this.onSuccess(response);
-          })
-          .catch((error) => {
-            this.onFailure(SafeErrorData(error));
-          });
-      });
-    },
-    updateIndex(data) {
-      this.submit("post", this.updateIndexUrl, data)
-        .then((response) => this.onSuccess(response))
-        .catch((response) => this.onFailure(response));
-    },
-    onSuccess(res) {
-      Toast.show(this, "Modules Sorted.");
-    },
-    onFailure(res) {
-      console.log(res);
-    },
-  },
+// State
+const allData = ref(SafeJsonParse(props.dataAllModules, []));
+const sortable = ref(null);
+const sortingInterval = ref(-1);
+const activeIndex = ref(null);
+
+// Computed
+const controllerName = computed(() => {
+  let cName = typeof props.dataControllerName === "undefined" ? "" : props.dataControllerName.toLowerCase();
+  return cName.replace(/\s/g, "");
+});
+
+const updateIndexUrl = computed(() => {
+  return AdminConfig.admin_path(`${controllerName.value}/updateIndex`);
+});
+
+// Methods
+const hasChild = (data) => data.child && data.child.length > 0;
+
+const toggleActive = (index) => {
+  activeIndex.value = activeIndex.value === index ? null : index;
 };
+
+const onSuccess = (res) => {
+  Toast.show(instance, "Modules Sorted.");
+};
+
+const onFailure = (res) => {
+  console.log(res);
+};
+
+const submit = (requestType, url, data) => {
+  return new Promise((resolve, reject) => {
+    axios[requestType](url, data)
+      .then((response) => {
+        onSuccess(response);
+        resolve(response);
+      })
+      .catch((error) => {
+        onFailure(SafeErrorData(error));
+        reject(error);
+      });
+  });
+};
+
+const updateIndex = (data) => {
+  submit("post", updateIndexUrl.value, data);
+};
+
+const sortingCallback = (evt) => {
+  const data = [];
+  const items = document.querySelectorAll(".parent");
+
+  items.forEach((item, index) => {
+    const textSpan = item.querySelector(".text-sm");
+    const text = textSpan ? textSpan.innerText : "";
+    const found = allData.value.find((d) => d.module_pid == 0 && d.name === text);
+    if (found) {
+      data.push({
+        id: found.id,
+        position: index,
+        name: found.name,
+      });
+    }
+  });
+
+  updateIndex(data);
+};
+
+const enableSorting = () => {
+  nextTick(() => {
+    if (sortable.value != null) {
+      sortable.value.destroy();
+    }
+    const el = document.getElementById("sortableField");
+    if (el) {
+      sortable.value = Sortable.create(el, {
+        animation: 300,
+        ghostClass: "bg-blue-50",
+        dragClass: "shadow-lg",
+        onEnd: sortingCallback,
+      });
+    }
+  });
+};
+
+// Lifecycle
+onMounted(() => {
+  enableSorting();
+});
 </script>
+

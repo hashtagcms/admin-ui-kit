@@ -4,20 +4,14 @@
   </div>
 </template>
 
-<script>
-export default {
-  mounted() {
-    // console.log("html slot mounted");
-    for (var i in this) {
-      if (this.hasOwnProperty(i)) {
-        // console.log(i + " : "+ this[i].toString());
-      }
-    }
-  },
-  methods: {
-    getAllInputs: function () {
-      console.log("all inputs");
-    },
-  },
+<script setup>
+import { onMounted } from "vue";
+
+onMounted(() => {
+  // console.log("html slot mounted");
+});
+
+const getAllInputs = () => {
+  console.log("all inputs");
 };
 </script>

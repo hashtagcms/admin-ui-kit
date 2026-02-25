@@ -1,5 +1,5 @@
 <template>
-  <div class="clearfix">
+  <div class="clearfix" ref="root">
     <template v-if="!isZeroResult()">
       <div v-if="layoutType === 'grid'" class="row">
         <div
@@ -19,14 +19,12 @@
               <td>
                 <span
                   v-if="!isActionFieldKey(getFieldName(fields, 'key'))"
-                  v-html="
-                    getFieldValue(row, getFieldName(fields, 'key'), fields)
-                  "
+                  v-html="sanitizeHTML(getFieldValue(row, getFieldName(fields, 'key'), fields))"
                 ></span>
                 <div
                   v-if="isActionFieldKey(getFieldName(fields, 'key'))"
                   class="actions"
-                  v-html="getActionValue(row)"
+                  v-html="sanitizeHTML(getActionValue(row))"
                 ></div>
               </td>
             </tr>
@@ -55,15 +53,15 @@
             class="list-table-row"
           >
             <td v-for="fields in headings">
-              <div
-                v-if="isActionFieldKey(getFieldName(fields, 'key'))"
-                class="actions"
-                v-html="getActionValue(row)"
-              ></div>
-              <span
-                v-else
-                v-html="getFieldValue(row, getFieldName(fields, 'key'), fields)"
-              ></span>
+                <div
+                  v-if="isActionFieldKey(getFieldName(fields, 'key'))"
+                  class="actions"
+                  v-html="sanitizeHTML(getActionValue(row))"
+                ></div>
+                <span
+                  v-else
+                  v-html="sanitizeHTML(getFieldValue(row, getFieldName(fields, 'key'), fields))"
+                ></span>
             </td>
           </tr>
         </tbody>
@@ -130,678 +128,483 @@
 
     <div v-if="isZeroResult()" class="row">
       <div class="col">
-        <div v-html="noResultsFoundText"></div>
+        <div v-html="sanitizeHTML(noResultsFoundText)"></div>
       </div>
     </div>
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, reactive, computed, onMounted, onBeforeUnmount, nextTick, getCurrentInstance, watch } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import axios from "axios";
-
 import { Toast, QueryBuilder, SafeJsonParse } from "../../../helpers/common";
 import { Fx } from "../../../helpers/fx";
 import { EventBus } from "../../../helpers/event-bus";
-import ModalBox from "./library/modal-box.vue";
+import DeletePopup from "./library/modal-box.vue";
 import InfoPopup from "./info-popup.vue";
 
-export default {
-  components: {
-    "info-popup": InfoPopup,
-    "delete-popup": ModalBox,
-  },
-  mounted() {
-    this.highlight();
-    this.bindAction();
-    //already uppercase
-    if (this.showDeletePopup === "FALSE") {
-      this.preventDeleteBox = true;
-    }
+const props = defineProps([
+  "dataHeaders",
+  "dataList",
+  "dataActionFields",
+  "dataMoreActionFields",
+  "dataControllerName",
+  "dataActionAsAjax",
+  "dataActionCss",
+  "dataUserRights",
+  "dataMakeFieldAsLink",
+  "dataShowDeletePopup",
+  "dataEditHandledByOtherComponent",
+  "dataMinResultsNeeded",
+  "dataLayoutType",
+  "dataNoResultsFoundText",
+]);
 
-    EventBus.on("list-view-hide-spinner", () => {
-      this.showHideSpinner(undefined, "false");
-    });
+const instance = getCurrentInstance();
+const deleteBox = ref(null);
+const infoPopup = ref(null);
+const root = ref(null);
 
-    EventBus.on("info-popup-open", () => {
-      this.removeAllSpinners();
-    });
-
-    //console.log("initing tablular view");
-  },
-  created() {
-    //console.log("created");
-    //console.log(this.headings);
-    //console.log("this.moreActions ",this.moreActions);
-    //console.log("this.actionFields ",this.actionFields);
-    //console.log("created tablular view");
-  },
-  props: [
-    "dataHeaders",
-    "dataList",
-    "dataActionFields",
-    "dataMoreActionFields",
-    "dataControllerName",
-    "dataActionAsAjax",
-    "dataActionCss",
-    "dataUserRights",
-    "dataMakeFieldAsLink",
-    "dataShowDeletePopup",
-    "dataEditHandledByOtherComponent",
-    "dataMinResultsNeeded",
-    "dataLayoutType",
-    "dataNoResultsFoundText",
-  ],
-
-  data() {
-    return {
-      actionFields: SafeJsonParse(this.dataActionFields, []),
-      userRights: SafeJsonParse(this.dataUserRights, []),
-      moreActions: SafeJsonParse(this.dataMoreActionFields, []),
-      actionAjax: SafeJsonParse(this.dataActionAsAjax, this.getDefaultValue("action_as_ajax", [])),
-      actionIconCss: SafeJsonParse(this.dataActionCss, this.getDefaultValue("action_icon_css", [])),
-      alertMessage: {
-        current: "Are you sure to delete this?",
-        delete: "Are you sure to delete this?",
-        permission: "Sorry! You don't have permission to delete this.",
-      },
-      isDelete: true,
-      currentActionItem: null,
-      preventDeleteBox: false,
-      makeFieldAsLink: SafeJsonParse(this.dataMakeFieldAsLink, []),
-      fieldAsLinkCache: {},
-      showDeletePopup: this.dataShowDeletePopup
-        ? this.dataShowDeletePopup.toString().toUpperCase()
-        : "FALSE",
-      editHandledByOtherComponent:
-        typeof this.dataEditHandledByOtherComponent !== "undefined" ||
-        (this.dataEditHandledByOtherComponent &&
-          this.dataEditHandledByOtherComponent.toString() === "true"),
-      minResultsNeeded:
-        typeof this.dataMinResultsNeeded === "undefined" ||
-        this.dataMinResultsNeeded === ""
-          ? -1
-          : parseInt(this.dataMinResultsNeeded),
-      layoutType:
-        typeof this.dataLayoutType === "undefined" || this.dataLayoutType === ""
-          ? "table"
-          : this.dataLayoutType,
-      noResultsFoundText: this.dataNoResultsFoundText,
-      spinnerCss: ["fa-spinner", "fa-pulse", "fa-fw"],
-    };
-  },
-  computed: {
-    headings() {
-      let heading = SafeJsonParse(this.dataHeaders, []);
-
-      let allHeadings = [];
-      if (heading.length > 0) {
-        heading.forEach(function (current, index) {
-          let label = current.label || current;
-          let key = current.key || current;
-          let isImage = !!(
-            current.isImage && current.isImage.toString() === "true"
-          );
-          let showAllScopes = !!(
-            current.showAllScopes && current.showAllScopes.toString() === "true"
-          );
-          allHeadings.push({ label, key, isImage, showAllScopes });
-        });
-      }
-
-      // console.log("allHeadings ",allHeadings)
-      return allHeadings;
-    },
-    rows() {
-      return SafeJsonParse(this.dataList, []);
-    },
-  },
-  methods: {
-    isActionFieldKey(key) {
-      //will have edit/delete/approve etc
-      key = key === undefined ? "" : key.toLowerCase();
-      return key === "action" || key === "moreactions";
-    },
-    isMakeFieldAsLink(key) {
-      //Making Cache for good performance
-
-      if (this.fieldAsLinkCache[key] !== undefined) {
-        return this.fieldAsLinkCache[key];
-      }
-
-      //console.log("searching... "+key);
-
-      let found = this.makeFieldAsLink.find(function (current, index) {
-        if (current.key === key || current.action === key) {
-          return current;
-        }
-      });
-      this.fieldAsLinkCache[key] = found === undefined ? -1 : found;
-      return this.fieldAsLinkCache[key];
-    },
-
-    getFieldName(key, prop, asFilterLabel) {
-      prop = prop ? prop : "label";
-      return typeof key == "string"
-        ? key
-        : key[prop] === undefined
-          ? key
-          : key[prop];
-    },
-    getFieldValue(row, key, fields) {
-      //console.log("calling ", key, row.id);
-      let $this = this;
-
-      //console.log("key", key, fields);
-
-      //data has something like lang.name
-      if (key.includes(".")) {
-        let extract = key.split(".");
-        let scope = extract[0];
-        let fieldName = extract[1];
-
-        scope = row[scope];
-
-        switch (Object.prototype.toString.call(scope)) {
-          case "[object Undefined]":
-            scope = "";
-            break;
-          case "[object Array]":
-            scope =
-              scope.length > 0
-                ? fields.showAllScopes
-                  ? getScopeAllVals(scope, fieldName)
-                  : scope[0][fieldName]
-                : scope[fieldName];
-            break;
-          case "[object Object]":
-            scope = scope[fieldName] || "";
-            break;
-        }
-
-        return scope;
-      }
-
-      //get value
-      return getActualValue(row, key, fields);
-
-      /**
-       * is action
-       * @param searchKey
-       * @returns {T}
-       */
-      function isAction(searchKey) {
-        return $this.makeFieldAsLink.find(function (current, index) {
-          if (current.key === searchKey) {
-            return current;
-          }
-        });
-      }
-
-      /**
-       * Get all scrope values
-       * @param scope
-       * @param fieldName
-       */
-      function getScopeAllVals(scope, fieldName) {
-        let values = [];
-        if (scope.length > 0) {
-          for (let i = 0, len = scope.length; i < len; i++) {
-            values.push(scope[i][fieldName]);
-          }
-        }
-        return values.join(",");
-      }
-
-      /**
-       * Get actual value
-       * @param row
-       * @param forKey
-       * @param fields
-       * @returns {*}
-       */
-      function getActualValue(row, forKey, fields) {
-        let withIcon = true;
-        //var actionAlias = {"id":"edit", "publish_status":"publish"};
-        let value = "";
-
-        let actionAlias = $this.isMakeFieldAsLink(forKey);
-
-        // check if this is action field
-        if (actionAlias !== undefined && actionAlias !== -1) {
-          //console.log(current=="edit" && this.actionFields.indexOf("edit")!=-1);
-          let current = forKey;
-          let actionName = actionAlias.action || current;
-
-          //console.log("actionName ",actionName, " ", current);
-          let title = actionName.charAt(0).toUpperCase() + actionName.slice(1);
-          //var path = (actionName=="edit") ? `${row.id}/${actionName}` : `${actionName}/${row.id}`;
-          let path = `${actionName}/${row.id}`;
-          path = AdminConfig.admin_path(`${$this.dataControllerName}/${path}`);
-
-          let iconOrValue = row[forKey];
-          let isAjaxCss = "";
-          let status = "";
-
-          // check if this is ajax : actionAjax
-          if ($this.isAjax(forKey)) {
-            isAjaxCss = $this.getAjaxCss(current);
-
-            isAjaxCss += " " + forKey + "_" + row[forKey]; //kind of "publish_1" or "publish_0";
-
-            if (withIcon) {
-              let icon_css = actionAlias["css_" + row[forKey]] || "";
-              iconOrValue = `<i class="js_icon ${icon_css}"></i>`;
-            }
-
-            //if this user has no rights - disable it
-            if (!$this.can(actionName)) {
-              isAjaxCss += " disabled";
-            }
-            status = row[forKey];
-          }
-
-          value = `<a class="${isAjaxCss}" data-value="${status}" data-rowid="${row.id}" data-action="${actionName}" title="${title}" href="${path}">${iconOrValue}</a>`;
-
-          //if edit and
-          if (forKey === "id" && $this.actionFields.indexOf("edit") === -1) {
-            value = iconOrValue;
-          }
-        } else {
-          value = row[forKey];
-          let media_path = AdminConfig.get("media_path");
-          value =
-            fields.isImage === false
-              ? value
-              : value !== "" && value != null
-                ? getImgOrVideo(value, media_path)
-                : value;
-        }
-
-        function getImgOrVideo(v, mediaPath) {
-          let imgs = [
-            "apng",
-            "avif",
-            "gif",
-            "jpg",
-            "jpeg",
-            "jfif",
-            "pjpeg",
-            "pjp",
-            "png",
-            "svg",
-            "webp",
-            "bmp",
-            "ico",
-            "cur",
-            "tif",
-            "tiff",
-          ];
-          let vids = ["mp4", "mov", "ogg"];
-          let ext = v.substring(v.lastIndexOf(".") + 1);
-          let str = "";
-          if (vids.indexOf(ext) >= 0) {
-            str = `<a class="table-links" href="${mediaPath}/${v}" target="_blank"><video height="30"><source src="${mediaPath}/${v}"></video></a>`;
-          } else if (imgs.indexOf(ext) >= 0) {
-            str = `<a class="table-links" href="${mediaPath}/${v}" target="_blank"><img height="30" src='${mediaPath}/${v}' /></a>`;
-          } else {
-            str = `<a class="table-links" href="${mediaPath}/${v}" target="_blank">${v}</a>`;
-          }
-          return str;
-        }
-
-        return value;
-      }
-    },
-    getActionValue(row, key) {
-      let html = [];
-
-      //this is last column things - edit/delete etc
-      if (this.actionFields.length > 0) {
-        for (let i = 0; i < this.actionFields.length; i++) {
-          let current = this.actionFields[i];
-          let isAjax = this.getAjaxCss(current);
-          let title = current.charAt(0).toUpperCase() + current.slice(1);
-
-          let path = "";
-
-          if (current === "edit") {
-            //path = AdminConfig.admin_path(`${this.dataControllerName}/${row.id}/${current}`);
-            path = AdminConfig.admin_path(
-              `${this.dataControllerName}/${current}/${row.id}`,
-            );
-          } else if (current === "delete") {
-            //console.log("this.minResultsNeeded <= this.rows.length ", this.minResultsNeeded , this.rows.length)
-
-            if (
-              this.minResultsNeeded !== -1 &&
-              this.minResultsNeeded >= this.rows.length
-            ) {
-              console.info(
-                `Hiding delete button, because ${this.minResultsNeeded} record(s) needed.`,
-              );
-            } else {
-              path = AdminConfig.admin_path(
-                `${this.dataControllerName}/destroy/${row.id}`,
-              );
-            }
-          } else {
-            path = AdminConfig.admin_path(
-              `${this.dataControllerName}/${current}/${row.id}`,
-            );
-          }
-
-          if (path !== "") {
-            let icon = `<i class="js_icon ${this.getIconCSS(current)}"></i>`;
-            let link = `<a class="${isAjax}" data-rowid="${row.id}" data-action="${current}" title="${title}" href="${path}" class="${current}">${icon}</a>`;
-            html.push(link);
-          }
-        }
-      }
-
-      if (this.moreActions.length > 0) {
-        for (let i = 0; i < this.moreActions.length; i++) {
-          let current = this.moreActions[i];
-
-          let isAjax = this.getAjaxCss(current);
-          let css = current["css"] || "";
-          let attributes = "";
-          if (current.hrefAttributes) {
-            for (let attr in current.hrefAttributes) {
-              if (current.hrefAttributes.hasOwnProperty(attr)) {
-                attributes += `${attr}='${current.hrefAttributes[attr]}' `;
-              }
-            }
-          }
-          let action = current.action;
-          let value = row[current.action_append_field] || "";
-          let title =
-            current.label.charAt(0).toUpperCase() + current.label.slice(1);
-          let path = AdminConfig.admin_path(
-            `${this.dataControllerName}/${action}/${value}`,
-          );
-          let icon = `<i class="js_icon ${current.icon_css}"></i>`;
-          let link = `<a class="${isAjax} ${css}" data-rowid="${row.id}" title="${title}" href="${path}" data-action="${action}" ${attributes}>${icon}</a>`;
-          html.push(link);
-        }
-      }
-
-      return html.join("&nbsp;");
-    },
-    can(rights) {
-      return this.userRights.indexOf(rights) >= 0;
-    },
-    isAjax(action) {
-      return this.actionAjax.indexOf(action) >= 0;
-    },
-    getAjaxCss(action) {
-      let css = "";
-      let action_css =
-        Object.prototype.toString.call(action) === "[object Object]"
-          ? action.action
-          : action;
-      if (this.isAjax(action)) {
-        css = "js_action js_ajax js_" + action_css;
-      } else {
-        css = "js_action js_" + action_css;
-      }
-
-      return css;
-    },
-    getDefaultValue(key, dv) {
-      return window.Laravel.htcmsAdminConfig(key) || dv;
-    },
-    getIconCSS(key) {
-      let action_icon_css = this.getDefaultValue("action_icon_css", "");
-
-      return action_icon_css[key] || "";
-    },
-    getTotalColumns() {
-      return this.headings.length;
-    },
-    getTotalRows() {
-      return this.rows.length;
-    },
-    isZeroResult() {
-      return this.rows.length === 0;
-    },
-    highlight() {
-      let id = QueryBuilder.get("id");
-      if (id !== "") {
-        let row = "row_" + id;
-        Fx.scrollWinTo("#" + row, function () {
-          Fx.highlight(row);
-        });
-      }
-    },
-    deleteNow(isOk = 1) {
-      let $this = this;
-      let rowid = -1;
-      try {
-        if (isOk === 1) {
-          let target = this.currentActionItem;
-          if (this.can("delete")) {
-            rowid = "row_" + target.getAttribute("data-rowid");
-            let href = target.getAttribute("href");
-            //Delete in db
-            this.doAjax("delete", href, feedback);
-          } else {
-            //sorry you don't have permission.
-            Toast.show($this, "Sorry! You don't have permission to delete.");
-            //some issue - will fix this
-            setTimeout(function () {
-              $this.showHideSpinner($this.currentActionItem, false);
-            }, 1000);
-          }
-        } else {
-          $this.showHideSpinner($this.currentActionItem, false);
-        }
-      } catch (e) {
-        $this.showHideSpinner($this.currentActionItem, false);
-        Toast.show(
-          $this,
-          "I don't understand what you are trying to do.",
-          5000,
-        );
-      }
-
-      //After delete
-      function feedback(res) {
-        if (res.status === 200) {
-          //delete from index
-          let index = $this.rows.findIndex(function (current) {
-            return current.id.toString() === res.data.id.toString();
-          });
-          if (index >= 0) {
-            Toast.show($this, "Record has been deleted", 2000);
-            if (document.getElementById(rowid)) {
-              document.getElementById(rowid).remove();
-            }
-            $this.rows.splice(index, 1);
-            $this.bindAction();
-            EventBus.emit("pagination-on-delete");
-          }
-        } else {
-          $this.showHideSpinner($this.currentActionItem, false);
-          Toast.show($this, "Ooops! Got some error!");
-        }
-      }
-
-      this.closeDialog();
-    },
-    showHideSpinner(event, show = true) {
-      let css = this.spinnerCss;
-      if (event) {
-        let current =
-          event instanceof HTMLAnchorElement ? event : event.currentTarget;
-        this.removeAllSpinners(); //remove old one
-        if (show === true) {
-          current.firstElementChild.classList.add(...css);
-        }
-      } else {
-        //remove all spinner
-        this.removeAllSpinners();
-      }
-    },
-    removeAllSpinners() {
-      let css = this.spinnerCss;
-      let allSpinners = document.querySelectorAll(".fa-spinner");
-      if (allSpinners.length > 0) {
-        allSpinners.forEach(function (current) {
-          current.classList.remove(...css);
-        });
-      }
-    },
-    closeDialog() {
-      this.$refs.deleteBox.close();
-      //this.currentActionItem = null;
-    },
-    doAjax(methodType = "get", url, success, fail) {
-      let $this = this;
-      return axios[methodType](url)
-        .then(function (res) {
-          if (success) {
-            success.apply(this, arguments);
-            //success(res);
-          }
-        })
-        .catch(function (res) {
-          if (fail) {
-            //fail(res);
-            fail.apply(fail, arguments);
-          } else {
-            //show default message
-            Toast.show($this, res.message, 5000);
-          }
-
-          $this.showHideSpinner($this.currentActionItem, false);
-        });
-    },
-    initAjaxAction(event) {
-      //@todo: action needs to handle in separate module
-      event.preventDefault();
-      event.stopPropagation();
-
-      let $this = this;
-      let current = event.currentTarget;
-
-      //console.log("current ",current);
-      let dataset = current.dataset;
-      let action = dataset.action;
-      let status = dataset["value"];
-      let href = current.getAttribute("href");
-      if (status) {
-        href = href + "/" + status;
-      }
-
-      this.currentActionItem = current;
-
-      switch (action) {
-        //handle special case
-        case "delete":
-          this.alertMessage.current = this.alertMessage.delete;
-          this.isDelete = true;
-          //prevent delete box is true then don't show delete box popup
-          if (this.preventDeleteBox === false) {
-            this.openDeleteAlert(current);
-          } else {
-            this.deleteNow(1);
-          }
-          //this.openPermissionAlert();
-          break;
-        case "showinfo":
-          let whatinfo = dataset.info;
-          let editable = dataset.editable;
-          let rowid = dataset.rowid;
-          let excludeFields = dataset.excludefields || [];
-          this.showInfo(whatinfo, rowid, excludeFields, editable);
-          break;
-
-        default:
-          this.doAjax(
-            "get",
-            href,
-            function (res) {
-              $this.showHideSpinner(current, false);
-
-              let actionFieldProp = $this.isMakeFieldAsLink(action);
-
-              //remove old class
-              let icon = current.getElementsByClassName("js_icon");
-              let icon_css = actionFieldProp["css_" + status];
-              if (icon.length > 0) {
-                icon = icon[0];
-                icon.classList.remove(...icon_css.split(" "));
-              }
-              //set new value
-              current.setAttribute("data-value", res.data.status);
-              //css handling
-              icon_css = actionFieldProp["css_" + res.data.status];
-              icon.classList.add(...icon_css.split(" "));
-            },
-            function (res) {
-              $this.showHideSpinner(current, false);
-              Toast.show(
-                $this,
-                res?.response?.data?.message || "Unknown Error!",
-                3000,
-              );
-            },
-          );
-          break;
-      }
-    },
-    bindAction() {
-      let allElement = this.$el.getElementsByClassName("js_action");
-
-      //console.log(allElement);
-
-      for (let i = 0; i < allElement.length; i++) {
-        let current = allElement[i];
-        if (current.classList.contains("js_ajax")) {
-          current.addEventListener("click", this.initAjaxAction, false);
-        }
-        if (current.classList.contains("js_action")) {
-          current.addEventListener("click", this.showHideSpinner, false);
-        }
-      }
-
-      //handle edit
-      if (this.editHandledByOtherComponent === true) {
-        let editElements = this.$el.querySelectorAll("a[data-action='edit']");
-        editElements.forEach(function (current, index) {
-          current.addEventListener("click", function (event) {
-            event.preventDefault();
-            EventBus.emit("list-view-pre-edit", this);
-          });
-        });
-      }
-    },
-    openDeleteAlert(current) {
-      this.$refs.deleteBox.open(current);
-    },
-    openPermissionAlert() {
-      this.alertMessage.current = this.alertMessage.permission;
-      this.isDelete = false;
-      this.currentActionItem = null;
-      this.$refs.deleteBox.open();
-    },
-    filterFieldsName(value) {
-      value = value.replace(/\.|_/g, " ");
-      return value.charAt(0).toUpperCase() + value.slice(1);
-    },
-    filterSnakeCase(value) {
-      return value.replace(/\s|\./g, "_").toLowerCase();
-    },
-    getCssForRow: function (fields, index) {
-      if (fields.length - 1 === index) {
-        return "active";
-      }
-      return "";
-    },
-    showInfo(type, id, excludeFields, editable) {
-      this.$refs.infoPopup.showInfo(type, id, excludeFields, editable);
-    },
-  },
+// Helpers
+const getDefaultValue = (key, dv) => {
+  return window.Laravel?.htcmsAdminConfig(key) || dv;
 };
+
+// State
+const actionFields = ref(SafeJsonParse(props.dataActionFields, []));
+const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+const moreActions = ref(SafeJsonParse(props.dataMoreActionFields, []));
+const actionAjax = ref(SafeJsonParse(props.dataActionAsAjax, getDefaultValue("action_as_ajax", [])));
+const actionIconCss = ref(SafeJsonParse(props.dataActionCss, getDefaultValue("action_icon_css", {})));
+const alertMessage = reactive({
+  current: "Are you sure to delete this?",
+  delete: "Are you sure to delete this?",
+  permission: "Sorry! You don't have permission to delete this.",
+});
+const isDelete = ref(true);
+const currentActionItem = ref(null);
+const preventDeleteBox = ref(false);
+const makeFieldAsLink = ref(SafeJsonParse(props.dataMakeFieldAsLink, []));
+const fieldAsLinkCache = reactive({});
+const showDeletePopup = ref(
+  props.dataShowDeletePopup ? props.dataShowDeletePopup.toString().toUpperCase() : "FALSE"
+);
+const editHandledByOtherComponent = ref(
+  props.dataEditHandledByOtherComponent === true ||
+    props.dataEditHandledByOtherComponent?.toString() === "true"
+);
+const minResultsNeeded = ref(
+  props.dataMinResultsNeeded === "" || props.dataMinResultsNeeded === undefined
+    ? -1
+    : parseInt(props.dataMinResultsNeeded)
+);
+const layoutType = ref(props.dataLayoutType || "table");
+const noResultsFoundText = ref(props.dataNoResultsFoundText);
+const spinnerCss = ["fa-spinner", "fa-pulse", "fa-fw"];
+
+// Computed
+const headings = computed(() => {
+  const heading = SafeJsonParse(props.dataHeaders, []);
+  const allHeadings = [];
+  if (heading.length > 0) {
+    heading.forEach((current) => {
+      const label = current.label || current;
+      const key = current.key || current;
+      const isImage = !!(current.isImage && current.isImage.toString() === "true");
+      const showAllScopes = !!(current.showAllScopes && current.showAllScopes.toString() === "true");
+      allHeadings.push({ label, key, isImage, showAllScopes });
+    });
+  }
+  return allHeadings;
+});
+
+const rows = ref(SafeJsonParse(props.dataList, []));
+watch(() => props.dataList, (newVal) => {
+  rows.value = SafeJsonParse(newVal, []);
+});
+
+// Methods
+const sanitizeHTML = (html) => {
+  if (!html || typeof html !== "string") return html;
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    const dangerousTags = ["script", "iframe", "object", "embed", "base"];
+    dangerousTags.forEach((tag) => {
+      doc.querySelectorAll(tag).forEach((el) => el.remove());
+    });
+    const allElements = doc.querySelectorAll("*");
+    allElements.forEach((el) => {
+      for (let i = el.attributes.length - 1; i >= 0; i--) {
+        const attr = el.attributes[i].name.toLowerCase();
+        if (attr.startsWith("on") || attr === "javascript:") {
+          el.removeAttribute(attr);
+        }
+      }
+    });
+    return doc.body.innerHTML;
+  } catch (e) {
+    console.error("Sanitization failed", e);
+    return html;
+  }
+};
+
+const isActionFieldKey = (key) => {
+  const k = (key === undefined ? "" : key).toLowerCase();
+  return k === "action" || k === "moreactions";
+};
+
+const isMakeFieldAsLink = (key) => {
+  if (fieldAsLinkCache[key] !== undefined) {
+    return fieldAsLinkCache[key];
+  }
+  const found = makeFieldAsLink.value.find((current) => current.key === key || current.action === key);
+  fieldAsLinkCache[key] = found === undefined ? -1 : found;
+  return fieldAsLinkCache[key];
+};
+
+const getFieldName = (key, prop = "label") => {
+  return typeof key === "string" ? key : key[prop] === undefined ? key : key[prop];
+};
+
+const can = (rights) => userRights.value.indexOf(rights) >= 0;
+const isAjax = (action) => actionAjax.value.indexOf(action) >= 0;
+
+const getAjaxCss = (action) => {
+  let css = "";
+  const action_css = Object.prototype.toString.call(action) === "[object Object]" ? action.action : action;
+  if (isAjax(action)) {
+    css = "js_action js_ajax js_" + action_css;
+  } else {
+    css = "js_action js_" + action_css;
+  }
+  return css;
+};
+
+const getIconCSS = (key) => {
+  const icons = getDefaultValue("action_icon_css", {});
+  return icons[key] || "";
+};
+
+const removeAllSpinners = () => {
+  const css = spinnerCss;
+  const allSpinners = document.querySelectorAll(".fa-spinner");
+  if (allSpinners.length > 0) {
+    allSpinners.forEach((current) => {
+      current.classList.remove(...css);
+    });
+  }
+};
+
+const showHideSpinner = (event, show = true) => {
+  if (event) {
+    let current = event instanceof HTMLAnchorElement ? event : event.currentTarget;
+    removeAllSpinners();
+    if (show === true) {
+      if (current && current.firstElementChild) {
+        current.firstElementChild.classList.add(...spinnerCss);
+      }
+    }
+  } else {
+    removeAllSpinners();
+  }
+};
+
+const getFieldValue = (row, key, fields) => {
+  if (key.includes(".")) {
+    const extract = key.split(".");
+    let scopeKey = extract[0];
+    const fieldName = extract[1];
+    let scope = row[scopeKey];
+
+    switch (Object.prototype.toString.call(scope)) {
+      case "[object Undefined]":
+        scope = "";
+        break;
+      case "[object Array]":
+        if (scope.length > 0) {
+          if (fields.showAllScopes) {
+            const values = scope.map((s) => s[fieldName]);
+            scope = values.join(",");
+          } else {
+            scope = scope[0][fieldName];
+          }
+        } else {
+          scope = "";
+        }
+        break;
+      case "[object Object]":
+        scope = scope[fieldName] || "";
+        break;
+    }
+    return scope;
+  }
+
+  // Actual value logic
+  let value = "";
+  const actionAlias = isMakeFieldAsLink(key);
+  if (actionAlias !== undefined && actionAlias !== -1) {
+    const actionName = actionAlias.action || key;
+    const title = actionName.charAt(0).toUpperCase() + actionName.slice(1);
+    const path = AdminConfig.admin_path(`${props.dataControllerName}/${actionName}/${row.id}`);
+    let iconOrValue = row[key];
+    let isAjaxCss = "";
+    let status = "";
+
+    if (isAjax(key)) {
+      isAjaxCss = getAjaxCss(key);
+      isAjaxCss += ` ${key}_${row[key]}`;
+      const icon_css = actionAlias[`css_${row[key]}`] || "";
+      iconOrValue = `<i class="js_icon ${icon_css}"></i>`;
+      if (!can(actionName)) {
+        isAjaxCss += " disabled";
+      }
+      status = row[key];
+    }
+    value = `<a class="${isAjaxCss}" data-value="${status}" data-rowid="${row.id}" data-action="${actionName}" title="${title}" href="${path}">${iconOrValue}</a>`;
+    if (key === "id" && actionFields.value.indexOf("edit") === -1) {
+      value = iconOrValue;
+    }
+  } else {
+    value = row[key];
+    const media_path = AdminConfig.get("media_path");
+    if (fields.isImage && value !== "" && value != null) {
+      const imgs = ["apng", "avif", "gif", "jpg", "jpeg", "jfif", "pjpeg", "pjp", "png", "svg", "webp", "bmp", "ico", "cur", "tif", "tiff"];
+      const vids = ["mp4", "mov", "ogg"];
+      const ext = value.substring(value.lastIndexOf(".") + 1).toLowerCase();
+      if (vids.indexOf(ext) >= 0) {
+        value = `<a class="table-links" href="${media_path}/${value}" target="_blank"><video height="30"><source src="${media_path}/${value}"></video></a>`;
+      } else if (imgs.indexOf(ext) >= 0) {
+        value = `<a class="table-links" href="${media_path}/${value}" target="_blank"><img height="30" src='${media_path}/${value}' /></a>`;
+      } else {
+        value = `<a class="table-links" href="${media_path}/${value}" target="_blank">${value}</a>`;
+      }
+    }
+  }
+  return value;
+};
+
+const getActionValue = (row) => {
+  const html = [];
+  if (actionFields.value.length > 0) {
+    actionFields.value.forEach((current) => {
+      let path = "";
+      if (current === "edit") {
+        path = AdminConfig.admin_path(`${props.dataControllerName}/${current}/${row.id}`);
+      } else if (current === "delete") {
+        if (minResultsNeeded.value !== -1 && minResultsNeeded.value >= rows.value.length) {
+          console.info(`Hiding delete button, because ${minResultsNeeded.value} record(s) needed.`);
+        } else {
+          path = AdminConfig.admin_path(`${props.dataControllerName}/destroy/${row.id}`);
+        }
+      } else {
+        path = AdminConfig.admin_path(`${props.dataControllerName}/${current}/${row.id}`);
+      }
+
+      if (path !== "") {
+        const isAjaxCss = getAjaxCss(current);
+        const title = current.charAt(0).toUpperCase() + current.slice(1);
+        const icon = `<i class="js_icon ${getIconCSS(current)}"></i>`;
+        html.push(`<a class="${isAjaxCss}" data-rowid="${row.id}" data-action="${current}" title="${title}" href="${path}">${icon}</a>`);
+      }
+    });
+  }
+
+  if (moreActions.value.length > 0) {
+    moreActions.value.forEach((current) => {
+      const isAjaxCss = getAjaxCss(current);
+      const css = current.css || "";
+      let attributes = "";
+      if (current.hrefAttributes) {
+        for (const attr in current.hrefAttributes) {
+          if (Object.prototype.hasOwnProperty.call(current.hrefAttributes, attr)) {
+            attributes += `${attr}='${current.hrefAttributes[attr]}' `;
+          }
+        }
+      }
+      const action = current.action;
+      const value = row[current.action_append_field] || "";
+      const title = current.label.charAt(0).toUpperCase() + current.label.slice(1);
+      const path = AdminConfig.admin_path(`${props.dataControllerName}/${action}/${value}`);
+      const icon = `<i class="js_icon ${current.icon_css}"></i>`;
+      html.push(`<a class="${isAjaxCss} ${css}" data-rowid="${row.id}" title="${title}" href="${path}" data-action="${action}" ${attributes}>${icon}</a>`);
+    });
+  }
+  return html.join("&nbsp;");
+};
+
+const doAjax = (methodType = "get", url, success, fail) => {
+  return axios[methodType](url)
+    .then((res) => {
+      if (success) success(res);
+    })
+    .catch((err) => {
+      if (fail) {
+        fail(err);
+      } else {
+        Toast.show(instance, err.message, 5000);
+      }
+      showHideSpinner(currentActionItem.value, false);
+    });
+};
+
+const closeDialog = () => {
+  if (deleteBox.value) deleteBox.value.close();
+};
+
+const openDeleteAlert = (current) => {
+  if (deleteBox.value) deleteBox.value.open(current);
+};
+
+const deleteNow = (isOk = 1) => {
+  let rowid = -1;
+  try {
+    if (isOk === 1) {
+      const target = currentActionItem.value;
+      if (can("delete")) {
+        rowid = "row_" + target.getAttribute("data-rowid");
+        const href = target.getAttribute("href");
+        doAjax("delete", href, (res) => {
+          if (res.status === 200) {
+            const index = rows.value.findIndex((r) => r.id.toString() === res.data.id.toString());
+            if (index >= 0) {
+              Toast.show(instance, "Record has been deleted", 2000);
+              rows.value.splice(index, 1);
+              // Note: rows is a ref initialized from props.dataList.
+              // If dataList is updated, TabularView re-renders via watch.
+              EventBus.emit("pagination-on-delete");
+              nextTick(() => bindAction());
+            }
+          } else {
+            showHideSpinner(currentActionItem.value, false);
+            Toast.show(instance, "Ooops! Got some error!");
+          }
+        });
+      } else {
+        Toast.show(instance, "Sorry! You don't have permission to delete.");
+        setTimeout(() => showHideSpinner(currentActionItem.value, false), 1000);
+      }
+    } else {
+      showHideSpinner(currentActionItem.value, false);
+    }
+  } catch (e) {
+    showHideSpinner(currentActionItem.value, false);
+    Toast.show(instance, "I don't understand what you are trying to do.", 5000);
+  }
+  closeDialog();
+};
+
+const showInfo = (type, id, excludeFields, editable) => {
+  if (infoPopup.value) infoPopup.value.showInfo(type, id, excludeFields, editable);
+};
+
+const initAjaxAction = (event) => {
+  event.preventDefault();
+  event.stopPropagation();
+  const current = event.currentTarget;
+  const dataset = current.dataset;
+  const action = dataset.action;
+  const status = dataset.value;
+  let href = current.getAttribute("href");
+  if (status) href = `${href}/${status}`;
+
+  currentActionItem.value = current;
+
+  switch (action) {
+    case "delete":
+      alertMessage.current = alertMessage.delete;
+      isDelete.value = true;
+      if (preventDeleteBox.value === false) {
+        openDeleteAlert(current);
+      } else {
+        deleteNow(1);
+      }
+      break;
+    case "showinfo":
+      showInfo(dataset.info, dataset.rowid, dataset.excludefields || [], dataset.editable);
+      break;
+    default:
+      doAjax("get", href, (res) => {
+        showHideSpinner(current, false);
+        const actionFieldProp = isMakeFieldAsLink(action);
+        const icon = current.querySelector(".js_icon");
+        if (icon) {
+          const oldIconCss = actionFieldProp[`css_${status}`];
+          if (oldIconCss) icon.classList.remove(...oldIconCss.split(" "));
+          const newStatus = res.data.status;
+          current.setAttribute("data-value", newStatus);
+          const newIconCss = actionFieldProp[`css_${newStatus}`];
+          if (newIconCss) icon.classList.add(...newIconCss.split(" "));
+        }
+      }, (err) => {
+        showHideSpinner(current, false);
+        Toast.show(instance, err?.response?.data?.message || "Unknown Error!", 3000);
+      });
+      break;
+  }
+};
+
+const bindAction = () => {
+  if (!root.value) return;
+  const allElement = root.value.getElementsByClassName("js_action");
+  for (let i = 0; i < allElement.length; i++) {
+    const current = allElement[i];
+    if (current.classList.contains("js_ajax")) {
+      current.addEventListener("click", initAjaxAction, false);
+    }
+    if (current.classList.contains("js_action")) {
+      current.addEventListener("click", showHideSpinner, false);
+    }
+  }
+
+  if (editHandledByOtherComponent.value === true) {
+    const editElements = root.value.querySelectorAll("a[data-action='edit']");
+    editElements.forEach((current) => {
+      current.addEventListener("click", (event) => {
+        event.preventDefault();
+        EventBus.emit("list-view-pre-edit", current);
+      });
+    });
+  }
+};
+
+const highlight = () => {
+  const id = QueryBuilder.get("id");
+  if (id !== "") {
+    const rowId = `row_${id}`;
+    Fx.scrollWinTo(`#${rowId}`, () => {
+      Fx.highlight(rowId);
+    });
+  }
+};
+
+const isZeroResult = () => rows.value.length === 0;
+const filterFieldsName = (value) => {
+  const v = value.replace(/\.|_/g, " ");
+  return v.charAt(0).toUpperCase() + v.slice(1);
+};
+const filterSnakeCase = (value) => value.replace(/\s|\./g, "_").toLowerCase();
+const getCssForRow = (fields, index) => (headings.value.length - 1 === index ? "active" : "");
+
+const initialSetup = () => {
+  highlight();
+  bindAction();
+  if (showDeletePopup.value === "FALSE") {
+    preventDeleteBox.value = true;
+  }
+};
+
+// Lifecycle
+onMounted(() => {
+  initialSetup();
+  EventBus.on("list-view-hide-spinner", () => showHideSpinner(undefined, false));
+  EventBus.on("info-popup-open", () => removeAllSpinners());
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("list-view-hide-spinner");
+  EventBus.off("info-popup-open");
+});
 </script>
+

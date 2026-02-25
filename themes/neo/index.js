@@ -24,8 +24,8 @@ import PlatformButton from "./components/platform-button.vue";
 import SearchBar from "./components/search-bar.vue";
 import SiteButton from "./components/site-button.vue";
 import SiteCloner from "./components/site-cloner.vue";
-import SitewiseCopier from "./components/sitewise-copier.vue";
-import SitewiseData from "./components/sitewise-data.vue";
+import SiteWiseCopier from "./components/sitewise-copier.vue";
+import SiteWiseData from "./components/sitewise-data.vue";
 import Sorter from "./components/sorter.vue";
 import TabularView from "./components/tabular-view.vue";
 import TabView from "./components/tab-view.vue";
@@ -67,8 +67,8 @@ export {
     SearchBar,
     SiteButton,
     SiteCloner,
-    SitewiseCopier,
-    SitewiseData,
+    SiteWiseCopier,
+    SiteWiseData,
     Sorter,
     TabularView,
     TabView,
@@ -92,8 +92,9 @@ import { EditorHelper, PageManager } from "../../helpers/editor";
 import { ErrorMessage } from "../../helpers/error-message-handler";
 import MapAPI from "../../helpers/map";
 import Form from "../../helpers/form";
+import TabularViewActions from "../../helpers/tabular-view-actions";
 
-export { AdminConfig, Dashboard, EditorHelper, PageManager, ErrorMessage, MapAPI, Form };
+export { AdminConfig, Dashboard, EditorHelper, PageManager, ErrorMessage, MapAPI, Form, TabularViewActions };
 export * from "../../helpers/common";
 
 const HashtagCmsAdminUI = {
@@ -122,8 +123,8 @@ const HashtagCmsAdminUI = {
     SearchBar,
     SiteButton,
     SiteCloner,
-    SitewiseCopier,
-    SitewiseData,
+    SiteWiseCopier,
+    SiteWiseData,
     Sorter,
     TabularView,
     TabView,
@@ -144,7 +145,8 @@ const HashtagCmsAdminUI = {
     PageManager,
     ErrorMessage,
     MapAPI,
-    Form
+    Form,
+    TabularViewActions
 };
 
 // Global exposure

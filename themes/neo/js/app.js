@@ -12,13 +12,14 @@ if (token) {
 window.axios = axios;
 
 
-// Helpers - Imported from @hashtagcms/admin-sdk (Pure Logic)
-import { AdminConfig, Storage, Fetcher } from '@hashtagcms/admin-sdk';
+// Helpers - Imported from local helpers (which bridge the SDK)
+import { AdminConfig } from '../../../helpers/admin-config';
+import { Storage, Fetcher } from '../../../helpers/common';
 // Helpers - Imported from @hashtagcms/admin-ui-kit (UI Bound)
-import { Toast } from '@hashtagcms/admin-ui-kit';
+import { Toast } from '../../../helpers';
 
 window.AdminConfig = new AdminConfig();
-window.ToastGloabl = Toast;
+window.ToastGlobal = Toast;
 window.log = console.log;
 window.Store = new Storage();
 window.Fetcher = new Fetcher();
@@ -33,16 +34,14 @@ import {
     Pagination,
     ModulePermission, ModuleCreator, FrontendModuleCreator,
     MenuSorter,
-    SitewiseData, SitewiseCopier, SiteCloner,
+    SiteWiseData, SiteWiseCopier, SiteCloner,
     LanguageCopier,
     CategoryPlatform, CategorySettings,
     ImageGallery
-} from '@hashtagcms/admin-ui-kit';
+} from '..';
 
 // Alias resolving if components had different names in import
 const PaginationView = Pagination;
-const SiteWiseData = SitewiseData;
-const SiteWiseCopier = SitewiseCopier;
 
 const app = createApp({
     components: {

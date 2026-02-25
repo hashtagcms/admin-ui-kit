@@ -45,52 +45,39 @@
   </nav>
 </template>
 
-<script>
+<script setup>
+import { computed, ref } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import GlobalSiteButton from "./global-site-button.vue";
-export default {
-  components: {
-    "global-site-button": GlobalSiteButton,
-  },
-  mounted() {
-    //console.log('dataCurrentSite '+this.dataCurrentSite);
-  },
-  props: [
-    "dataUsername",
-    "dataSiteName",
-    "dataCurrentSite",
-    "dataSupportedSites",
-    "dataIsAdmin",
-    "dataSiteCombo",
-    "dataLogo",
-    "dataLogoHeight",
-  ],
-  computed: {
-    logo() {
-      return typeof this.dataLogo !== "undefined" && this.dataLogo !== ""
-        ? this.dataLogo
-        : AdminConfig.admin_asset("img/logo-transparent.png");
-    },
-  },
-  data() {
-    return {
-      siteName: this.dataSiteName || "hashtagcms.org",
-      userName: this.dataUsername,
-      isLoggedIn: !!(this.dataUsername && this.dataUsername !== ""),
-      siteCombo: !(
-        typeof this.dataSiteCombo == "undefined" ||
-        this.dataSiteCombo === "false"
-      ),
-      logoHeight:
-        typeof this.dataLogoHeight === "undefined" || this.dataLogoHeight === ""
-          ? 50
-          : this.dataLogoHeight,
-    };
-  },
-  methods: {
-    logout(event) {
-      document.getElementById("logout-form").submit();
-    },
-  },
+
+const props = defineProps([
+  "dataUsername",
+  "dataSiteName",
+  "dataCurrentSite",
+  "dataSupportedSites",
+  "dataIsAdmin",
+  "dataSiteCombo",
+  "dataLogo",
+  "dataLogoHeight",
+]);
+
+// State
+const siteName = ref(props.dataSiteName || "hashtagcms.org");
+const userName = ref(props.dataUsername);
+const isLoggedIn = ref(!!(props.dataUsername && props.dataUsername !== ""));
+const siteCombo = ref(!(typeof props.dataSiteCombo === "undefined" || props.dataSiteCombo === "false"));
+const logoHeight = ref(typeof props.dataLogoHeight === "undefined" || props.dataLogoHeight === "" ? 50 : props.dataLogoHeight);
+
+// Computed
+const logo = computed(() => {
+  return typeof props.dataLogo !== "undefined" && props.dataLogo !== ""
+    ? props.dataLogo
+    : AdminConfig.admin_asset("img/logo-transparent.png");
+});
+
+// Methods
+const logout = () => {
+  document.getElementById("logout-form").submit();
 };
 </script>
+

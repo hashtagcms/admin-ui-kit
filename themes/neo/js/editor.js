@@ -1,3 +1,3 @@
-import { EditorHelper, PageManager } from '@hashtagcms/admin-ui-kit';
+import { EditorHelper, PageManager } from '../../../helpers';
 window.EditorHelper = EditorHelper;
 window.PageManager = PageManager;

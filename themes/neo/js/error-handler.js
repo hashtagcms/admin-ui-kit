@@ -1,2 +1,2 @@
-import { ErrorMessage } from '@hashtagcms/admin-ui-kit';
+import { ErrorMessage } from '../../../helpers';
 new ErrorMessage();

@@ -68,86 +68,67 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
+import { SafeJsonParse } from "../../../helpers/common";
 
-import { Toast, SafeJsonParse } from "../../../helpers/common";
+const props = defineProps(["dataAllSites"]);
 
-export default {
-  mounted() {
-    //console.log(this.allData);
-    //  console.log(this.allData.data[0]);
-    //console.log(this.cuurent);
-    // this.initData();
-  },
-  created() {
-    //this.initData();
-  },
+// State
+const allSites = ref(SafeJsonParse(props.dataAllSites, []));
+const sourceSiteId = ref("");
+const targetSiteId = ref("");
+const isLoading = ref(0); // 0: no, 1: loading, 2+: finished
+const errorMsg = ref("");
+const successMsg = ref([]);
 
-  props: ["dataAllSites"],
-  data() {
-    return {
-      allSites: SafeJsonParse(this.dataAllSites, []),
-      sourceSiteId: "",
-      targetSiteId: "",
-      isLoading: false,
-      errorMsg: "",
-      successMsg: [],
-    };
-  },
-  computed: {
-    errorMessage() {
-      return this.errorMsg === ""
-        ? "It's undoable. Please be careful."
-        : this.errorMsg;
-    },
-  },
-  methods: {
-    getLabel(data) {
-      var label = "";
-      if (data.name || data.alias) {
-        label = data.name || data.alias;
-      } else if (data.lang) {
-        label = typeof data.lang.name == "undefined" ? "" : data.lang.name;
-      }
-      return label;
-    },
-    loading(isLoading) {
-      this.isLoading = isLoading;
-    },
-    cloneSite() {
-      console.log("copying now...");
-      //console.log(allData, seletedData, ids);
-      //get all from
-      this.loading(1);
-      let $this = this;
-      let postData = {
-        sourceSiteId: this.sourceSiteId,
-        tagetSiteId: this.targetSiteId,
-      };
+// Computed
+const errorMessage = computed(() => {
+  return errorMsg.value === "" ? "It's undoable. Please be careful." : errorMsg.value;
+});
 
-      let url = AdminConfig.admin_path("site/cloneSite");
-      axios
-        .post(url, postData)
-        .then((response) => {
-          console.log(response);
-          feedback(response);
-          this.loading(2);
-        })
-        .catch((error) => {
-          console.log("Error: ", error.response);
-          $this.errorMsg = error.response ? error.response.data.message : error.message;
-          this.loading(0);
-        });
+// Methods
+const getLabel = (data) => {
+  let label = "";
+  if (data.name || data.alias) {
+    label = data.name || data.alias;
+  } else if (data.lang) {
+    label = typeof data.lang.name === "undefined" ? "" : data.lang.name;
+  }
+  return label;
+};
 
-      function feedback(response) {
-        let data = response.data;
-        $this.successMsg = data;
-      }
-    },
-    doAction() {
-      this.cloneSite();
-    },
-  },
+const loading = (val) => {
+  isLoading.value = val;
+};
+
+const cloneSite = () => {
+  console.log("copying now...");
+  loading(1);
+  
+  const postData = {
+    sourceSiteId: sourceSiteId.value,
+    tagetSiteId: targetSiteId.value,
+  };
+
+  const url = AdminConfig.admin_path("site/cloneSite");
+  axios
+    .post(url, postData)
+    .then((response) => {
+      console.log(response);
+      successMsg.value = response.data;
+      loading(2);
+    })
+    .catch((error) => {
+      console.log("Error: ", error.response);
+      errorMsg.value = error.response ? error.response.data.message : error.message;
+      loading(0);
+    });
+};
+
+const doAction = () => {
+  cloneSite();
 };
 </script>
+

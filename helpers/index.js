@@ -8,3 +8,4 @@ export * from './form';
 export * from './fx';
 export * from './humanize';
 export * from './map';
+export { default as TabularViewActions } from './tabular-view-actions';

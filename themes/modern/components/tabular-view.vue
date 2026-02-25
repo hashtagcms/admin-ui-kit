@@ -10,7 +10,7 @@
           class="group"
         >
           <hc-card
-            shadow="lg"
+            shadow="md"
             rounded="lg"
             body-class="p-0"
             p="p-0"
@@ -31,12 +31,12 @@
                 <td :class="['px-5 py-2.5 font-bold text-gray-700', isActionFieldKey(getFieldName(fields, 'key')) ? 'bg-gray-50/50 border-t border-gray-100' : '']">
                   <span
                     v-if="!isActionFieldKey(getFieldName(fields, 'key'))"
-                    v-html="getFieldValue(row, getFieldName(fields, 'key'), fields)"
+                    v-html="sanitizeHTML(getFieldValue(row, getFieldName(fields, 'key'), fields))"
                   ></span>
                   <div
                     v-else
                     class="flex flex-wrap gap-2 actions"
-                    v-html="getActionValue(row)"
+                    v-html="sanitizeHTML(getActionValue(row))"
                   ></div>
                 </td>
               </tr>
@@ -49,7 +49,7 @@
       <div v-if="layoutType === 'table'" class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
-            <thead class="bg-gray-50/50 border-b border-gray-100">
+            <thead class="bg-gray-100/50 border-b border-gray-100">
               <tr>
                 <th
                   v-for="fields in headings"
@@ -73,12 +73,12 @@
                   <div
                     v-if="isActionFieldKey(getFieldName(fields, 'key'))"
                     class="flex items-center gap-2 actions min-w-[120px]"
-                    v-html="getActionValue(row)"
+                    v-html="sanitizeHTML(getActionValue(row))"
                   ></div>
                   <span
                     v-else
                     class="block group-hover:text-blue-900 transition-colors"
-                    v-html="getFieldValue(row, getFieldName(fields, 'key'), fields)"
+                    v-html="sanitizeHTML(getFieldValue(row, getFieldName(fields, 'key'), fields))"
                   ></span>
                 </td>
               </tr>
@@ -154,16 +154,17 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, getCurrentInstance } from 'vue';
+import { ref, reactive, computed, onMounted, getCurrentInstance, watch } from 'vue';
 import AdminConfig from "../../../helpers/admin-config";
 import axios from "axios";
-import { Toast, QueryBuilder, SafeJsonParse } from "../../../helpers/common";
+import { Toast, QueryBuilder, SafeJsonParse, ACTION_MAP } from "../../../helpers/common";
 import { Fx } from "../../../helpers/fx";
 import { EventBus } from "../../../helpers/event-bus";
 import ModalBox from "./library/modal-box.vue";
 import InfoPopup from "./info-popup.vue";
 import HcCard from "../ui-kit/HcCard.vue";
 import HcAlert from "../ui-kit/HcAlert.vue";
+import TabularViewActions from "../../../helpers/tabular-view-actions";
 
 const props = defineProps([
   "dataHeaders",
@@ -181,6 +182,8 @@ const props = defineProps([
   "dataLayoutType",
   "dataNoResultsFoundText",
 ]);
+
+const emit = defineEmits(["onAction"]);
 
 const { proxy } = getCurrentInstance();
 
@@ -221,21 +224,71 @@ const deleteBox = ref(null);
 const infoPopup = ref(null);
 
 /** Computed **/
+const hasAnyVisibleActions = computed(() => visibleActions.value.length > 0);
+
 const headings = computed(() => {
   const headingData = SafeJsonParse(props.dataHeaders, []);
-  return headingData.map(current => ({
-    label: current.label || current,
-    key: current.key || current,
-    isImage: current.isImage?.toString() === "true",
-    showAllScopes: current.showAllScopes?.toString() === "true",
-  }));
+  return headingData
+    .filter(current => {
+      const key = current.key || current;
+      if (isActionFieldKey(key)) {
+        return hasAnyVisibleActions.value;
+      }
+      return true;
+    })
+    .map(current => ({
+      label: current.label || current,
+      key: current.key || current,
+      isImage: current.isImage?.toString() === "true",
+      showAllScopes: current.showAllScopes?.toString() === "true",
+    }));
 });
 
-const rows = computed(() => {
-  return SafeJsonParse(props.dataList, []);
+const rows = ref(SafeJsonParse(props.dataList, []));
+watch(() => props.dataList, (newVal) => {
+  rows.value = SafeJsonParse(newVal, []);
 });
+
+const findRowById = (id) => {
+    return rows.value.find(r => r.id.toString() === id.toString());
+};
 
 /** Methods **/
+
+/**
+ * Sanitizes HTML strings to prevent XSS while allowing safe tags/attributes.
+ * @param {string} html - The raw HTML string.
+ * @returns {string} The sanitized HTML string.
+ */
+const sanitizeHTML = (html) => {
+  if (!html || typeof html !== "string") return html;
+  try {
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(html, "text/html");
+    
+    // Remove scripts and potentially dangerous elements
+    const dangerousTags = ["script", "iframe", "object", "embed", "base"];
+    dangerousTags.forEach(tag => {
+      doc.querySelectorAll(tag).forEach(el => el.remove());
+    });
+
+    // Strip event handlers (onmouseover, onclick, etc.)
+    const allElements = doc.querySelectorAll("*");
+    allElements.forEach(el => {
+      for (let i = el.attributes.length - 1; i >= 0; i--) {
+        const attr = el.attributes[i].name.toLowerCase();
+        if (attr.startsWith("on") || attr === "javascript:") {
+          el.removeAttribute(attr);
+        }
+      }
+    });
+    
+    return doc.body.innerHTML;
+  } catch (e) {
+    console.error("Sanitization failed", e);
+    return html;
+  }
+};
 
 /**
  * =============================================================================
@@ -266,13 +319,68 @@ const isMakeFieldAsLink = (key) => {
   return fieldAsLinkCache[key];
 };
 
+
+
+/**
+ * Normalizes actions and maps them to permissions.
+ */
+const visibleActions = computed(() => {
+  const result = [];
+  
+  // 1. Process Standard Actions (dataActionFields)
+  actionFields.value.forEach(actionName => {
+    const requiredRight = ACTION_MAP[actionName] || actionName;
+    if (can(requiredRight)) {
+      result.push({
+        action: actionName,
+        label: filterFieldsName(actionName),
+        icon_css: getIconCSS(actionName),
+        isAjax: isAjax(actionName)
+      });
+    }
+  });
+
+  // 2. Process More Actions (dataMoreActionFields)
+  moreActions.value.forEach(item => {
+    const actionName = item.action;
+    const requiredRight = item.right || ACTION_MAP[actionName] || actionName;
+    
+    // User requested moreActionFields visibility. 
+    // If user has any right and it's not strictly 'read' for single right user, show it.
+    const isVisible = can(requiredRight) || (userRights.value.length === 1 && userRights.value[0] !== 'read') || userRights.value.length > 1;
+
+    if (isVisible) {
+      result.push({
+        ...item,
+        label: item.label || filterFieldsName(actionName),
+        icon_css: item.icon_css || getIconCSS(actionName) || "",
+        isAjax: item.isAjax || isAjax(actionName),
+        isCustom: item.isCustom || false
+      });
+    }
+  });
+
+  return result;
+});
+
+const hasAction = (actionName) => {
+  return visibleActions.value.some(a => a.action === actionName);
+};
+
+
 /**
  * Checks if the current user has specific rights/permissions.
  * @param {string} rights - The permission string to check.
  * @returns {boolean} True if the user has the permission.
  */
 const can = (rights) => {
-  return userRights.value.indexOf(rights) >= 0;
+    const r = userRights.value;
+    const isSpecialAction = ["add", "edit", "approve"].includes(rights);
+    // User requested: if user has only one right. should be able add/edit/approve.
+    if (r.length === 1 && r[0] !== 'read' && isSpecialAction) {
+        return true;
+    }
+  return r.indexOf(rights) >= 0;
 };
 
 /**
@@ -443,10 +551,23 @@ const renderActionLink = (row, forKey, actionAlias) => {
     
     if (!can(actionName)) {
       isAjaxCss += " opacity-30 cursor-not-allowed pointer-events-none";
+      // Alternatively, if the user strictly wants to HIDE it:
+      // return iconOrValue; 
     }
   }
 
-  if (forKey === "id" && actionFields.value.indexOf("edit") === -1) {
+  if (forKey === "id") {
+    if (hasAction("edit")) {
+      const editPath = AdminConfig.admin_path(`${props.dataControllerName}/edit/${row.id}`);
+      const extraCss = " text-blue-500 hover:text-blue-800 decoration-blue-200 decoration-2 transition-colors font-black";
+      return `<a class="js_action${extraCss}" data-rowid="${row.id}" data-action="edit" title="Edit" href="${editPath}">${iconOrValue}</a>`;
+    }
+    
+    if (can("read")) {
+      const extraCss = " text-blue-500 hover:text-blue-800 decoration-blue-200 decoration-2 transition-colors font-black cursor-pointer";
+      return `<a class="js_action js_ajax${extraCss}" data-info="${props.dataControllerName}" data-editable="false" data-value="${status}" data-rowid="${row.id}" data-action="showinfo" title="View Details" href="javascript:void(0)">${iconOrValue}</a>`;
+    }
+    
     return iconOrValue;
   }
 
@@ -500,66 +621,44 @@ const getFieldValue = (row, key, fields) => {
   return getActualValue(row, key, fields);
 };
 
-/**
- * Generates the HTML for the action column(s), including primary and "more" actions.
- * @param {object} row - The data row.
- * @returns {string} HTML string containing action buttons.
- */
 const getActionValue = (row) => {
   const html = [];
+  const baseBtnCss = "w-8 h-8 flex items-center justify-center rounded-lg transition-all hover:bg-gray-100 text-gray-400 hover:text-blue-600";
 
-  // Primary Actions (edit, delete, etc.)
-  actionFields.value.forEach(current => {
+  visibleActions.value.forEach(item => {
     let path = "";
-    const title = filterFieldsName(current);
-
-    if (current === "edit") {
-      path = AdminConfig.admin_path(`${props.dataControllerName}/${current}/${row.id}`);
-    } else if (current === "delete") {
+    const actionName = item.action;
+    
+    // Determine path
+    if (actionName === "delete") {
       if (minResultsNeeded.value === -1 || minResultsNeeded.value < rows.value.length) {
         path = AdminConfig.admin_path(`${props.dataControllerName}/destroy/${row.id}`);
       }
+    } else if (item.href) {
+       path = item.href;
     } else {
-      path = AdminConfig.admin_path(`${props.dataControllerName}/${current}/${row.id}`);
+      const appendVal = item.action_append_field ? row[item.action_append_field] : row.id;
+      path = AdminConfig.admin_path(`${props.dataControllerName}/${actionName}/${appendVal}`);
     }
 
     if (path) {
-      const isAjaxVal = getAjaxCss(current);
-      const baseBtnCss = "w-8 h-8 flex items-center justify-center rounded-lg transition-all hover:bg-gray-100 text-gray-400 hover:text-blue-600";
-      let icon_css = getIconCSS(current);
-      if (icon_css && !icon_css.includes("fa ")) icon_css = "fa " + icon_css;
+      const isAjaxVal = getAjaxCss(item, item.isAjax);
+      let iconCss = item.icon_css;
+      if (iconCss && !iconCss.includes("fa ")) iconCss = "fa " + iconCss;
       
-      const icon = `<i class="js_icon ${icon_css}"></i>`;
-      html.push(`<a class="${isAjaxVal} ${baseBtnCss}" data-rowid="${row.id}" data-action="${current}" title="${title}" href="${path}">${icon}</a>`);
+      let attributes = item.hrefAttributes ? Object.entries(item.hrefAttributes).map(([k, v]) => `${k}='${v}'`).join(" ") : "";
+      if (item.isCustom) {
+          attributes += ` data-custom="true"`;
+      }
+      const icon = `<i class="js_icon ${iconCss}"></i>`;
+      
+      html.push(`<a class="${isAjaxVal} ${baseBtnCss}" data-rowid="${row.id}" data-action="${actionName}" title="${item.label}" href="${path}" ${attributes}>${icon}</a>`);
     }
-  });
-
-  // More Actions
-  moreActions.value.forEach(current => {
-    const isAjaxVal = getAjaxCss(current);
-    const baseBtnCss = "w-8 h-8 flex items-center justify-center rounded-lg transition-all hover:bg-gray-100 text-gray-400 hover:text-blue-600";
-    const css = current.css || "";
-    let attributes = "";
-    if (current.hrefAttributes) {
-      Object.entries(current.hrefAttributes).forEach(([attr, val]) => {
-        attributes += `${attr}='${val}' `;
-      });
-    }
-    
-    const action = current.action;
-    const value = row[current.action_append_field] || "";
-    const title = filterFieldsName(current.label);
-    const path = AdminConfig.admin_path(`${props.dataControllerName}/${action}/${value}`);
-    
-    let icon_css = current.icon_css || "";
-    if (icon_css && !icon_css.includes("fa ")) icon_css = "fa " + icon_css;
-    const icon = `<i class="js_icon ${icon_css}"></i>`;
-    
-    html.push(`<a class="${isAjaxVal} ${baseBtnCss} ${css}" data-rowid="${row.id}" title="${title}" href="${path}" data-action="${action}" ${attributes}>${icon}</a>`);
   });
 
   return html.join("&nbsp;");
 };
+
 
 // =============================================================================
 // UI Feedback (Spinners)
@@ -592,37 +691,8 @@ const showHideSpinner = (event, show = true) => {
 };
 
 // =============================================================================
-// Ajax Handling
-// =============================================================================
-
-/**
- * Performs an AJAX request.
- * @param {string} method - HTTP method (get, post, delete, etc.).
- * @param {string} url - The URL to request.
- * @param {Function} success - Callback for success.
- * @param {Function} fail - Callback for failure.
- * @returns {Promise} The Axios promise.
- */
-const doAjax = (method, url, success, fail) => {
-  return axios[method](url)
-    .then(res => success && success(res))
-    .catch(err => {
-      if (fail) fail(err);
-      else Toast.show(proxy, err.message, 5000, "error");
-      showHideSpinner(currentActionItem.value, false);
-    });
-};
-
-// =============================================================================
 // Dialogs & Modals
 // =============================================================================
-
-/**
- * Closes the delete confirmation dialog.
- */
-const closeDialog = () => {
-  if (deleteBox.value) deleteBox.value.close();
-};
 
 /**
  * Opens the delete confirmation dialog for a specific item.
@@ -633,95 +703,46 @@ const openDeleteAlert = (current) => {
 };
 
 /**
+ * Helper to get the context for actions.
+ */
+const getActionContext = (target) => {
+  return {
+    target,
+    proxy,
+    rows,
+    bindAction,
+    can,
+    showHideSpinner,
+    isMakeFieldAsLink,
+    infoPopup: infoPopup.value,
+    deleteBox: deleteBox.value,
+    controllerName: props.dataControllerName,
+    editHandledByOtherComponent: editHandledByOtherComponent.value,
+    emit,
+    findRowById
+  };
+};
+
+/**
  * Executed when the user confirms or cancels deletion.
  * @param {number} [isOk=1] - 1 for confirmed, 0 for cancelled.
  */
 const deleteNow = (isOk = 1) => {
-  if (isOk !== 1) {
-    showHideSpinner(currentActionItem.value, false);
-    closeDialog();
-    return;
-  }
-
   const target = currentActionItem.value;
-  if (!can("delete")) {
-    Toast.show(proxy, "Sorry! You don't have permission to delete.", 3000, "error");
-    setTimeout(() => showHideSpinner(target, false), 1000);
-    closeDialog();
+  if (isOk !== 1) {
+    showHideSpinner(target, false);
+    if (deleteBox.value) deleteBox.value.close();
     return;
   }
 
-  const rowid = "row_" + target.getAttribute("data-rowid");
-  const href = target.getAttribute("href");
-  
-  doAjax("delete", href, (res) => {
-    if (res.status === 200) {
-      const index = rows.value.findIndex(c => c.id.toString() === res.data.id.toString());
-      if (index >= 0) {
-        Toast.show(proxy, "Record has been deleted", 2000);
-        document.getElementById(rowid)?.remove();
-        // Note: rows is derived from props, so we cannot splice it reactively here
-        // without parent intervention (mutating props is anti-pattern).
-        // DOM removal provides immediate visual feedback.
-      } else {
-         Toast.show(proxy, "Record deleted but list state mismatch.", 2000, "warning");
-      }
-      setTimeout(bindAction, 100); 
-      EventBus.emit("pagination-on-delete");
-    } else {
-      showHideSpinner(target, false);
-      Toast.show(proxy, "Ooops! Got some error!", 5000, "error");
-    }
-  });
-  closeDialog();
+  const row = findRowById(target.dataset.rowid);
+  TabularViewActions.execute("delete", row, getActionContext(target));
+  if (deleteBox.value) deleteBox.value.close();
 };
 
 /**
- * Opens the info popup with details.
- * @param {string} type - The type of info to show.
- * @param {string|number} id - The ID of the record.
- * @param {Array} excludeFields - Fields to exclude.
- * @param {string} editable - Whether the info is editable.
- */
-const showInfo = (type, id, excludeFields, editable) => {
-  if (infoPopup.value) infoPopup.value.showInfo(type, id, excludeFields, editable);
-};
-
-// =============================================================================
-// Action Handling
-// =============================================================================
-
-/**
- * Handles generic AJAX actions (status toggles, etc.).
- * @param {HTMLElement} current - The element triggering the action.
- * @param {string} action - The action name.
- * @param {string} status - Current status/value.
- * @param {string} href - The URL to call.
- */
-const handleGenericAjax = (current, action, status, href) => {
-  doAjax("get", href, (res) => {
-    showHideSpinner(current, false);
-    const actionProp = isMakeFieldAsLink(action);
-    const icon = current.querySelector(".js_icon");
-    
-    if (icon) {
-      const oldCss = actionProp["css_" + status];
-      if (oldCss) icon.classList.remove(...oldCss.split(" "));
-      
-      const newStatus = res.data.status;
-      current.setAttribute("data-value", newStatus);
-      const newCss = actionProp["css_" + newStatus];
-      if (newCss) icon.classList.add(...newCss.split(" "));
-    }
-  }, (res) => {
-    showHideSpinner(current, false);
-    Toast.show(proxy, res?.response?.data?.message || "Unknown Error!", 5000, "error");
-  });
-};
-
-/**
- * Initial handler for any AJAX action click event.
- * Delegates to specific handlers based on action type.
+ * Initial handler for any action click event.
+ * Delegates to TabularViewActions for execution.
  * @param {Event} event - The click event.
  */
 const initAjaxAction = (event) => {
@@ -729,21 +750,20 @@ const initAjaxAction = (event) => {
   event.stopPropagation();
 
   const current = event.currentTarget;
-  const { action, rowid, value: status } = current.dataset;
-  let href = current.getAttribute("href");
-  
-  if (status) href += `/${status}`;
+  const { action, rowid } = current.dataset;
   currentActionItem.value = current;
 
   if (action === "delete") {
     alertMessage.current = alertMessage.delete;
     isDelete.value = true;
     preventDeleteBox.value ? deleteNow(1) : openDeleteAlert(current);
-  } else if (action === "showinfo") {
-    const { info, editable, excludefields = [] } = current.dataset;
-    showInfo(info, rowid, excludefields, editable);
+  } else if (current.dataset.custom === "true") {
+    // Custom action handled by parent component
+    emit("onAction", { action, rowid, status: current.dataset.value, row: findRowById(rowid), target: current });
+    showHideSpinner(current, false);
   } else {
-    handleGenericAjax(current, action, status, href);
+    const row = findRowById(rowid);
+    TabularViewActions.execute(action, row, getActionContext(current));
   }
 };
 

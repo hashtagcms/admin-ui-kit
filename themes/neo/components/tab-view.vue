@@ -21,84 +21,79 @@
   </ul>
 </template>
 
-<script>
+<script setup>
+import { computed } from "vue";
 import { SafeJsonParse } from "../../../helpers/common";
 
-export default {
-  name: 'TabView',
-  props: {
-    // Array of tabs - can be strings or objects with {label, id, href}
-    // Can also be a JSON string that will be parsed
-    dataTabs: {
-      type: [Array, String],
-      required: true,
-      default: () => []
-    },
-    // Currently active tab (string or object)
-    dataActiveTab: {
-      type: [String, Object],
-      default: null
-    },
-    // Base URL for generating hrefs (optional)
-    dataBaseUrl: {
-      type: String,
-      default: ''
-    }
+const props = defineProps({
+  // Array of tabs - can be strings or objects with {label, id, href}
+  // Can also be a JSON string that will be parsed
+  dataTabs: {
+    type: [Array, String],
+    required: true,
+    default: () => [],
   },
-  emits: ['tab-change'],
-  computed: {
-    tabs() {
-      return SafeJsonParse(this.dataTabs, []);
-    },
-    activeTab() {
-      return this.dataActiveTab;
-    },
-    baseUrl() {
-      return this.dataBaseUrl;
-    }
+  // Currently active tab (string or object)
+  dataActiveTab: {
+    type: [String, Object],
+    default: null,
   },
-  methods: {
-    moveToTab(tab) {
-      this.$emit('tab-change', tab);
-      window.location.href = this.getTabHref(tab);
-    },
-    getTabId(tab) {
-      if (typeof tab === 'string') {
-        return tab.replace(/\s/g, '').toLowerCase();
-      }
-      return tab.id || tab.label.replace(/\s/g, '').toLowerCase();
-    },
-    
-    getTabLabel(tab) {
-      return typeof tab === 'string' ? tab : tab.label;
-    },
-    
-    getTabHref(tab) {
-      if (typeof tab === 'object' && tab.href) {
-        return tab.href;
-      }
-      if (this.baseUrl) {
-        return `${this.baseUrl}/${this.getTabId(tab)}`;
-      }
-      return `#${this.getTabId(tab)}`;
-    },
-    
-    isActive(tab) {
-      const tabId = this.getTabId(tab);
-      const activeId = this.activeTab 
-        ? (typeof this.activeTab === 'string' 
-            ? this.activeTab.replace(/\s/g, '').toLowerCase()
-            : this.getTabId(this.activeTab))
-        : null;
-      return tabId === activeId;
-    },
-    
-    selectTab(tab) {
-      this.$emit('tab-change', tab);
-    }
+  // Base URL for generating hrefs (optional)
+  dataBaseUrl: {
+    type: String,
+    default: "",
+  },
+});
+
+const emit = defineEmits(["tab-change"]);
+
+// Computed
+const tabs = computed(() => SafeJsonParse(props.dataTabs, []));
+const activeTab = computed(() => props.dataActiveTab);
+const baseUrl = computed(() => props.dataBaseUrl);
+
+// Methods
+const getTabId = (tab) => {
+  if (typeof tab === "string") {
+    return tab.replace(/\s/g, "").toLowerCase();
   }
+  return tab.id || tab.label.replace(/\s/g, "").toLowerCase();
+};
+
+const getTabLabel = (tab) => {
+  return typeof tab === "string" ? tab : tab.label;
+};
+
+const getTabHref = (tab) => {
+  if (typeof tab === "object" && tab.href) {
+    return tab.href;
+  }
+  if (baseUrl.value) {
+    return `${baseUrl.value}/${getTabId(tab)}`;
+  }
+  return `#${getTabId(tab)}`;
+};
+
+const isActive = (tab) => {
+  const tabId = getTabId(tab);
+  const activeId = activeTab.value
+    ? typeof activeTab.value === "string"
+      ? activeTab.value.replace(/\s/g, "").toLowerCase()
+      : getTabId(activeTab.value)
+    : null;
+  return tabId === activeId;
+};
+
+const moveToTab = (tab) => {
+  emit("tab-change", tab);
+  window.location.href = getTabHref(tab);
+};
+
+const selectTab = (tab) => {
+  emit("tab-change", tab);
 };
 </script>
+
 
 <style scoped>
 /* Hide scrollbar for Chrome, Safari and Opera */

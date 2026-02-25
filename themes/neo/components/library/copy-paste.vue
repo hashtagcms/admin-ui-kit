@@ -21,7 +21,8 @@
   </button>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, getCurrentInstance } from "vue";
 import {
   CopyToClipboard,
   PasteFromClipboard,
@@ -30,156 +31,137 @@ import {
   SafeJsonParse,
 } from "../../../../helpers/common";
 import { EventBus } from "../../../../helpers/event-bus";
-export default {
-  props: [
-    "dataIgnoreFields",
-    "dataPasteElement",
-    "dataForm",
-    "dataBackUrl",
-    "dataCopyPasteAutoInit",
-    "dataShowCopy",
-    "dataShowPaste",
-  ],
-  mounted() {
-    if (this.autoInit) {
-      this.init();
+
+const props = defineProps([
+  "dataIgnoreFields",
+  "dataPasteElement",
+  "dataForm",
+  "dataBackUrl",
+  "dataCopyPasteAutoInit",
+  "dataShowCopy",
+  "dataShowPaste",
+]);
+
+const instance = getCurrentInstance();
+
+// State
+const ignoreFields = ref(
+  SafeJsonParse(props.dataIgnoreFields, [
+    "id",
+    "site_id",
+    "backURL",
+    "actionPerformed",
+    "platform_id",
+    "_token",
+    "insert_by",
+    "update_by",
+  ])
+);
+const copyKey = ref("cms_copy_data");
+const backURL = ref(props.dataBackUrl || "");
+const autoInit = ref(
+  props.dataCopyPasteAutoInit === undefined || props.dataCopyPasteAutoInit?.toString() === "true"
+);
+const showCopy = ref(props.dataShowCopy === undefined || props.dataShowCopy.toString() === "true");
+const showPaste = ref(props.dataShowPaste === undefined || props.dataShowPaste.toString() === "true");
+
+// Computed
+const form = computed(() => {
+  let holder;
+  if (typeof props.dataForm !== "undefined" && document.getElementById(props.dataForm)) {
+    holder = document.getElementById(props.dataForm);
+  } else {
+    holder = document;
+  }
+  return holder;
+});
+
+const pasteElement = computed(() => {
+  let holder;
+  if (typeof props.dataPasteElement === "undefined") {
+    holder = form.value.querySelectorAll("input[type='text']")[0];
+  } else {
+    holder = form.value.getElementById(props.dataPasteElement);
+  }
+  return holder;
+});
+
+// Methods
+const fillData = (data) => {
+  const f = form.value;
+  if (data) {
+    for (const i in data) {
+      try {
+        const ele = f[i] || document.getElementById(i);
+        const val = data[i];
+        if (ele.type === "checkbox" || ele.type === "radio") {
+          ele.checked = val;
+        } else {
+          ele.value = val;
+        }
+      } catch (e) {
+        console.info(`unable to set value @ ${i}`);
+      }
     }
-  },
-  created() {},
-  data() {
-    return {
-      ignoreFields: SafeJsonParse(this.dataIgnoreFields, [
-        "id",
-        "site_id",
-        "backURL",
-        "actionPerformed",
-        "platform_id",
-        "_token",
-        "insert_by",
-        "update_by",
-      ]),
-      copyKey: "cms_copy_data",
-      backURL:
-        typeof this.dataBackUrl === "undefined" || this.dataBackUrl === ""
-          ? ""
-          : this.dataBackUrl,
-      autoInit:
-        this.dataCopyPasteAutoInit === undefined ||
-        this.dataCopyPasteAutoInit?.toString() === "true",
-      showCopy:
-        this.dataShowCopy === undefined ||
-        this.dataShowCopy.toString() === "true",
-      showPaste:
-        this.dataShowPaste === undefined ||
-        this.dataShowPaste.toString() === "true",
-    };
-  },
-  computed: {
-    form() {
-      let holder;
-      if (
-        typeof this.dataForm !== "undefined" &&
-        document.getElementById(this.dataForm)
-      ) {
-        holder = document.getElementById(this.dataForm);
-      } else {
-        holder = document;
-      }
-      return holder;
-    },
-    pasteElement() {
-      let holder;
-      if (typeof this.dataPasteElement === "undefined") {
-        holder = this.form.querySelectorAll("input[type='text']")[0];
-      } else {
-        holder = this.form.getElementById(this.dataPasteElement);
-      }
-      //console.log("holder", holder);
-      return holder;
-    },
-  },
-  methods: {
-    init() {
-      let $this = this;
-      if (this.pasteElement) {
-        this.pasteElement.addEventListener("blur", function () {
-          if (IsJson(this.value)) {
-            $this.pasteNow();
-          }
-        });
-      }
-    },
-    copyNow() {
-      let $this = this;
-
-      let inputs = this.form.querySelectorAll("input");
-      let textAreas = this.form.querySelectorAll("textarea");
-      let selects = this.form.querySelectorAll("select");
-
-      let allElements = [...inputs, ...textAreas, ...selects];
-
-      let store = {};
-      allElements.forEach(function (current) {
-        let name = current.getAttribute("name") || current.getAttribute("id");
-
-        if (
-          name != null &&
-          typeof name !== "object" &&
-          shouldIgnore(name) === -1
-        ) {
-          store[name] =
-            current.type === "checkbox" || current.type === "radio"
-              ? current.checked
-              : current.value;
-        }
-      });
-
-      let data = JSON.stringify(store);
-      CopyToClipboard(data);
-
-      EventBus.emit("on-copy", data);
-      Toast.show(this, "Copied...", 1000);
-
-      function shouldIgnore(name) {
-        return $this.ignoreFields.findIndex(function (nm) {
-          return name === nm;
-        });
-      }
-    },
-    fillData: function (data) {
-      let form = this.form;
-      if (data) {
-        for (let i in data) {
-          try {
-            let ele = form[i] || document.getElementById(i);
-            let val = data[i];
-            if (ele.type === "checkbox" || ele.type === "radio") {
-              ele.checked = val;
-            } else {
-              ele.value = val;
-            }
-          } catch (e) {
-            console.info("unable to set value @ " + i);
-          }
-        }
-      }
-    },
-    pasteNow(cb) {
-      PasteFromClipboard()
-        .then((res) => {
-          if (IsJson(res)) {
-            let data = SafeJsonParse(res, {});
-            this.fillData(data);
-            if (cb) {
-              cb(data);
-            }
-          }
-          EventBus.emit("on-paste", res);
-        })
-        .catch((res) => {
-          console.log("unable to paste");
-        });
-    },
-  },
+  }
 };
+
+const pasteNow = (cb) => {
+  PasteFromClipboard()
+    .then((res) => {
+      if (IsJson(res)) {
+        const data = SafeJsonParse(res, {});
+        fillData(data);
+        if (cb) {
+          cb(data);
+        }
+      }
+      EventBus.emit("on-paste", res);
+    })
+    .catch((res) => {
+      console.error("unable to paste", res);
+    });
+};
+
+const init = () => {
+  if (pasteElement.value) {
+    pasteElement.value.addEventListener("blur", function () {
+      if (IsJson(this.value)) {
+        pasteNow();
+      }
+    });
+  }
+};
+
+const copyNow = () => {
+  const inputs = form.value.querySelectorAll("input");
+  const textAreas = form.value.querySelectorAll("textarea");
+  const selects = form.value.querySelectorAll("select");
+
+  const allElements = [...inputs, ...textAreas, ...selects];
+
+  const store = {};
+  const shouldIgnore = (name) => ignoreFields.value.findIndex((nm) => name === nm);
+
+  allElements.forEach((current) => {
+    const name = current.getAttribute("name") || current.getAttribute("id");
+
+    if (name != null && typeof name !== "object" && shouldIgnore(name) === -1) {
+      store[name] = current.type === "checkbox" || current.type === "radio" ? current.checked : current.value;
+    }
+  });
+
+  const data = JSON.stringify(store);
+  CopyToClipboard(data);
+
+  EventBus.emit("on-copy", data);
+  Toast.show(instance, "Copied...", 1000);
+};
+
+onMounted(() => {
+  if (autoInit.value) {
+    init();
+  }
+});
 </script>
+

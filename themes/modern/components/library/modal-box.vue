@@ -25,90 +25,94 @@
   </hc-modal>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted } from "vue";
 import HcModal from "../../ui-kit/HcModal.vue";
 import HcButton from "../../ui-kit/HcButton.vue";
 
-export default {
-  name: "ModalBox",
-  components: {
-    HcModal,
-    HcButton
-  },
-  emits: ["onClose"],
-  props: [
-    "dataShowModal",
-    "dataShowFooter",
-    "dataTitleCss",
-    "dataContentCss",
-    "dataFooterCss",
-    "dataModalCss",
-    "dataWidth",
-  ],
-  mounted() {
-    if (this.visible) {
-      this.open();
-    }
-  },
-  data() {
-    return {
-      titleCss: typeof this.dataTitleCss === "undefined" ? "" : this.dataTitleCss,
-      contentCss: typeof this.dataContentCss === "undefined" ? "" : this.dataContentCss,
-      footerCss: typeof this.dataFooterCss === "undefined" ? "" : this.dataFooterCss,
-      visible: this.dataShowModal !== undefined && this.dataShowModal.toString() === "true",
-      toBeReturned: {},
-      title: "Alert",
-      content: "Modal Content",
-      footerContent: "",
-    };
-  },
-  computed: {
-    showFooter() {
-      return (
-        (typeof this.dataShowFooter !== "undefined" &&
-          this.dataShowFooter.toString() === "true") ||
-        this.footerContent !== ""
-      );
-    },
-    modalSize() {
-      if (typeof this.dataWidth != "undefined") {
-        const w = parseInt(this.dataWidth);
-        if (w < 400) return 'sm';
-        if (w < 700) return 'md';
-        if (w < 1000) return 'lg';
-        return 'xl';
-      }
-      return "md";
-    },
-  },
-  methods: {
-    open(toBeReturned = {}) {
-      this.visible = true;
-      this.toBeReturned = toBeReturned;
-    },
-    close() {
-      this.visible = false;
-      if (typeof this.toBeReturned === "function") {
-        this.toBeReturned();
-      }
-    },
-    sendData(isOkay) {
-      this.close();
-      this.$emit("onClose", isOkay, this.toBeReturned);
-    },
-    show(message, position, callback, timeout) {
-      if (typeof message == "string") {
-        this.content = message;
-      } else {
-        if (message.title) this.title = message.title;
-        if (message.content) this.content = message.content;
-        if (message.footerContent) this.footerContent = message.footerContent;
-      }
-      this.open(callback);
-    },
-    hide() {
-      this.close();
-    },
-  },
+const props = defineProps([
+  "dataShowModal",
+  "dataShowFooter",
+  "dataTitleCss",
+  "dataContentCss",
+  "dataFooterCss",
+  "dataModalCss",
+  "dataWidth",
+]);
+
+const emit = defineEmits(["onClose"]);
+
+const titleCss = ref(typeof props.dataTitleCss === "undefined" ? "" : props.dataTitleCss);
+const contentCss = ref(typeof props.dataContentCss === "undefined" ? "" : props.dataContentCss);
+const footerCss = ref(typeof props.dataFooterCss === "undefined" ? "" : props.dataFooterCss);
+const visible = ref(props.dataShowModal !== undefined && props.dataShowModal.toString() === "true");
+const toBeReturned = ref({});
+const title = ref("Alert");
+const content = ref("Modal Content");
+const footerContent = ref("");
+
+const showFooter = computed(() => {
+  return (
+    (typeof props.dataShowFooter !== "undefined" &&
+      props.dataShowFooter.toString() === "true") ||
+    footerContent.value !== ""
+  );
+});
+
+const modalSize = computed(() => {
+  if (typeof props.dataWidth != "undefined") {
+    const w = parseInt(props.dataWidth);
+    if (w < 400) return 'sm';
+    if (w < 700) return 'md';
+    if (w < 1000) return 'lg';
+    return 'xl';
+  }
+  return "md";
+});
+
+const open = (returnedData = {}) => {
+    visible.value = true;
+    toBeReturned.value = returnedData;
 };
+
+const close = () => {
+    visible.value = false;
+    if (typeof toBeReturned.value === "function") {
+        toBeReturned.value();
+    }
+};
+
+const sendData = (isOkay) => {
+    close();
+    emit("onClose", isOkay, toBeReturned.value);
+};
+
+const show = (message, position, callback, timeout) => {
+    if (typeof message == "string") {
+        content.value = message;
+    } else {
+        if (message.title) title.value = message.title;
+        if (message.content) content.value = message.content;
+        if (message.footerContent) footerContent.value = message.footerContent;
+    }
+    open(callback);
+};
+
+const hide = () => {
+    close();
+};
+
+onMounted(() => {
+    if (visible.value) {
+        open();
+    }
+});
+
+defineExpose({
+    open,
+    close,
+    show,
+    hide
+});
 </script>
+

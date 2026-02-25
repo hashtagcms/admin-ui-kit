@@ -28,99 +28,82 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { EventBus } from "../../../helpers/event-bus";
 import { SafeJsonParse } from "../../../helpers/common";
 import DownloadButton from "./downloads.vue";
 
-export default {
-  components: {
-    "download-button": DownloadButton,
-  },
-  mounted() {
-    this.updatePageParams();
-    let $this = this;
-    EventBus.on("pagination-on-delete", function () {
-      $this.decreaseCounter();
-    });
-  },
-  props: [
-    "dataPaginator",
-    "dataFirstItem",
-    "dataLastItem",
-    "dataTotal",
-    "dataControllerName",
-    "dataNextLabel",
-    "dataPreviousLabel",
-    "dataShowDownload",
-  ],
-  data() {
-    return {
-      totalCount: parseInt(this.dataTotal),
-      lastItem: parseInt(this.dataLastItem),
-      controllerName: this.dataControllerName,
-      paginator: SafeJsonParse(this.dataPaginator, {}),
-      pageLabel: {
-        "pagination.next": this.dataNextLabel,
-        "pagination.previous": this.dataPreviousLabel,
-      },
-      showDownload:
-        this.dataShowDownload === "true" || this.dataShowDownload === "1",
-    };
-  },
-  computed: {
-    hasPreviousPage() {
-      return this.paginator.prev_page_url != null;
-    },
-    allPages() {
-      return this.paginator.links;
-    },
-    showPagination() {
-      return this.allPages.length > 3; //["Previous", "1", "Next"]
-    },
-  },
-  methods: {
-    decreaseCounter() {
-      this.totalCount = this.totalCount - 1;
-      this.lastItem = this.lastItem - 1;
-    },
-    getLink(page) {
-      return page.url == null ? "javascript:void(0)" : page.url;
-    },
-    getLabel(label) {
-      //label is provided from view file
-      if (this.pageLabel[label]) {
-        return this.pageLabel[label];
-      }
+const props = defineProps([
+  "dataPaginator",
+  "dataFirstItem",
+  "dataLastItem",
+  "dataTotal",
+  "dataControllerName",
+  "dataNextLabel",
+  "dataPreviousLabel",
+  "dataShowDownload",
+]);
 
-      return label;
-    },
-    getCss(page) {
-      if (page.url == null) {
-        return "page-item disabled";
-      }
-      return page.active === true ? "page-item active" : "page-item";
-    },
-    updatePageParams() {
-      let params = window.location.search.substring(1);
-      // console.log("params "+params);
-      let hasPage = params.match(/page=\d+/gi);
-      if (hasPage != null) {
-        params = params.replace(/page=\d+/, "");
-      }
-      if (params !== "") {
-        params = params.indexOf("&") === 0 ? params : "&" + params;
-        let elements = document.querySelectorAll(".pagination a");
-        elements.forEach(function (ele, index) {
-          let href = ele.href;
-          href = href + "" + params;
-          //remove last and double &
-          href = href.replace(/&$/, "");
-          href = href.replace(/&&/, "&");
-          ele.href = href;
-        });
-      }
-    },
-  },
+// State
+const totalCount = ref(parseInt(props.dataTotal));
+const lastItem = ref(parseInt(props.dataLastItem));
+const controllerName = ref(props.dataControllerName);
+const paginator = ref(SafeJsonParse(props.dataPaginator, {}));
+const pageLabel = {
+  "pagination.next": props.dataNextLabel,
+  "pagination.previous": props.dataPreviousLabel,
 };
+const showDownload = ref(props.dataShowDownload === "true" || props.dataShowDownload === "1");
+
+// Computed
+const hasPreviousPage = computed(() => paginator.value.prev_page_url != null);
+const allPages = computed(() => paginator.value.links || []);
+const showPagination = computed(() => allPages.value.length > 3); // ["Previous", "1", "Next"]
+
+// Methods
+const decreaseCounter = () => {
+  totalCount.value -= 1;
+  lastItem.value -= 1;
+};
+
+const getLink = (page) => (page.url == null ? "javascript:void(0)" : page.url);
+
+const getLabel = (label) => pageLabel[label] || label;
+
+const getCss = (page) => {
+  if (page.url == null) {
+    return "page-item disabled";
+  }
+  return page.active === true ? "page-item active" : "page-item";
+};
+
+const updatePageParams = () => {
+  let params = window.location.search.substring(1);
+  const hasPage = params.match(/page=\d+/gi);
+  if (hasPage != null) {
+    params = params.replace(/page=\d+/, "");
+  }
+  if (params !== "") {
+    params = params.indexOf("&") === 0 ? params : `&${params}`;
+    const elements = document.querySelectorAll(".pagination a");
+    elements.forEach((ele) => {
+      let href = ele.href;
+      href = `${href}${params}`;
+      // remove last and double &
+      href = href.replace(/&$/, "").replace(/&&/, "&");
+      ele.href = href;
+    });
+  }
+};
+
+onMounted(() => {
+  updatePageParams();
+  EventBus.on("pagination-on-delete", decreaseCounter);
+});
+
+onBeforeUnmount(() => {
+  EventBus.off("pagination-on-delete", decreaseCounter);
+});
 </script>
+
