@@ -1,0 +1,92 @@
+import HcButton from './HcButton.vue';
+import HcBadge from './HcBadge.vue';
+import HcAlert from './HcAlert.vue';
+import HcTable from './HcTable.vue';
+import HcModal from './HcModal.vue';
+import HcSpinner from './HcSpinner.vue';
+import HcProgress from './HcProgress.vue';
+import HcCard from './HcCard.vue';
+import HcPlaceholder from './HcPlaceholder.vue';
+import HcCheckbox from './HcCheckbox.vue';
+import HcRadioGroup from './HcRadioGroup.vue';
+import HcFileUpload from './HcFileUpload.vue';
+import HcPagination from './HcPagination.vue';
+import HcTabs from './HcTabs.vue';
+import HcButtonGroup from './HcButtonGroup.vue';
+import HcTooltip from './HcTooltip.vue';
+import HcPopover from './HcPopover.vue';
+import HcToast from './HcToast.vue';
+import HcBadgeContainer from './HcBadgeContainer.vue';
+import HcInput from './HcInput.vue';
+import HcSelect from './HcSelect.vue';
+import HcSwitch from './HcSwitch.vue';
+import HcAvatar from './HcAvatar.vue';
+import HcStatCard from './HcStatCard.vue';
+import HcBreadcrumbs from './HcBreadcrumbs.vue';
+import HcDropdown from './HcDropdown.vue';
+import HcDrawer from './HcDrawer.vue';
+import HcAutoSuggest from './HcAutoSuggest.vue';
+
+export {
+  HcButton,
+  HcBadge,
+  HcAlert,
+  HcTable,
+  HcModal,
+  HcSpinner,
+  HcProgress,
+  HcCard,
+  HcPlaceholder,
+  HcCheckbox,
+  HcRadioGroup,
+  HcFileUpload,
+  HcPagination,
+  HcTabs,
+  HcButtonGroup,
+  HcTooltip,
+  HcPopover,
+  HcToast,
+  HcBadgeContainer,
+  HcInput,
+  HcSelect,
+  HcSwitch,
+  HcAvatar,
+  HcStatCard,
+  HcBreadcrumbs,
+  HcDropdown,
+  HcDrawer,
+  HcAutoSuggest
+};
+
+const HcUiKit = {
+  HcButton,
+  HcBadge,
+  HcAlert,
+  HcTable,
+  HcModal,
+  HcSpinner,
+  HcProgress,
+  HcCard,
+  HcPlaceholder,
+  HcCheckbox,
+  HcRadioGroup,
+  HcFileUpload,
+  HcPagination,
+  HcTabs,
+  HcButtonGroup,
+  HcTooltip,
+  HcPopover,
+  HcToast,
+  HcBadgeContainer,
+  HcInput,
+  HcSelect,
+  HcSwitch,
+  HcAvatar,
+  HcStatCard,
+  HcBreadcrumbs,
+  HcDropdown,
+  HcDrawer,
+  HcAutoSuggest
+};
+
+export default HcUiKit;

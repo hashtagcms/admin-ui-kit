@@ -5,7 +5,7 @@
       variant="secondary"
       outline
       is-square
-      size="sm"
+      size="md"
       icon="fa fa-copy"
       title="Copy Configuration"
       @click="copyNow"
@@ -14,7 +14,7 @@
       v-if="showPaste"
       variant="primary"
       is-square
-      size="sm"
+      size="md"
       icon="fa fa-paste"
       title="Paste Configuration"
       @click="pasteNow"

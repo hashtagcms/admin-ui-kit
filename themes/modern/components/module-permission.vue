@@ -132,15 +132,21 @@
         </div>
         <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
           <button
-            class="w-full sm:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-1 active:scale-95 text-lg tracking-wide"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-12 py-4 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 text-white font-black rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-1 active:scale-95 text-lg tracking-wide"
             name="submit"
             type="submit"
           >
+            <i class="fa fa-save text-base"></i>
             Update Permissions
           </button>
-          <a :href="dataBackUrl" class="w-full sm:w-auto px-10 py-4 bg-white border border-gray-200 text-gray-500 font-bold rounded-lg hover:bg-gray-100 hover:text-gray-700 transition-all text-center">
-            Cancel
-          </a>
+          <button
+            type="button"
+            @click="goBack()"
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-10 py-4 bg-white border border-gray-200 text-gray-600 font-bold rounded-lg hover:bg-gray-50 hover:border-gray-300 hover:text-gray-800 focus:outline-none focus:ring-4 focus:ring-gray-200 shadow-sm transition-all hover:-translate-y-0.5 active:scale-95 text-base"
+          >
+            <i class="fa fa-arrow-left text-sm"></i>
+            Go Back
+          </button>
         </div>
       </div>
     </form>

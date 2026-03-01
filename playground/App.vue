@@ -837,6 +837,27 @@
                         <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">File Management</p>
                         <component :is="activeComponents.HcFileUpload" />
                       </div>
+                    <div class="space-y-6">
+                        <p class="text-[10px] font-black uppercase text-gray-400 tracking-widest">Autocomplete (HcAutoSuggest)</p>
+                        <div class="grid grid-cols-1 gap-4 bg-slate-50 p-6 rounded-2xl border border-dashed border-slate-200">
+                           <component :is="activeComponents.HcAutoSuggest" 
+                             v-model="suggestValue" 
+                             label="Search Remote Users" 
+                             placeholder="Type 'Le' or 'Er'..." 
+                             endpoint="https://jsonplaceholder.typicode.com/users"
+                             display-field="name"
+                             hint="Fetching from JSONPlaceholder API"
+                             @select="onUserSelect"
+                           >
+                              <template #icon-left><i class="fa fa-search"></i></template>
+                           </component>
+                           <div v-if="selectedUser" class="mt-4 p-4 bg-white rounded-xl border border-blue-100 animate-in fade-in slide-in-from-top-1">
+                              <p class="text-[10px] font-black uppercase text-blue-400 mb-1">Selected User Info</p>
+                              <p class="text-xs font-bold text-slate-700">{{ selectedUser.name }} ({{ selectedUser.email }})</p>
+                              <p class="text-[10px] text-slate-400 mt-1 uppercase tracking-tighter">Company: {{ selectedUser.company.name }}</p>
+                           </div>
+                        </div>
+                      </div>
                     </div>
                   </section>
 
@@ -980,8 +1001,15 @@ const backupState = ref(true);
 const radioValue = ref('opt1');
 const inputValue = ref('Premium Admin Kit');
 const selectValue = ref('opt2');
+const suggestValue = ref('');
+const selectedUser = ref(null);
 const currentPage = ref(3);
 const toasts = ref([]);
+
+const onUserSelect = (user) => {
+    selectedUser.value = user;
+    addToast('success');
+};
 
 // Code View Logic
 const activeCode = ref(null);
@@ -1014,6 +1042,14 @@ const codes = {
 <HcCheckbox v-model="check" label="Subscribe" />
 <HcSwitch v-model="toggle" label="Active" />
 <HcRadioGroup v-model="radio" :options="opts" is-stacked />`,
+    autosuggest: `<HcAutoSuggest 
+  v-model="val" 
+  label="User Search" 
+  endpoint="https://api.example.com/users" 
+  display-field="name" 
+>
+  <template #icon-left><i class="fa fa-user"></i></template>
+</HcAutoSuggest>`,
     buttons: `<HcButton variant="primary">Primary</HcButton>
 <HcButton variant="secondary" outline>Outline</HcButton>
 <HcButtonGroup>

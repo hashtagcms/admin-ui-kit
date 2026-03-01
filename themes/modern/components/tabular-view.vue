@@ -28,7 +28,7 @@
                 <td :class="['px-5 py-2.5 font-black text-gray-400 uppercase tracking-widest bg-gray-100/50 w-1/3 border-r border-gray-100 head_' + getFieldName(fields)]">
                   {{ filterFieldsName(getFieldName(fields)) }}
                 </td>
-                <td :class="['px-5 py-2.5 font-bold text-gray-700', isActionFieldKey(getFieldName(fields, 'key')) ? 'bg-gray-50/50 border-t border-gray-100' : '']">
+                <td :class="['px-5 py-2.5 text-gray-700', isActionFieldKey(getFieldName(fields, 'key')) ? 'bg-gray-50/50 border-t border-gray-100' : '']">
                   <span
                     v-if="!isActionFieldKey(getFieldName(fields, 'key'))"
                     v-html="sanitizeHTML(getFieldValue(row, getFieldName(fields, 'key'), fields))"
@@ -69,7 +69,7 @@
                 :data-id="row.id"
                 class="group hover:bg-blue-50/30 transition-all duration-200 list-table-row border-b border-gray-100 last:border-0"
               >
-                <td v-for="fields in headings" :key="getFieldName(fields, 'key')" class="px-6 py-3 text-sm font-bold text-gray-700">
+                <td v-for="fields in headings" :key="getFieldName(fields, 'key')" class="px-6 py-3 text-sm text-gray-700">
                   <div
                     v-if="isActionFieldKey(getFieldName(fields, 'key'))"
                     class="flex items-center gap-2 actions min-w-[120px]"
@@ -77,7 +77,8 @@
                   ></div>
                   <span
                     v-else
-                    class="block group-hover:text-blue-900 transition-colors"
+                    class="block max-w-[220px] truncate group-hover:text-blue-900 transition-colors"
+                    :title="getFieldValue(row, getFieldName(fields, 'key'), fields)"
                     v-html="sanitizeHTML(getFieldValue(row, getFieldName(fields, 'key'), fields))"
                   ></span>
                 </td>
@@ -559,12 +560,12 @@ const renderActionLink = (row, forKey, actionAlias) => {
   if (forKey === "id") {
     if (hasAction("edit")) {
       const editPath = AdminConfig.admin_path(`${props.dataControllerName}/edit/${row.id}`);
-      const extraCss = " text-blue-500 hover:text-blue-800 decoration-blue-200 decoration-2 transition-colors font-black";
+      const extraCss = " text-blue-500 hover:text-blue-800 decoration-blue-200 decoration-2 transition-colors";
       return `<a class="js_action${extraCss}" data-rowid="${row.id}" data-action="edit" title="Edit" href="${editPath}">${iconOrValue}</a>`;
     }
     
-    if (can("read")) {
-      const extraCss = " text-blue-500 hover:text-blue-800 decoration-blue-200 decoration-2 transition-colors font-black cursor-pointer";
+    if (!can("edit") && can("read")) {
+      const extraCss = " text-blue-500 hover:text-blue-800 decoration-blue-200 decoration-2 transition-colors cursor-pointer";
       return `<a class="js_action js_ajax${extraCss}" data-info="${props.dataControllerName}" data-editable="false" data-value="${status}" data-rowid="${row.id}" data-action="showinfo" title="View Details" href="javascript:void(0)">${iconOrValue}</a>`;
     }
     

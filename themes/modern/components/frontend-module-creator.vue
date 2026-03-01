@@ -1,85 +1,80 @@
 
 <template>
-  <div class="max-w-4xl mx-auto space-y-8">
+  <div>
     <form
       id="addEditFrm"
-      :action="saveURL"
-      class="bg-white shadow-lg rounded-lg border border-gray-100 overflow-hidden"
+      :action="saveURL"      
       method="post"
       role="form"
       v-on:keyup="hideErrorMessage($event)"
       v-on:submit.prevent="createModule"
     >
-      <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-          <h2 class="text-2xl font-black text-gray-800 tracking-tight">Frontend Module Configuration</h2>
-          <p class="text-sm text-gray-500 mt-1">Configure layout, data handlers, and cache settings</p>
-      </div>
+      <div class="p-8 lg:p-10 space-y-10">
 
-      <div class="p-8 space-y-6">
           <!-- Basic Branding -->
-          <div class="space-y-6 pb-6 border-b border-gray-100">
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Module Name</label>
+          <div class="space-y-6">
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700 block" for="name">Module Name</label>
                 <input
                   @blur="fillCopiedData"
                   id="name"
                   v-model="form.name"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
+                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
                   name="name"
                   placeholder="e.g. Header Module"
                   required
                   type="text"
                 />
-                <div class="mt-2 ml-1">
+                <div class="flex items-center gap-2 mt-2">
                     <label class="inline-flex items-center gap-2 cursor-pointer group">
                         <input
                           v-model="conventional"
                           type="checkbox"
                           @click="goConventional()"
-                          class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                          class="w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
                         />
-                        <span class="text-xs font-bold text-gray-400 group-hover:text-blue-600 transition-colors" :style="checkBoxAlignment">Apply Conventions</span>
+                        <span class="text-xs font-semibold text-slate-500 group-hover:text-blue-600 transition-colors" :style="checkBoxAlignment">Apply Conventions</span>
                     </label>
                 </div>
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.name">{{ errors.name }}</div>
+                <div class="text-[11px] text-rose-500 font-bold mt-1" v-if="errors.name">{{ errors.name }}</div>
               </div>
 
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Alias</label>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700 block" for="alias">Alias</label>
                 <input
                   id="alias"
                   v-model="form.alias"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
+                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
                   name="alias"
                   placeholder="MODULE_ALIAS_HERE"
                   required
                   type="text"
                 />
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.alias">{{ errors.alias }}</div>
+                <div class="text-[11px] text-rose-500 font-bold mt-1" v-if="errors.alias">{{ errors.alias }}</div>
               </div>
 
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">View Name</label>
+              <div class="space-y-2">
+                <label class="text-sm font-medium text-slate-700 block" for="view_name">View Name</label>
                 <input
                   id="view_name"
                   v-model="form.view_name"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
+                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
                   name="view_name"
                   placeholder="e.g. components/header"
                   required
                   type="text"
                 />
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.view_name">{{ errors.view_name }}</div>
+                <div class="text-[11px] text-rose-500 font-bold mt-1" v-if="errors.view_name">{{ errors.view_name }}</div>
               </div>
 
-              <div class="space-y-1.5">
+              <div class="space-y-2">
                 <div class="flex items-center justify-between">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Cache Settings</label>
+                    <label class="text-sm font-medium text-slate-700" for="cache_group">Cache Settings</label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input
                           v-model="form.individual_cache"
                           type="checkbox"
-                          class="w-4 h-4 text-orange-500 border-gray-300 rounded focus:ring-orange-500"
+                          class="w-4 h-4 text-orange-500 border-slate-300 rounded focus:ring-orange-500"
                         />
                         <span class="text-[10px] font-black text-orange-400 uppercase tracking-widest" :style="checkBoxAlignment">Individual?</span>
                     </label>
@@ -87,36 +82,35 @@
                 <input
                   id="cache_group"
                   v-model="form.cache_group"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
+                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
                   maxlength="60"
                   name="cache_group"
                   placeholder="Cache group name"
                 />
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.cache_group">{{ errors.cache_group }}</div>
+                <div class="text-[11px] text-rose-500 font-bold mt-1" v-if="errors.cache_group">{{ errors.cache_group }}</div>
               </div>
           </div>
 
           <!-- Data Logic Section -->
-          <div class="space-y-6">
+          <div class="space-y-6 border-t border-slate-50 pt-10">
               <div class="flex items-center gap-3">
-                  <div class="h-8 w-1 bg-green-500 rounded-full"></div>
-                  <h3 class="text-lg font-black text-gray-800">Data & Logic</h3>
+                  <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Data &amp; Logic</h3>
               </div>
 
-              <div class="space-y-4">
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Data Type</label>
+              <div class="space-y-6">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block" for="data_type">Data Type</label>
                     <select
                       id="data_type"
                       v-model="form.data_type"
-                      class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm cursor-pointer"
+                      class="form-select w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
                       @change="checkForService(form.data_type)"
                     >
                       <option value="">Select Data Type</option>
                       <option v-for="dataType in allDataTypes" :key="dataType" :value="dataType">{{ dataType }}</option>
                     </select>
-                    <!-- Data type info panel — always shown, falls back to _default for unknown types -->
-                    <div v-if="form.data_type" class="mt-3 rounded-xl border overflow-hidden shadow-sm" :class="activeTypeInfo.borderClass">
+                    <!-- Data type info panel -->
+                    <div v-if="form.data_type" class="mt-3 rounded-xl border overflow-hidden" :class="activeTypeInfo.borderClass">
                       <div class="flex items-center gap-2 px-4 py-2" :class="activeTypeInfo.headerClass">
                         <i :class="activeTypeInfo.icon" class="text-sm"></i>
                         <span class="text-[10px] font-black uppercase tracking-widest">{{ form.data_type }}</span>
@@ -126,15 +120,15 @@
                         {{ activeTypeInfo.description }}
                       </div>
                     </div>
-                    <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.data_type">{{ errors.data_type }}</div>
+                    <div class="text-[11px] text-rose-500 font-bold mt-1" v-if="errors.data_type">{{ errors.data_type }}</div>
                   </div>
 
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Data Handler</label>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block" for="data_handler">Data Handler</label>
                     <textarea
                       id="data_handler"
                       v-model="form.data_handler"
-                      class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-inner font-mono min-h-[100px]"
+                      class="form-control w-full rounded-xl border-slate-200 bg-slate-50 font-mono text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-4 px-5 min-h-[100px]"
                       name="data_handler"
                       :placeholder="activeTypeInfo.placeholder"
                     ></textarea>
@@ -143,115 +137,124 @@
           </div>
 
           <!-- Service Properties (Conditional) -->
-          <div v-show="showServiceForm" class="bg-blue-50/20 p-6 rounded-lg border border-blue-100 space-y-4 animate-fadeIn">
-              <h4 class="text-xs font-black text-blue-400 uppercase tracking-widest border-b border-blue-100 pb-2">External Service Integration</h4>
-              
-              <div class="space-y-4">
-                  <div class="space-y-1.5">
-                    <label class="text-[10px] font-black text-gray-500 ml-1">HTTP METHOD</label>
-                    <select v-model="form.method_type" class="bg-white border border-gray-200 text-xs rounded-lg block w-full px-3 py-2">
+          <div v-show="showServiceForm" class="space-y-6 border-t border-slate-50 pt-10">
+              <h3 class="text-xs font-black uppercase tracking-[0.2em] text-blue-400">External Service Integration</h3>
+              <div class="space-y-6">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">HTTP Method</label>
+                    <select v-model="form.method_type" class="form-select w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4">
                       <option value="">Select</option>
                       <option v-for="mt in allMethodTypes" :key="mt.value" :value="mt.value">{{ mt.name }}</option>
                     </select>
                   </div>
-                  <div class="space-y-1.5">
-                    <label class="text-[10px] font-black text-gray-500 ml-1">QUERY PARAMS</label>
-                    <input v-model="form.service_params" class="bg-white border border-gray-200 text-xs rounded-lg block w-full px-3 py-2" placeholder="param1=val&param2=val" />
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Query Params</label>
+                    <input v-model="form.service_params" class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4" placeholder="param1=val&param2=val" />
                   </div>
-              </div>
-              
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-500 ml-1 uppercase">Custom Headers (JSON)</label>
-                <textarea v-model="form.headers" placeholder='{"Authorization": "Bearer..."}' class="bg-white border border-gray-200 text-xs rounded-lg block w-full px-3 py-2 font-mono h-20" />
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Custom Headers (JSON)</label>
+                    <textarea v-model="form.headers" placeholder='{"Authorization": "Bearer..."}' class="form-control w-full rounded-xl border-slate-200 bg-slate-50 font-mono text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-4 px-5 min-h-[80px]" />
+                  </div>
               </div>
           </div>
 
-           <!-- Query Service (Conditional) -->
-           <div v-show="showQueryForm" class="bg-purple-50/30 p-6 rounded-lg border border-purple-100 space-y-4 animate-fadeIn">
-               <h4 class="text-xs font-black text-purple-400 uppercase tracking-widest border-b border-purple-100 pb-2">Query Engine Properties</h4>
-               <div class="space-y-4">
-                   <div class="space-y-1.5">
-                       <label class="text-[10px] font-black text-purple-600 ml-1">RAW SQL QUERY</label>
-                       <textarea v-model="form.query_statement" class="bg-white border border-purple-100 text-xs rounded-lg block w-full px-3 py-2 font-mono h-24 shadow-sm" placeholder="SELECT..." />
-                   </div>
-                   <div class="space-y-1.5">
-                       <label class="text-[10px] font-black text-purple-600 ml-1">RESULT MAPPING</label>
-                       <select v-model="form.query_as" class="bg-white border border-purple-100 text-xs rounded-lg block w-full px-3 py-2 shadow-sm">
-                           <option value="">Select Mapping</option>
-                           <option v-for="qdt in allQueryDataTypes" :key="qdt.value" :value="qdt.value">{{ qdt.name }}</option>
-                       </select>
-                   </div>
-               </div>
-           </div>
+          <!-- Query Service (Conditional) -->
+          <div v-show="showQueryForm" class="space-y-6 border-t border-slate-50 pt-10">
+              <h3 class="text-xs font-black uppercase tracking-[0.2em] text-violet-400">Query Engine Properties</h3>
+              <div class="space-y-6">
+                  <div class="space-y-2">
+                      <label class="text-sm font-medium text-slate-700 block">Raw SQL Query</label>
+                      <textarea v-model="form.query_statement" class="form-control w-full rounded-xl border-slate-200 bg-slate-50 font-mono text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-4 px-5 min-h-[100px]" placeholder="SELECT..." />
+                  </div>
+                  <div class="space-y-2">
+                      <label class="text-sm font-medium text-slate-700 block">Result Mapping</label>
+                      <select v-model="form.query_as" class="form-select w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4">
+                          <option value="">Select Mapping</option>
+                          <option v-for="qdt in allQueryDataTypes" :key="qdt.value" :value="qdt.value">{{ qdt.name }}</option>
+                      </select>
+                  </div>
+              </div>
+          </div>
 
           <!-- Component Attributes -->
-          <div class="flex flex-wrap gap-4 bg-gray-50/30 p-4 rounded-xl border border-gray-100">
-              <label class="flex flex-col items-center justify-center p-3 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
-                  <input v-model="form.is_seo_module" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-gray-300" />
-                  <span class="text-[10px] font-black text-gray-400 group-hover:text-gray-900 uppercase tracking-tighter" :style="checkBoxAlignment">SEO Module</span>
-              </label>
-              <label class="flex flex-col items-center justify-center p-3 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
-                  <input v-model="form.is_mandatory" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-gray-300" />
-                  <span class="text-[10px] font-black text-gray-400 group-hover:text-gray-900 uppercase tracking-tighter" :style="checkBoxAlignment">Mandatory</span>
-              </label>
-              <label class="flex flex-col items-center justify-center p-3 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
-                  <input v-model="form.shared" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-gray-300" />
-                  <span class="text-[10px] font-black text-gray-400 group-hover:text-gray-900 uppercase tracking-tighter" :style="checkBoxAlignment">Shared</span>
-              </label>
-              <label class="flex flex-col items-center justify-center p-3 bg-white rounded-xl border border-gray-100 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
-                  <input v-model="form.live_edit" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-gray-300" />
-                  <span class="text-[10px] font-black text-gray-400 group-hover:text-gray-900 uppercase tracking-tighter" :style="checkBoxAlignment">Live Edit</span>
-              </label>
+          <div class="space-y-4 border-t border-slate-50 pt-10">
+              <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Attributes</h3>
+              <div class="flex flex-wrap gap-3">
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                      <input v-model="form.is_seo_module" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
+                      <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">SEO Module</span>
+                  </label>
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                      <input v-model="form.is_mandatory" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
+                      <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">Mandatory</span>
+                  </label>
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                      <input v-model="form.shared" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
+                      <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">Shared</span>
+                  </label>
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                      <input v-model="form.live_edit" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
+                      <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">Live Edit</span>
+                  </label>
+              </div>
           </div>
 
           <!-- Extended Properties -->
-          <div class="space-y-6">
+          <div class="space-y-6 border-t border-slate-50 pt-10">
+              <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Extended Properties</h3>
               <div class="space-y-6">
-                <div class="space-y-1.5">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Linked Module Alias</label>
-                    <input v-model="form.linked_module" class="bg-white border border-gray-200 text-sm rounded-xl block w-full px-4 py-3 outline-none shadow-sm focus:ring-2 focus:ring-blue-500/20" placeholder="ALIAS_OF_TARGET" />
+                <div class="space-y-2">
+                    <HcAutoSuggest
+                        v-model="form.linked_module"
+                        label="Linked Module Alias"
+                        placeholder="ALIAS_OF_TARGET"
+                        :endpoint="props.dataFormAction.replace('/store', '/getModuleAlias')"
+                        display-field="alias"
+                        :min-chars="2"
+                    >
+                        <template #icon-left>
+                            <i class="fa fa-link"></i>
+                        </template>
+                    </HcAutoSuggest>
                 </div>
-                <div class="space-y-1.5">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Data Key Map</label>
-                    <input v-model="form.data_key_map" class="bg-white border border-gray-200 text-sm rounded-xl block w-full px-4 py-3 outline-none shadow-sm focus:ring-2 focus:ring-blue-500/20" placeholder=":id, :site_id..." />
+                <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Data Key Map</label>
+                    <input v-model="form.data_key_map" class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4" placeholder=":id, :site_id..." />
                 </div>
-              </div>
-
-               <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Contextual Description</label>
-                <textarea v-model="form.description" class="bg-white border border-gray-200 text-sm rounded-xl block w-full px-4 py-3 min-h-[80px] shadow-sm focus:ring-2 focus:ring-blue-500/20 outline-none" placeholder="Purpose of this module..." />
+                <div class="space-y-2">
+                  <label class="text-sm font-medium text-slate-700 block">Contextual Description</label>
+                  <textarea v-model="form.description" class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4 min-h-[80px]" placeholder="Purpose of this module..." />
+                </div>
               </div>
           </div>
 
           <!-- Global Update Section -->
-          <div v-show="showAllUpdateSection" class="bg-red-50/50 p-6 rounded-lg border border-red-100 border-dashed space-y-4">
+          <div v-show="showAllUpdateSection" class="p-6 bg-rose-50/50 rounded-2xl border border-dashed border-rose-200 space-y-4">
               <label class="flex items-center gap-3 cursor-pointer group">
-                  <input v-model="form.update_inAllSites" type="checkbox" class="w-6 h-6 text-red-600 border-red-300 rounded focus:ring-red-500" />
-                  <span class="text-sm font-black text-red-700" :style="checkBoxAlignment">Sync Changes Across All Sites</span>
+                  <input v-model="form.update_inAllSites" type="checkbox" class="w-5 h-5 text-rose-600 border-rose-300 rounded focus:ring-rose-500" />
+                  <span class="text-sm font-black text-rose-700" :style="checkBoxAlignment">Sync Changes Across All Sites</span>
               </label>
-              <div class="bg-red-100/50 text-[11px] text-red-700 p-4 rounded-xl border border-red-100 leading-relaxed font-bold">
+              <div class="bg-rose-100/50 text-[11px] text-rose-700 p-4 rounded-xl border border-rose-100 leading-relaxed font-bold">
                   <i class="fa fa-exclamation-triangle mr-1"></i> WARNING: This action will overwrite module metadata on multiple sites. Use only for global structural changes.
               </div>
           </div>
+
       </div>
 
       <!-- Action Footer -->
-      <div class="px-8 py-10 bg-gray-50/50 border-t border-gray-100 flex flex-col items-center gap-6">
-        <div v-if="errorMessage !== ''" class="w-full max-w-xl bg-red-50 text-red-700 px-6 py-4 rounded-lg border border-red-100 text-sm font-black flex items-center gap-4 animate-shake shadow-sm">
-           <i class="fa fa-exclamation-triangle text-2xl"></i> {{ errorMessage }}
+      <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-4">
+        <div v-if="errorMessage !== ''" class="w-full bg-rose-50 text-rose-700 px-4 py-3 rounded-xl border border-rose-100 text-xs font-black flex items-center gap-3">
+           <i class="fa fa-exclamation-triangle"></i> {{ errorMessage }}
         </div>
-        <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-          <button
-            class="w-full sm:w-auto px-16 py-4.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-1 active:scale-95 text-lg"
-            name="submit"
-            type="submit"
-          >
-            Save Module
-          </button>
-          <a :href="dataBackUrl" class="w-full sm:w-auto px-12 py-4.5 bg-white border border-gray-200 text-gray-500 font-bold rounded-lg hover:bg-gray-100 hover:text-gray-700 transition-all text-center">
-            Back to List
-          </a>
-        </div>
+        <a :href="dataBackUrl" class="w-full sm:w-auto text-center px-6 py-2.5 text-xs font-black uppercase tracking-widest text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1">Cancel</a>
+        <button
+          class="w-full sm:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2"
+          name="submit"
+          type="submit"
+        >
+          <i class="fa fa-save opacity-50"></i>
+          Save Module
+        </button>
       </div>
     </form>
   </div>
@@ -261,6 +264,7 @@
 import { ref, reactive, computed, onMounted, getCurrentInstance } from "vue";
 import { Toast, PasteFromClipboard, IsJson, SafeJsonParse, CheckBoxAlignment } from "../../../helpers/common";
 import Form from "../../../helpers/form";
+import { HcAutoSuggest } from "../ui-kit";
 
 const props = defineProps([
   "dataControllerName",
@@ -508,6 +512,8 @@ const createModule = () => {
             showError(response);
         });
 };
+
+
 
 onMounted(() => {
     if (props.dataActionPerformed === "edit") {

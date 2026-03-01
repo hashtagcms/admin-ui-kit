@@ -27,6 +27,7 @@
         :href="backUrl"
         as="a"
         icon="fa fa-arrow-left"
+        size="md"
       >
         {{ backTitle }}
       </hc-button>

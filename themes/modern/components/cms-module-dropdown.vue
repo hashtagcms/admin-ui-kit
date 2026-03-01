@@ -6,7 +6,7 @@
       @change="onChange"
       :data-parser="parseData"
       :data-selected="currentIndex"
-      data-btn-css="bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30"
+      data-btn-css="bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 h-10 px-5"
     >
       <span class="font-black tracking-tight uppercase text-[10px]">{{ selectedModule }}</span>
     </split-button>

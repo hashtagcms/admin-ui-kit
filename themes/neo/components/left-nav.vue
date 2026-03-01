@@ -1,7 +1,7 @@
 <template>
   <div class="d-flex flex-column flex-shrink-0 t_left js_left_menu">
     <ul class="list-unstyled ps-0">
-      <template v-for="current in allData">
+      <template v-for="current in filteredData">
         <li v-if="current.parent_id === 0">
           <a
             :title="current.sub_title"
@@ -79,6 +79,37 @@ const props = defineProps([
 const allData = ref(SafeJsonParse(props.dataList, []));
 const modulesAllowed = ref(SafeJsonParse(props.dataModulesAllowed, []));
 
+const isAdmin = computed(() => String(props.dataIsAdmin) === '1' || props.dataIsAdmin === true);
+
+const filteredData = computed(() => {
+  if (isAdmin.value) {
+    return allData.value;
+  }
+  
+  const allowed = modulesAllowed.value || [];
+  
+  return allData.value.reduce((acc, current) => {
+    // Check if the parent module is allowed OR if any of its children are allowed
+    const isParentAllowed = allowed.some(m => m.module_id === current.id);
+    
+    let newItem = { ...current };
+    
+    // Check and filter children separately
+    if (newItem.child && newItem.child.length > 0) {
+       newItem.child = newItem.child.filter(child => {
+          return allowed.some(m => m.module_id === child.id);
+       });
+    }
+    
+    // Parent is visible if explicitly allowed or if any child is allowed
+    if (isParentAllowed || (newItem.child && newItem.child.length > 0)) {
+       acc.push(newItem);
+    }
+    
+    return acc;
+  }, []);
+});
+
 // Computed
 const linkForHashtag = computed(
   () => `https://www.hashtagcms.org/?utm_src=${encodeURIComponent(window.location.href)}`
@@ -126,12 +157,7 @@ const showHide = (event) => {
   }
 };
 
-const hasAccess = (module_id) => {
-  if (props.dataIsAdmin.toString() === "1") {
-    return true;
-  }
-  return modulesAllowed.value.some((current) => current.module_id === module_id);
-};
+// Removed unused hasAccess because filteredData handles the exact requirement automatically
 
 const getMinHeight = () => `height:${window.innerHeight}px;`;
 </script>

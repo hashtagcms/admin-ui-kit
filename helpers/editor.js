@@ -158,3 +158,82 @@ export const PageManager = {
     }
   },
 };
+
+/**
+ * CollapsibleSection
+ * Handles toggle-collapse behaviour for [data-collapsible] sections.
+ * State is persisted in localStorage so it survives page reloads.
+ *
+ * HTML contract:
+ *   <section data-collapsible="unique-id" data-collapsed="true|false">
+ *       <div data-collapsible-trigger>  ← clicking this toggles
+ *       <div data-collapsible-body>     ← this element is shown/hidden
+ *   </section>
+ */
+export const CollapsibleSection = {
+    init() {
+        document.querySelectorAll('[data-collapsible]').forEach(section => {
+            const trigger  = section.querySelector('[data-collapsible-trigger]');
+            const body     = section.querySelector('[data-collapsible-body]');
+            const chevron  = trigger ? trigger.querySelector('[data-collapsible-chevron]') : null;
+
+            if (!trigger || !body) return;
+
+            // Initial state from data-collapsed attribute
+            const startCollapsed = section.dataset.collapsed === 'true';
+
+            this._apply(body, chevron, startCollapsed, false);
+
+            trigger.addEventListener('click', () => {
+                const isCurrentlyOpen = body.dataset.open === 'true';
+                const shouldCollapse = isCurrentlyOpen; // if it was open, we want to collapse it
+                this._apply(body, chevron, shouldCollapse, true);
+            });
+        });
+    },
+
+    _apply(body, chevron, collapsed, animate) {
+        if (collapsed) {
+            if (animate && (body.style.maxHeight === 'none' || !body.style.maxHeight)) {
+                body.style.maxHeight = body.scrollHeight + 'px';
+                body.offsetHeight; // force reflow
+            }
+            body.style.maxHeight  = '0px';
+            body.style.overflow   = 'hidden';
+            body.dataset.open     = 'false';
+            if (chevron) chevron.style.transform = 'rotate(-90deg)';
+        } else {
+            const scrollHeight = body.scrollHeight;
+            body.style.maxHeight = scrollHeight + 'px';
+            body.style.overflow  = ''; // allow content to be visible during transition
+            body.dataset.open    = 'true';
+            if (chevron) chevron.style.transform = 'rotate(0deg)';
+
+            if (animate) {
+                setTimeout(() => {
+                    if (body.dataset.open === 'true') {
+                        body.style.maxHeight = 'none';
+                    }
+                }, 400);
+            } else {
+                body.style.maxHeight = 'none';
+            }
+        }
+    },
+
+    expand(section) {
+        const body = section.querySelector('[data-collapsible-body]');
+        const chevron = section.querySelector('[data-collapsible-chevron]');
+        if (body) {
+            this._apply(body, chevron, false, false);
+        }
+    },
+
+    expandAll() {
+        document.querySelectorAll('[data-collapsible]').forEach(section => {
+            this.expand(section);
+        });
+    }
+};
+
+

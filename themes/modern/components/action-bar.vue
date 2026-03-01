@@ -51,7 +51,7 @@
               icon="fa fa-search"
               :active="showSearchPanel"
               is-square
-              size="sm"
+              size="md"
             />
 
             <hc-button
@@ -62,7 +62,7 @@
               :icon="layoutIcon"
               :active="layoutType !== 'table'"
               is-square
-              size="sm"
+              size="md"
             />
 
             <hc-button

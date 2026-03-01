@@ -46,8 +46,8 @@
                 <span class="text-xs font-black text-gray-500 group-hover:text-gray-900 transition-colors">{{ getLabel(data) }}</span>
                 <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
                   <span>ID: {{ data.id }}</span>
-                  <span v-if="data.module">
-                    &bullet; Module Alias: {{ data.module.alias }}
+                  <span v-if="data.module || data.alias">
+                    &bullet; Alias: {{ data.module?.alias || data.alias }}
                   </span>
                   <span v-if="data.platform_id">
                     &bullet; Platform ID: {{ data.platform_id }}
@@ -102,8 +102,8 @@
                 <span class="text-xs font-black text-gray-700 group-hover:text-green-700 transition-colors">{{ getLabelForSite(sData) }}</span>
                 <span class="text-[9px] font-black text-gray-300 uppercase tracking-widest flex items-center gap-2">
                   <span>ID: {{ sData.id }}</span> 
-                   <span v-if="sData.module">
-                    &bullet; Module Alias: {{ sData.module.alias }}
+                   <span v-if="sData.module || sData.alias">
+                    &bullet; Alias: {{ sData.module?.alias || sData.alias }}
                   </span>
                   <span v-if="sData.platform_id">
                     &bullet; Platform ID: {{ sData.platform_id }}

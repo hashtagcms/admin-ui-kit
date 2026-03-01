@@ -6,7 +6,7 @@
       @change="setLanguage"
       :data-parser="parseLang"
       :data-selected="currentIndex"
-      data-btn-css="bg-white border border-gray-200 text-gray-700 hover:border-blue-300 shadow-sm"
+      data-btn-css="bg-white border border-gray-200 text-gray-700 hover:border-blue-300 shadow-sm h-10 px-5"
     >
       <div class="flex items-center gap-2 px-1">
           <i class="fa fa-globe text-[10px] text-gray-400"></i>

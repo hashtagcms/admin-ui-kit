@@ -13,7 +13,7 @@
     </div>
 
     <nav class="flex-1 px-4 space-y-1 mt-3">
-      <template v-for="current in allData">
+      <template v-for="current in filteredData">
         <div 
           v-if="current.parent_id === 0" 
           :key="current.id"
@@ -131,7 +131,7 @@
 
          <div class="relative z-10">
             <div class="px-4 py-2 border-b border-white/5 mb-2">
-               <h4 class="text-xs font-black text-white uppercase tracking-widest">{{ activeHoveredMenu.name }}</h4>
+               <h4 class="text-xs font-black text-white uppercase tracking-widest"><a :href="getHref(activeHoveredMenu)">{{ activeHoveredMenu.name }}</a></h4>
                <p v-if="activeHoveredMenu.sub_title" class="text-[9px] text-gray-500 font-bold mt-0.5">{{ activeHoveredMenu.sub_title }}</p>
             </div>
             
@@ -172,6 +172,37 @@ const props = defineProps([
 
 const allData = ref(SafeJsonParse(props.dataList, []));
 const modulesAllowed = ref(SafeJsonParse(props.dataModulesAllowed, []));
+
+const isAdmin = computed(() => String(props.dataIsAdmin) === '1' || props.dataIsAdmin === true);
+
+const filteredData = computed(() => {
+  if (isAdmin.value) {
+    return allData.value;
+  }
+  
+  const allowed = modulesAllowed.value || [];
+  
+  return allData.value.reduce((acc, current) => {
+    // Check if the parent module is allowed OR if any of its children are allowed
+    const isParentAllowed = allowed.some(m => m.module_id === current.id);
+    
+    let newItem = { ...current };
+    
+    // Check and filter children separately
+    if (newItem.child && newItem.child.length > 0) {
+       newItem.child = newItem.child.filter(child => {
+          return allowed.some(m => m.module_id === child.id);
+       });
+    }
+    
+    // Parent is visible if explicitly allowed or if any child is allowed (so users can navigate via folder)
+    if (isParentAllowed || (newItem.child && newItem.child.length > 0)) {
+       acc.push(newItem);
+    }
+    
+    return acc;
+  }, []);
+});
 const expandedMenus = ref([]);
 const isCollapsed = ref(false);
 const hoveredMenu = ref(null);
@@ -182,13 +213,14 @@ const tooltipVisible = ref(false);
 const tooltipX = ref(0);
 const tooltipY = ref(0);
 
+
 const linkForHashtag = computed(() => {
   return `https://www.hashtagcms.org/?utm_src=${window.location.host}`;
 });
 
 const activeHoveredMenu = computed(() => {
   if (!hoveredMenu.value) return null;
-  return allData.value.find((m) => m.id === hoveredMenu.value);
+  return filteredData.value.find((m) => m.id === hoveredMenu.value);
 });
 
 const updateTooltipPosition = (e) => {
@@ -305,7 +337,7 @@ onMounted(() => {
 
   // Auto-expand menus that have active children on page load (only if not collapsed)
   if (!isCollapsed.value) {
-    allData.value.forEach((current) => {
+    filteredData.value.forEach((current) => {
       if (isActive(current.controller_name, current)) {
         expandedMenus.value.push(current.id);
       }

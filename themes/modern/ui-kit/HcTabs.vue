@@ -1,90 +1,28 @@
 <template>
-  <div class="w-full">
-    <!-- Tab Headers -->
-    <div class="border-b border-gray-100 mb-6">
-      <ul class="flex flex-nowrap overflow-x-auto no-scrollbar -mb-px">
-        <li v-for="tab in tabs" :key="tab.id" class="mr-6 flex-shrink-0">
-          <button 
-            ref="tabButtons"
-            @click="activeId = tab.id"
-            :class="[
-              'py-4 px-1 border-b-[3px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95',
-              activeId === tab.id 
-                ? 'border-blue-600 text-blue-600 rounded-t-sm' 
-                : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-200'
-            ]"
-          >
-            {{ tab.label }}
-          </button>
-        </li>
-      </ul>
-    </div>
-
-    <!-- Tab Content -->
-    <div class="relative min-h-[100px]">
-      <div 
-        v-for="tab in tabs" 
-        :key="tab.id"
-        v-show="activeId === tab.id"
-        class="animate-in fade-in slide-in-from-bottom-2 duration-300"
-      >
-        <slot :name="tab.id">{{ tab.content }}</slot>
-      </div>
-    </div>
-  </div>
+  <RawComponent v-bind="$attrs" :ui="uiStyle">
+    <template v-for="slot in Object.keys($slots)" #[slot]="scope">
+      <slot :name="slot" v-bind="scope" />
+    </template>
+  </RawComponent>
 </template>
 
-<script>
-export default {
-  name: 'HcTabs',
-  props: {
-    tabs: {
-      type: Array,
-      required: true,
-      // Expected: [{ id: 'general', label: 'General', content: '...' }]
-    },
-    initialTab: {
-      type: String,
-      default: ''
-    }
-  },
-  data() {
-    return {
-      activeId: this.initialTab || (this.tabs.length ? this.tabs[0].id : '')
-    };
-  },
-  watch: {
-    activeId() {
-      this.scrollToActiveTab();
-    },
-    tabs: {
-      handler() {
-        this.$nextTick(() => this.scrollToActiveTab());
-      },
-      deep: true
-    }
-  },
-  mounted() {
-    this.scrollToActiveTab();
-  },
-  methods: {
-    scrollToActiveTab() {
-      this.$nextTick(() => {
-        const index = this.tabs.findIndex(t => t.id === this.activeId);
-        if (index !== -1 && this.$refs.tabButtons && this.$refs.tabButtons[index]) {
-          this.$refs.tabButtons[index].scrollIntoView({
-            behavior: 'smooth',
-            block: 'nearest',
-            inline: 'center'
-          });
-        }
-      });
-    }
-  }
+<script setup>
+/**
+ * Modern Theme Wrapper for HcTabs
+ * Injects Tailwind styles into the theme-blind common component.
+ */
+import RawComponent from '../../../common/js/ui-kit/HcTabs.vue';
+defineOptions({ name: 'ModernHcTabs' });
+
+const uiStyle = {
+  wrapper: "w-full",
+  headerContainer: "border-b border-gray-100 mb-6",
+  tabList: "flex flex-nowrap overflow-x-auto no-scrollbar -mb-px",
+  tabItem: "mr-6 flex-shrink-0",
+  tabButton: "py-4 px-1 border-b-[3px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95",
+  activeTab: "border-blue-600 text-blue-600 rounded-t-sm",
+  inactiveTab: "border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-200",
+  contentContainer: "relative min-h-[100px]",
+  contentPanel: "animate-in fade-in slide-in-from-bottom-2 duration-300"
 };
 </script>
-
-<style scoped>
-.no-scrollbar::-webkit-scrollbar { display: none; }
-.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-</style>

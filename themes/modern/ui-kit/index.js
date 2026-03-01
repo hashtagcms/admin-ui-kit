@@ -25,6 +25,7 @@ import HcStatCard from './HcStatCard.vue';
 import HcBreadcrumbs from './HcBreadcrumbs.vue';
 import HcDropdown from './HcDropdown.vue';
 import HcDrawer from './HcDrawer.vue';
+import HcAutoSuggest from './HcAutoSuggest.vue';
 
 export {
   HcButton,
@@ -53,37 +54,15 @@ export {
   HcStatCard,
   HcBreadcrumbs,
   HcDropdown,
-  HcDrawer
+  HcDrawer,
+  HcAutoSuggest
 };
 
 const HcUiKit = {
-  HcButton,
-  HcBadge,
-  HcAlert,
-  HcTable,
-  HcModal,
-  HcSpinner,
-  HcProgress,
-  HcCard,
-  HcPlaceholder,
-  HcCheckbox,
-  HcRadioGroup,
-  HcFileUpload,
-  HcPagination,
-  HcTabs,
-  HcButtonGroup,
-  HcTooltip,
-  HcPopover,
-  HcToast,
-  HcBadgeContainer,
-  HcInput,
-  HcSelect,
-  HcSwitch,
-  HcAvatar,
-  HcStatCard,
-  HcBreadcrumbs,
-  HcDropdown,
-  HcDrawer
+  HcButton, HcBadge, HcAlert, HcTable, HcModal, HcSpinner, HcProgress, HcCard, HcPlaceholder,
+  HcCheckbox, HcRadioGroup, HcFileUpload, HcPagination, HcTabs, HcButtonGroup, HcTooltip,
+  HcPopover, HcToast, HcBadgeContainer, HcInput, HcSelect, HcSwitch, HcAvatar, HcStatCard,
+  HcBreadcrumbs, HcDropdown, HcDrawer, HcAutoSuggest
 };
 
 export default HcUiKit;

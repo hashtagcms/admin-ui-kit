@@ -22,6 +22,13 @@ export class ErrorMessage {
         this.handleUploadErrorParam();
         this.renderErrors();
         this.focusFirst();
+
+        // Expand all collapsible sections if there are errors
+        if (Object.keys(this.errors).length > 0) {
+            if (window.CollapsibleSection && typeof window.CollapsibleSection.expandAll === "function") {
+                window.CollapsibleSection.expandAll();
+            }
+        }
     };
 
     if (document.readyState === "loading") {

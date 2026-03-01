@@ -3,7 +3,7 @@
     <hc-button
       variant="soft"
       is-square
-      size="sm"
+      size="md"
       :icon="currentCss"
       @click="toggleMenu"
       :aria-label="mode === 'collapse' ? 'Collapse Side Menu' : 'Toggle Side Menu'"

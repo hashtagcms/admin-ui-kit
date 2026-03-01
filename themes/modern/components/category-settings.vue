@@ -201,7 +201,7 @@
                     </div>
                     <span class="text-sm font-bold text-gray-600 group-hover:text-blue-900 transition-colors">{{ category.category_name }}</span>
                 </div>
-                <i class="fa fa-plus text-xs text-blue-300 group-hover:text-blue-600 transition-all translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0" @click="addToCurrentPlatform(category)"></i>
+                <i class="fa fa-plus text-xs text-blue-300 group-hover:text-blue-600 transition-all translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 cursor-pointer" @click="addToCurrentPlatform(category)"></i>
               </li>
             </ul>
          </div>
