@@ -74,7 +74,7 @@
           </div>
 
           <div class="space-y-2">
-              <div v-for="(msg, idx) in messages" :key="idx" :class="[msg.status === 0 ? 'bg-red-50 text-red-600 border-red-100' : 'bg-green-50 text-green-600 border-green-100', 'px-4 py-3 rounded-lg border text-xs font-bold transition-all animate-fadeIn shadow-sm']">
+              <div v-for="(msg, idx) in messages" :key="idx" :class="[msg.status === 0 ?'bg-red-50 text-red-600 border-red-100' : 'bg-green-50 text-green-600 border-green-100', 'px-4 py-3 rounded-lg border text-xs font-bold transition-all animate-fadeIn shadow-sm']">
                 {{ msg.message }}
               </div>
           </div>

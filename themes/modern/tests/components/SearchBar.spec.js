@@ -1,18 +1,15 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import SearchBar from '@hashtagcms/theme/modern/components/search-bar.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 describe('Modern: SearchBar.vue', () => {
 
   const defaultProps = {
          dataSelectedParams: JSON.stringify({ q: "", f: "id", o: "=" }),
-         dataControllerName: 'users',
-         dataFields: JSON.stringify([
-            { label: 'ID', key: 'id' }, 
-            { label: 'Created At', key: 'created_at' }
-         ]),
-         dataActionFields: JSON.stringify(['edit'])
+         dataControllerName: countryData.controller,
+         dataFields: JSON.stringify(countryData.dataFields),
+         dataActionFields: JSON.stringify(countryData.actionFields)
   };
 
   it('renders correctly with modern input group styling', () => {
@@ -39,7 +36,7 @@ describe('Modern: SearchBar.vue', () => {
     
     // Set field to something with _at or _date
     const select = wrapper.find('select');
-    await select.setValue('created_at');
+    await select.setValue('updated_at');
     
     expect(wrapper.find('input').attributes('type')).toBe('date');
   });

@@ -8,7 +8,7 @@
       <slot name="title">{{ title }}</slot>
     </template>
 
-    <div :class="[contentCss, 'text-gray-600 font-medium leading-relaxed']">
+    <div :class="[contentCss,'text-gray-600 font-medium leading-relaxed']">
       <slot name="content">
         <slot>{{ content }}</slot>
       </slot>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import HcModal from "../../ui-kit/HcModal.vue";
 import HcButton from "../../ui-kit/HcButton.vue";
 
@@ -38,6 +38,7 @@ const props = defineProps([
   "dataFooterCss",
   "dataModalCss",
   "dataWidth",
+  "dataSize",
 ]);
 
 const emit = defineEmits(["onClose"]);
@@ -51,6 +52,12 @@ const title = ref("Alert");
 const content = ref("Modal Content");
 const footerContent = ref("");
 
+const handleKeydown = (e) => {
+    if (e.key === "Escape" && visible.value) {
+        close();
+    }
+}
+
 const showFooter = computed(() => {
   return (
     (typeof props.dataShowFooter !== "undefined" &&
@@ -60,6 +67,9 @@ const showFooter = computed(() => {
 });
 
 const modalSize = computed(() => {
+  if (typeof props.dataSize != "undefined") {
+    return props.dataSize;
+  }
   if (typeof props.dataWidth != "undefined") {
     const w = parseInt(props.dataWidth);
     if (w < 400) return 'sm';
@@ -106,6 +116,11 @@ onMounted(() => {
     if (visible.value) {
         open();
     }
+    window.addEventListener("keydown", handleKeydown);
+});
+
+onUnmounted(() => {
+    window.removeEventListener("keydown", handleKeydown);
 });
 
 defineExpose({

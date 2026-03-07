@@ -46,7 +46,7 @@
       </div>
 
       <!-- Table View -->
-      <div v-if="layoutType === 'table'" class="bg-white rounded-lg shadow-lg border border-gray-100 overflow-hidden">
+      <div v-if="layoutType === 'table'" class="bg-white rounded-lg shadow-md border border-gray-100 overflow-hidden">
         <div class="overflow-x-auto">
           <table class="w-full text-left border-collapse">
             <thead class="bg-gray-100/50 border-b border-gray-100">
@@ -190,7 +190,10 @@ const { proxy } = getCurrentInstance();
 
 // Data
 const actionFields = ref(SafeJsonParse(props.dataActionFields, []));
-const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+const userRightsList = SafeJsonParse(props.dataUserRights, []);
+const userRights = ref(userRightsList);
+const userRightsSet = new Set(userRightsList);
+
 const moreActions = ref(SafeJsonParse(props.dataMoreActionFields, []));
 
 // Helper for default values
@@ -198,7 +201,9 @@ const getDefaultValue = (key, dv) => {
   return window.Laravel?.htcmsAdminConfig?.(key) || dv;
 };
 
-const actionAjax = ref(SafeJsonParse(props.dataActionAsAjax, getDefaultValue("action_as_ajax", [])));
+const actionAjaxList = SafeJsonParse(props.dataActionAsAjax, getDefaultValue("action_as_ajax", []));
+const actionAjax = ref(actionAjaxList);
+const actionAjaxSet = new Set(actionAjaxList);
 const actionIconCss = ref(SafeJsonParse(props.dataActionCss, getDefaultValue("action_icon_css", [])));
 
 const alertMessage = reactive({
@@ -227,8 +232,10 @@ const infoPopup = ref(null);
 /** Computed **/
 const hasAnyVisibleActions = computed(() => visibleActions.value.length > 0);
 
-const headings = computed(() => {
-  const headingData = SafeJsonParse(props.dataHeaders, []);
+const headingData = SafeJsonParse(props.dataHeaders, []);
+
+const headings = computed(() => {  
+  //const headingData = SafeJsonParse(props.dataHeaders, []);
   return headingData
     .filter(current => {
       const key = current.key || current;
@@ -240,8 +247,10 @@ const headings = computed(() => {
     .map(current => ({
       label: current.label || current,
       key: current.key || current,
-      isImage: current.isImage?.toString() === "true",
-      showAllScopes: current.showAllScopes?.toString() === "true",
+      isImage: current.isImage?.toString() === "true" || current.isImage === true,
+      showAllScopes: current.showAllScopes?.toString() === "true" || current.showAllScopes === true,
+      height: current.height || null,
+      width: current.width || null
     }));
 });
 
@@ -267,19 +276,34 @@ const sanitizeHTML = (html) => {
     const parser = new DOMParser();
     const doc = parser.parseFromString(html, "text/html");
     
-    // Remove scripts and potentially dangerous elements
-    const dangerousTags = ["script", "iframe", "object", "embed", "base"];
+    // Remove scripts and potentially dangerous structural elements
+    const dangerousTags = ["script", "iframe", "object", "embed", "base", "meta", "style"];
     dangerousTags.forEach(tag => {
       doc.querySelectorAll(tag).forEach(el => el.remove());
     });
 
-    // Strip event handlers (onmouseover, onclick, etc.)
+    // Strip event handlers AND dangerous protocols in specific attributes
     const allElements = doc.querySelectorAll("*");
     allElements.forEach(el => {
       for (let i = el.attributes.length - 1; i >= 0; i--) {
-        const attr = el.attributes[i].name.toLowerCase();
-        if (attr.startsWith("on") || attr === "javascript:") {
-          el.removeAttribute(attr);
+        const attrName = el.attributes[i].name.toLowerCase();
+        const attrValue = el.attributes[i].value;
+        const normalizedValue = attrValue.toLowerCase().replace(/\s/g, ''); // catch "java script:"
+        
+        // 1. Strip ALL event handlers (onclick, onmouseover, etc.)
+        if (attrName.startsWith("on")) {
+          el.removeAttribute(attrName);
+        } 
+        // 2. Strip XSS protocols from actionable attributes
+        else if (['href', 'src', 'action', 'formaction', 'data', 'xlink:href'].includes(attrName)) {
+           // EXCEPTION: Allow javascript:void(0) as it is heavily used by tabular-view action links (Details/showinfo)
+           if (normalizedValue === 'javascript:void(0)' || normalizedValue === 'javascript:void(0);') {
+             continue; // safe to keep
+           }
+           
+           if (normalizedValue.startsWith('javascript:') || normalizedValue.startsWith('data:text/html')) {
+              el.removeAttribute(attrName);
+           }
         }
       }
     });
@@ -364,8 +388,14 @@ const visibleActions = computed(() => {
   return result;
 });
 
+const visibleActionKeys = computed(() => {
+  const map = new Set();
+  visibleActions.value.forEach(a => map.add(a.action));
+  return map;
+});
+
 const hasAction = (actionName) => {
-  return visibleActions.value.some(a => a.action === actionName);
+  return visibleActionKeys.value.has(actionName);
 };
 
 
@@ -375,13 +405,12 @@ const hasAction = (actionName) => {
  * @returns {boolean} True if the user has the permission.
  */
 const can = (rights) => {
-    const r = userRights.value;
     const isSpecialAction = ["add", "edit", "approve"].includes(rights);
     // User requested: if user has only one right. should be able add/edit/approve.
-    if (r.length === 1 && r[0] !== 'read' && isSpecialAction) {
+    if (userRightsSet.size === 1 && !userRightsSet.has('read') && isSpecialAction) {
         return true;
     }
-  return r.indexOf(rights) >= 0;
+  return userRightsSet.has(rights);
 };
 
 /**
@@ -390,7 +419,7 @@ const can = (rights) => {
  * @returns {boolean} True if the action is configured as AJAX.
  */
 const isAjax = (action) => {
-  return actionAjax.value.indexOf(action) >= 0;
+  return actionAjaxSet.has(action);
 };
 
 // =============================================================================
@@ -504,17 +533,28 @@ const getNestedValue = (row, key, fields) => {
  * @param {string} v - The filename.
  * @returns {string} HTML string for the media link.
  */
-const getImgOrVideoHtml = (v) => {
+const getImgOrVideoHtml = (v, field) => {
   const mediaPath = AdminConfig.get("media_path");
   const imgs = ["apng", "avif", "gif", "jpg", "jpeg", "jfif", "pjpeg", "pjp", "png", "svg", "webp", "bmp", "ico", "cur", "tif", "tiff"];
   const vids = ["mp4", "mov", "ogg"];
-  const ext = v.toString().substring(v.lastIndexOf(".") + 1).toLowerCase();
-  
+  const ext = v.toString().substring(v.lastIndexOf(".") + 1).toLowerCase();  
   let content = "";
+
+  let sizeAttrs = "";
+  if (field && field.height) {
+    sizeAttrs += ` height="${field.height.replace('px', '')}"`;
+  }
+  if (field && field.width) {
+    sizeAttrs += ` width="${field.width.replace('px', '')}"`;
+  }
+  if (!sizeAttrs) {
+    sizeAttrs = ` height="30"`;
+  }
+
   if (vids.includes(ext)) {
-    content = `<video height="30"><source src="${mediaPath}/${v}"></video>`;
+    content = `<video${sizeAttrs}><source src="${mediaPath}/${v}"></video>`;
   } else if (imgs.includes(ext)) {
-    content = `<img height="30" src='${mediaPath}/${v}' />`;
+    content = `<img${sizeAttrs} src='${mediaPath}/${v}' class="rounded shadow border border-gray-100 object-cover" />`;
   } else {
     content = v;
   }
@@ -602,7 +642,7 @@ const getActualValue = (row, forKey, fields) => {
   }
 
   if (fields.isImage && value) {
-    return getImgOrVideoHtml(value);
+    return getImgOrVideoHtml(value, fields);
   }
 
   return value;
@@ -647,13 +687,14 @@ const getActionValue = (row) => {
       let iconCss = item.icon_css;
       if (iconCss && !iconCss.includes("fa ")) iconCss = "fa " + iconCss;
       
-      let attributes = item.hrefAttributes ? Object.entries(item.hrefAttributes).map(([k, v]) => `${k}='${v}'`).join(" ") : "";
+      let attributes = item.hrefAttributes ? Object.entries(item.hrefAttributes).map(([k, v]) => `${k}='${typeof v === "object" ? JSON.stringify(v) : v}'`).join(" ") : "";
       if (item.isCustom) {
           attributes += ` data-custom="true"`;
       }
       const icon = `<i class="js_icon ${iconCss}"></i>`;
+      const extraCss = item.css || "";
       
-      html.push(`<a class="${isAjaxVal} ${baseBtnCss}" data-rowid="${row.id}" data-action="${actionName}" title="${item.label}" href="${path}" ${attributes}>${icon}</a>`);
+      html.push(`<a class="${isAjaxVal} ${extraCss} ${baseBtnCss}" data-rowid="${row.id}" data-action="${actionName}" title="${item.label}" href="${path}" ${attributes}>${icon}</a>`);
     }
   });
 
@@ -820,18 +861,7 @@ onMounted(() => {
   }
   EventBus.on("list-view-hide-spinner", () => showHideSpinner(undefined, "false"));
   EventBus.on("info-popup-open", () => removeAllSpinners());
-});
 
-// Since we can't mutate computed prop 'rows' (derived from props), 
-// and the original component splice logic was flawed if strictly following Vue philosophy 
-// (it mutated a parsed copy in data() but labeled as rows computed in my previous conversion attempt, 
-// actually in original code 'rows' WAS computed so splice shouldn't start working? 
-// Wait, original code: rows() { return SafeJsonParse... }. Computed. 
-// splice() on array returned from computed? Use caution.
-// 'rows' is computed returning a NEW array every time props change.
-// But splice() on the *result* of computed property acts on that temporary array. 
-// It won't persist if props trigger re-compute.
-// Ideally usage of dataList prop implies parent manages state. 
-// But here we are just replicating existing behavior.
+});
 
 </script>

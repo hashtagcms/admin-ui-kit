@@ -59,18 +59,27 @@ const decreaseCounter = () => {
 };
 
 const handlePageChange = (page) => {
-  // Find the URL for this page number in Laravel's links
-  // Usually Laravel provides links like [ {label: "1", url: "..."}, {label: "2", url: "..."}, ... ]
+  let targetUrl = paginator.value.path;
   const pageLink = paginator.value.links?.find((link) => link.label == page);
+
   if (pageLink && pageLink.url) {
-    window.location.href = pageLink.url;
-  } else {
-    // Fallback: manually construct URL or find by page number
-    const baseUrl = paginator.value.path;
-    const searchParams = new URLSearchParams(window.location.search);
-    searchParams.set("page", page);
-    window.location.href = `${baseUrl}?${searchParams.toString()}`;
+    targetUrl = pageLink.url;
   }
+
+  // Merge with existing window.location params
+  const urlObj = new URL(targetUrl, window.location.origin);
+  const currentParams = new URLSearchParams(window.location.search);
+  
+  for (const [key, value] of currentParams.entries()) {
+    if (key !== 'page' && !urlObj.searchParams.has(key)) {
+      urlObj.searchParams.set(key, value);
+    }
+  }
+  
+  // Ensure the page parameter is explicitly updated
+  urlObj.searchParams.set("page", page);
+
+  window.location.href = urlObj.toString();
 };
 
 onMounted(() => {

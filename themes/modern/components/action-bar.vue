@@ -12,6 +12,7 @@
         
         <!-- Actions Toolbar -->
         <div class="flex flex-wrap items-center gap-3 bg-gray-50/50 p-2 rounded-lg border border-gray-100 shadow-inner w-full lg:w-auto">
+            <cms-module-dropdown :data-modules="cmsModules" :data-current-module="controllerName"></cms-module-dropdown>
             <language-button
               v-if="hasLangMethod"
               :data-languages="dataLanguages"
@@ -36,16 +37,17 @@
               outline
               :href="getAction(actionButton.action)"
               :icon="actionButton.icon_css"
+              :is-square="getButtonType(actionButton) !== 'button'"
               as="a"
             >
-              <span v-if="getButtonType(actionButton) == 'button'">{{
-                actionButton.label
-              }}</span>
+              <template #default v-if="getButtonType(actionButton) == 'button'">
+                <span>{{ actionButton.label }}</span>
+              </template>
             </hc-button>
 
             <hc-button
               v-if="showSearchButton"
-              variant="secondary"
+              variant="soft"
               outline
               @click="showHideSearch"
               icon="fa fa-search"
@@ -77,7 +79,7 @@
     </div>
     
     <!-- Search Panel -->
-    <div class="mt-8 transform origin-top transition-all" :class="showSearchPanel ? 'scale-100 opacity-100' : 'scale-95 opacity-0 hidden'" v-if="showSearchPanel">
+    <div class="mt-8 transform origin-top transition-all" :class="showSearchPanel ?'scale-100 opacity-100' : 'scale-95 opacity-0 hidden'" v-if="showSearchPanel">
       <div class="bg-white p-6 rounded-lg border border-gray-100 shadow-lg shadow-blue-500/5">
           <search-bar
             :class="searchAnim"
@@ -121,12 +123,12 @@ const props = defineProps([
 
 const instance = getCurrentInstance();
 
-const userRights = ref(SafeJsonParse(props.dataUserRights, []));
+const userRights = computed(() => SafeJsonParse(props.dataUserRights, []));
 const can = (rights) => {
   return userRights.value.indexOf(rights) >= 0;
 };
 
-const showSearchButton = ref(!(
+const showSearchButton = computed(() => !(
   typeof props.dataShowSearch === "undefined" ||
   props.dataShowSearch === "" ||
   props.dataShowSearch === "false"
@@ -135,47 +137,41 @@ const showSearchPanel = ref(false);
 const searchAnim = ref("");
 
 
-
-const moreActionButtons = ref(SafeJsonParse(props.dataMoreActions, []));
+const moreActionButtons = computed(() => SafeJsonParse(props.dataMoreActions, []));
 
 const filteredMoreActionButtons = computed(() => {
     return moreActionButtons.value;
 });
-const showAdd = ref(
+const showAdd = computed(() =>
   typeof props.dataShowAdd === "undefined" || props.dataShowAdd === "true"
 );
-const hasLangMethod = ref(!(
+const hasLangMethod = computed(() => !(
   typeof props.dataHasLangMethod === "undefined" ||
   props.dataHasLangMethod === "false"
 ));
-const cmsModules = ref(SafeJsonParse(props.dataCmsModules, {}));
-const selectedParams = ref(
+const cmsModules = computed(() => SafeJsonParse(props.dataCmsModules, {}));
+const selectedParams = computed(() =>
   typeof props.dataSelectedParams === "undefined"
     ? ""
     : props.dataSelectedParams
 );
-const controllerName = ref(
+const controllerName = computed(() =>
   typeof props.dataControllerName === "undefined"
     ? ""
     : props.dataControllerName
 );
-const controllerTitle = ref(
+const controllerTitle = computed(() =>
   typeof props.dataControllerTitle === "undefined"
     ? ""
     : props.dataControllerTitle
 );
-const fields = ref(
-  typeof props.dataFields === "undefined" || props.dataFields === ""
-    ? []
-    : props.dataFields
+const fields = computed(() =>
+  typeof props.dataFields === "string" ? SafeJsonParse(props.dataFields, []) : props.dataFields || []
 );
-const actionFields = ref(
-  typeof props.dataActionFields === "undefined" ||
-  props.dataActionFields === ""
-    ? []
-    : props.dataActionFields
+const actionFields = computed(() =>
+  typeof props.dataActionFields === "string" ? SafeJsonParse(props.dataActionFields, []) : props.dataActionFields || []
 );
-const showBack = ref(props.dataShowBack === "true");
+const showBack = computed(() => props.dataShowBack === "true");
 const layoutType = ref(
   typeof props.dataLayoutType === "undefined" || props.dataLayoutType === ""
     ? "table"

@@ -84,7 +84,18 @@ export default class TabularViewActions {
      */
     static showinfo(row, context) {
         const { target, infoPopup } = context;
-        const { info, editable, excludefields = [] } = target.dataset;
+        const { info, editable } = target.dataset;
+        let excludefields = [];
+        if (target.dataset.excludefields) {
+            try {
+                // Try to parse as valid JSON array
+                excludefields = JSON.parse(target.dataset.excludefields);
+            } catch (e) {
+                // Fallback to comma-separated string, removing brackets if present
+                let cleanStr = target.dataset.excludefields.replace(/^\[|\]$/g, '').replace(/'|"/g, '');
+                excludefields = cleanStr.split(",").map(s => s.trim());
+            }
+        }
         const rowid = target.dataset.rowid;
         if (infoPopup) {
             infoPopup.showInfo(info, rowid, excludefields, editable);

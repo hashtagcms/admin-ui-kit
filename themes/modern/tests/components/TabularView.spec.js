@@ -1,26 +1,27 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import TabularView from '@hashtagcms/theme/modern/components/tabular-view.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 vi.mock('axios');
 
 // Mock window.Laravel
 global.window.Laravel = {
-    htcmsAdminConfig: vi.fn().mockReturnValue({})
+    htcmsAdminConfig: vi.fn((key) => {
+        if (key === "action_as_ajax") return [];
+        return null;
+    })
 };
 
 describe('Modern: TabularView.vue', () => {
 
-  const dataProps = loadFakeData('table-view.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataHeaders: JSON.stringify([...countryData.dataFields, 'action']),
+    dataList: JSON.stringify(countryData.paginator.data),
+    dataActionFields: JSON.stringify(countryData.actionFields),
+    dataUserRights: JSON.stringify(countryData.actionFields),
+    dataControllerName: "country"
+  };
 
   it('renders correctly as a modern dashboard table', () => {
     const wrapper = shallowMount(TabularView, { 
@@ -34,8 +35,9 @@ describe('Modern: TabularView.vue', () => {
     });
 
     // Check for modern table shadows and borders
-    const tableContainer = wrapper.find('.bg-white.rounded-lg.shadow-lg');
+    const tableContainer = wrapper.find('.bg-white.rounded-lg.shadow-md');
     expect(tableContainer.exists()).toBe(true);
+    
     
     // Check for high-contrast headers
     const th = wrapper.find('th');

@@ -1,7 +1,7 @@
 import { shallowMount, flushPromises } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import SiteWiseCopier from '@hashtagcms/theme/neo/components/sitewise-copier.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -25,19 +25,18 @@ vi.stubGlobal('axios', mockAxios);
 
 describe('Neo: SiteWiseCopier.vue', () => {
 
-  const dataProps = loadFakeData('site-wise-copier.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (key === 'dataAllSites') {
-          const sites = dataProps[key];
-          sites.push({id: 2, name: 'Secondary Site'}); // Add another site to avoid filtering out everything
-          props[key] = JSON.stringify(sites);
-      } else if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataAllSites: JSON.stringify([
+      { id: siteData.siteInfo.id, name: siteData.siteInfo.name },
+      { id: 2, name: 'Secondary Site' }
+    ]),
+    dataSiteId: String(siteData.siteInfo.id),
+    dataMessage: "Languages",
+    dataAllData: JSON.stringify({ label: 'Languages', data: [] }),
+    dataSiteData: JSON.stringify([]),
+    dataCurrentKey: "language",
+    dataControllerName: "site"
+  };
 
   it('renders correctly', () => {
     const wrapper = shallowMount(SiteWiseCopier, { props });

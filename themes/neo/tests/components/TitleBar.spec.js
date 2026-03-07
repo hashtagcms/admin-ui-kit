@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import TitleBar from '@hashtagcms/theme/neo/components/title-bar.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -12,15 +12,10 @@ vi.mock('@hashtagcms/helpers/admin-config', () => ({
 
 describe('TitleBar.vue', () => {
 
-  const dataProps = loadFakeData('title-bar.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataTitle: countryData.name,
+    dataBackUrl: countryData.route
+  };
 
   it('renders correctly with given props', () => {
     const wrapper = shallowMount(TitleBar, { 
@@ -49,7 +44,7 @@ describe('TitleBar.vue', () => {
      });
      
      await wrapper.find('button[aria-label="Back"]').trigger('click');
-     expect(window.location.href).toBe('http://localhost:8000/admin/country?id=244'); // from fake data
+     expect(window.location.href).toBe('/admin/country'); // from countryData.route
      
      window.location = originalLocation;
   });

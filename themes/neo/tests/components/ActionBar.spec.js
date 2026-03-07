@@ -1,9 +1,7 @@
 import { mount, shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import ActionBar from '@hashtagcms/theme/neo/components/action-bar.vue';
-import AdminConfig from '@hashtagcms/helpers/admin-config';
-import { Toast } from '@hashtagcms/helpers/common';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -24,30 +22,37 @@ vi.mock('@hashtagcms/helpers/humanize', () => ({
 
 describe('ActionBar.vue', () => {
     
-  const dataProps = loadFakeData('action-bar.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataControllerTitle: "Countries",
+    dataControllerName: "Country",
+    dataSelectedParams: JSON.stringify([]),
+    dataFields: JSON.stringify(countryData.dataFields),
+    dataActionFields: JSON.stringify(countryData.actionFields),
+    dataLanguages: JSON.stringify(countryData.supportedLangs),
+    dataSelectedLanguage: "1",
+    dataMoreActions: JSON.stringify([]),
+    dataHasLangMethod: "true",
+    dataCmsModules: JSON.stringify([]),
+    dataLayoutType: 'table',
+    dataShowSearch: "true",
+    dataShowAdd: "true",
+    dataUserRights: JSON.stringify(countryData.actionFields)
+  };
 
   it('renders correctly with given props', () => {
     const wrapper = shallowMount(ActionBar, { props });
 
-    // action-bar.txt has title "Countries"
+    // Verify title rendering
     expect(wrapper.find('.moduleTitle').text()).toBe('COUNTRIES'); // Mocked Humanize returns uppercase
     
     // hasLangMethod is true and languages are provided
     expect(wrapper.find('language-button-stub').exists()).toBe(true);
     
     // showAdd is likely true (default/missing prop implies true or explicit true?)
-    // action-bar.txt doesn't have data-show-add=false.
+    // Verify add button presence
     // It has action-fields=["edit","delete"]. Edit implies Add button logic if showAdd is true/undefined.
     // Let's check logic: showAdd defaults to true. showAddButtonBasedOnAction checks if 'edit' is in actionFields.
-    // Yes, 'edit' is in action-bar.txt.
+    // Verify edit action
     expect(wrapper.find('button[aria-label="Add New"]').exists()).toBe(true);
   });
 
@@ -72,7 +77,7 @@ describe('ActionBar.vue', () => {
 
     await wrapper.find('button[aria-label="Add New"]').trigger('click');
     // controller name is 'country'
-    expect(window.location.href).toBe('/admin/country/create');
+    expect(window.location.href).toBe('/admin/Country/create');
 
     // Restore
     window.location = originalLocation;

@@ -25,6 +25,9 @@ export class ErrorMessage {
 
         // Expand all collapsible sections if there are errors
         if (Object.keys(this.errors).length > 0) {
+            document.querySelectorAll('[data-collapsible]').forEach(el => {
+                el.dataset.collapsed = 'false';
+            });
             if (window.CollapsibleSection && typeof window.CollapsibleSection.expandAll === "function") {
                 window.CollapsibleSection.expandAll();
             }

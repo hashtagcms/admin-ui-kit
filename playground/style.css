@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Common Playground Styles */
+@layer base {
+  body {
+    @apply m-0 font-sans bg-slate-50 text-slate-900;
+  }
+}
+
+@layer components {
+  .playground-header {
+    @apply sticky top-0 z-[1050] bg-slate-900 text-white px-6 py-3 flex justify-between items-center shadow-xl;
+  }
+  
+  .brand { @apply flex items-center gap-3; }
+  .logo { @apply w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center font-black; }
+  .brand h1 { @apply text-base font-black uppercase tracking-tight m-0 text-white; }
+  .brand h1 span { @apply text-blue-400; }
+
+  .actions { @apply flex items-center gap-6; }
+  .theme-selector { @apply flex items-center gap-2; }
+  .label { @apply text-[10px] font-black uppercase tracking-widest text-slate-500; }
+  .theme-selector select { @apply bg-slate-800 border border-slate-700 text-white text-xs font-bold rounded-lg px-3 py-1.5 outline-none cursor-pointer hover:bg-slate-800 transition-colors; }
+
+  .divider { @apply h-6 w-px bg-slate-800; }
+
+  .quick-nav { @apply flex items-center gap-4; }
+  .nav-item { @apply text-[10px] font-black uppercase tracking-widest text-slate-400 no-underline transition-colors hover:text-blue-400; }
+  .nav-item.router-link-active { @apply text-blue-500; }
+}
+
+/* Animations */
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease, transform 0.3s ease; }
+.fade-enter-from { opacity: 0; transform: translateY(10px); }
+.fade-leave-to { opacity: 0; transform: translateY(-10px); }

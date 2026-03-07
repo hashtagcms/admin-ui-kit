@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import SiteWiseData from '@hashtagcms/theme/neo/components/sitewise-data.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -25,15 +25,12 @@ vi.stubGlobal('axios', mockAxios);
 
 describe('Neo: SiteWiseData.vue', () => {
 
-  const dataProps = loadFakeData('site-wise.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataAllData: JSON.stringify({ label: 'Platforms', data: siteData.siteInfo.platform }),
+    dataSiteData: JSON.stringify(siteData.siteInfo.platform),
+    dataCurrentKey: 'platform',
+    dataSiteId: String(siteData.siteInfo.id)
+  };
 
   it('renders correctly with given props', () => {
     const wrapper = shallowMount(SiteWiseData, { props });

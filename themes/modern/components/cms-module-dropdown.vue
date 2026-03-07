@@ -6,22 +6,22 @@
       @change="onChange"
       :data-parser="parseData"
       :data-selected="currentIndex"
-      data-btn-css="bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/30 h-10 px-5"
+      data-btn-css="bg-blue-600 hover:bg-blue-700 hover:text-white shadow-blue-500/30 h-10 px-5"
     >
-      <span class="font-black tracking-tight uppercase text-[10px]">{{ selectedModule }}</span>
+      <span class="font-black tracking-tight uppercase text-[10px]">{{ selectedModuleName }}</span>
     </split-button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, watch } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
 import SplitButton from "./library/split-button.vue";
 
 const props = defineProps(["dataModules", "dataCurrentModule"]);
 
-const modules = ref(SafeJsonParse(props.dataModules, []));
+const modules = ref(typeof props.dataModules === 'string' ? SafeJsonParse(props.dataModules, {}) : props.dataModules || {});
 const selectedModule = ref(
     typeof props.dataCurrentModule == "undefined"
         ? ""
@@ -35,6 +35,14 @@ const allModules = computed(() => {
         controller_name: modules.value.controller_name,
     });
     return options;
+});
+
+const selectedModuleName = computed(() => {
+    if (allModules.value.length > 0) {
+        const found = allModules.value.find(m => m.controller_name.toLowerCase() === selectedModule.value.toLowerCase());
+        return found ? found.name : selectedModule.value;
+    }
+    return selectedModule.value;
 });
 
 const currentIndex = computed(() => {
@@ -53,12 +61,19 @@ const currentIndex = computed(() => {
     return 0;
 });
 
+watch(() => props.dataModules, (newValue) => {
+    modules.value = typeof newValue === 'string' ? SafeJsonParse(newValue, {}) : newValue || {};
+});
+watch(() => props.dataCurrentModule, (newValue) => {
+    selectedModule.value = newValue || "";
+});
+
 const hasChild = () => {
-    return modules.value.parent_id == 0 && allModules.value.length > 1;
+    return allModules.value.length > 1;
 };
 
 const parseData = (row) => {
-    return { label: row.name, value: row.controller_name };
+    return { label: row.name || row.display_name || row.controller_name, value: row.controller_name };
 };
 
 const onChange = (data) => {

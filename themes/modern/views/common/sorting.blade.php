@@ -6,7 +6,7 @@
                data-show-copy="false"
                data-show-paste="false"
     ></title-bar>
-    <div class="row">
+    <div class="flex flex-wrap -mx-4">
         <div class="col-md-4">
             <menu-sorter
                     data-all-data="{{json_encode($data)}}"

@@ -5,8 +5,8 @@
  * from the packages/themes directory.
  */
 
-// Auto-discover all theme playground configs
-const themeConfigModules = import.meta.glob('../packages/themes/*/playground.config.js', { eager: true });
+// Auto-discover all theme playgrounds
+const themePlaygroundModules = import.meta.glob('../themes/*/playground/App.vue');
 
 /**
  * Get all available theme configurations
@@ -15,10 +15,15 @@ const themeConfigModules = import.meta.glob('../packages/themes/*/playground.con
 export function getAllThemeConfigs() {
   const configs = [];
   
-  for (const path in themeConfigModules) {
-    const config = themeConfigModules[path].default;
-    if (config && config.name) {
-      configs.push(config);
+  for (const path in themePlaygroundModules) {
+    // Extract theme name from path "../themes/modern/playground/App.vue"
+    const match = path.match(/\.\.\/themes\/(.*)\/playground\/App\.vue/);
+    if (match) {
+      const name = match[1];
+      configs.push({
+        name: name,
+        displayName: name.charAt(0).toUpperCase() + name.slice(1)
+      });
     }
   }
   
@@ -62,6 +67,16 @@ export function themeExists(themeName) {
 export function getDefaultTheme() {
   const configs = getAllThemeConfigs();
   return configs.length > 0 ? configs[0].name : 'modern';
+}
+
+/**
+ * Get the playground component for a theme
+ * @param {string} themeName 
+ * @returns {Function|null} Dynamic import function or null
+ */
+export function getThemePlayground(themeName) {
+  const path = `../themes/${themeName}/playground/App.vue`;
+  return themePlaygroundModules[path] || null;
 }
 
 console.log('🎨 Discovered themes:', getAllThemeConfigs().map(c => c.name).join(', '));

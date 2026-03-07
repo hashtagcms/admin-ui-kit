@@ -1,87 +1,71 @@
 # API Reference
 
-This document provides a technical overview of the exports and architecture of `@hashtagcms/admin-ui-kit`.
+This document provides a technical overview of the exports and internal architecture of the `@hashtagcms/admin-ui-kit` library.
 
 ---
 
-## 🏗 Package Structure
+## 🏗 Package Architecture
 
-The package is organized into several internal packages:
+The library is distributed as a unified bundle but is logically organized into focused modules:
 
-- `@hashtagcms/components`: Vue UI components.
-- `@hashtagcms/helpers`: Logic and utility classes.
-- `@hashtagcms/styles`: Global SCSS and theme styles.
-- `@hashtagcms/admin-sdk`: Base logic (internal dependency).
+- **`@hashtagcms/components`**: Direct access to Vue 3 UI components.
+- **`@hashtagcms/helpers`**: Logic and state management classes.
+- **`@hashtagcms/styles`**: Theme-specific SCSS and Tailwind source files.
 
 ---
 
-## 📦 Unified Exports
+## 📦 Core Exports
 
-All major features are re-exported from the package root:
+All primary features are re-exported from the package root for ease of use.
 
 ```javascript
 import { 
   // UI Components
-  ActionBar, TabularView, TopNav, ... 
+  ActionBar, TabularView, TopNav, LeftNav, TabView, ... 
   
   // Helpers
   AdminConfig, Toast, Loader, Modal, Form, ...
   
-  // Utils
-  Storage, Fetcher, QueryBuilder, SafeJsonParse, SafeErrorData, ...
+  // Utility Functions
+  SafeJsonParse, SafeErrorData, QueryBuilder, EventBus, ...
 } from "@hashtagcms/admin-ui-kit";
 ```
 
 ### 🧰 Utility Functions
 
-#### `SafeJsonParse(prop, defaultValue = null)`
-Safely parses a prop value that may be a JSON string, object, undefined, or null.
-- **`prop`**: The value to parse.
-- **`defaultValue`**: Value returned if parsing fails or prop is empty.
+#### `SafeJsonParse(input, defaultValue = null)`
+Safely handles data hydration from props. It can parse JSON strings, handle pre-parsed objects, and gracefully fail back to a default value.
+- **`input`**: The raw data (String, Object, or null).
+- **`defaultValue`**: The fallback value returned if parsing fails.
 
-#### `SafeErrorData(error, defaults = {})`
-Safely extracts error data from an Axios catch block, handling network or CORS errors gracefully.
-- **`error`**: The error object from a catch block.
-- **`defaults`**: Optional default properties to include in the returned object.
+#### `SafeErrorData(error)`
+Standardized error extraction for Axios requests. It ensures that connectivity issues, 4xx/5xx responses, and validation payloads are returned in a consistent object format.
 
 ---
 
-## 🛠 Helper Methods
+## 🛠 Class Reference
 
 ### `AdminConfig`
-- `get(key, defaultVal)`
-- `has(key)`
-- `admin_path(path, params)`
-- `admin_asset(path)`
+The single source of truth for the admin environment.
+- `get(key)`: Retrieve a configuration value.
+- `admin_path(relativeUrl)`: Returns an absolute URL prefixed with the local admin path.
 
 ### `Form`
-- `post(url, resetAfterSubmit)`
-- `put(url, resetAfterSubmit)`
-- `delete(url, resetAfterSubmit)`
-- `reset()`
-- `data()`
+- `post(url)`: Submits the current state via POST.
+- `put(url)`: Submits via PUT.
+- `reset()`: Reverts fields to their initial state and clears validation errors.
+- `data()`: Returns a plain object of current field values.
 
-### `Toast`, `Loader`, `Modal`
-- `show(vm, ...)`
-- `hide(vm, ...)`
-- `open(vm, id)`
-- `close(vm, id)`
+### `EventBus`
+Global message broker based on `mitt`. Use this for inter-component communication that doesn't follow a parent-child prop pattern.
+- `on(event, callback)`
+- `emit(event, payload)`
 
 ---
 
-## 🎨 Styles
+## 🔗 Next Steps
 
-The package contains the SCSS source files used to style the admin interface. You can import the source to override variables or use the pre-compiled version.
+Interested in extending the library or contributing a new theme?
 
-### Source Import
-```scss
-// Your overrides
-$primary-color: #3498db;
-
-@import "@hashtagcms/admin-ui-kit/packages/styles/src/app";
-```
-
-### Key Files
-- `_variables.scss`: Global SASS variables for colors, spacing, and typography.
-- `_admin.scss`: Core layout styles for the dashboard shell.
-- `_table-grid.scss`: Styles for the `TabularView` component.
+- **[Theme Guide](./05-theme-guide.md)**: Architectural documentation for themes and styling.
+- **[Component Catalog](./02-components.md)**: Explore the visual interface components.

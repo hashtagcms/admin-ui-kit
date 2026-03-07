@@ -1,23 +1,23 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import TitleBar from '@hashtagcms/theme/modern/components/title-bar.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 describe('Modern: TitleBar.vue', () => {
-
-  const dataProps = loadFakeData('title-bar.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+    
+  const props = {
+    dataTitle: countryData.name,
+    dataBackUrl: countryData.backUrl,
+    dataShowExpand: "true"
+  };
 
   it('renders correctly with modern tailwind classes', () => {
     const wrapper = mount(TitleBar, { 
-        props,
+        props: {
+            dataTitle: countryData.name,
+            dataBackUrl: countryData.backUrl,
+            dataShowExpand: "true"
+        },
         global: {
             stubs: {
                 'left-menu-toggle': true,
@@ -63,7 +63,7 @@ describe('Modern: TitleBar.vue', () => {
      }
      
      await backBtn.trigger('click');
-     expect(backBtn.attributes('href')).toBe('http://localhost:8000/admin/country?id=244');
+     expect(backBtn.attributes('href')).toBe('/admin/country');
      
      window.location = originalLocation;
   });

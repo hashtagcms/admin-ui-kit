@@ -15,7 +15,7 @@ import RawComponent from '../../../common/js/ui-kit/HcButton.vue';
 defineOptions({ name: 'ModernHcButton' });
 
 const uiStyle = {
-  base: "inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group",
+  base: "inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group border border-transparent",
   variants: {
     'primary': 'bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-500/30',
     'secondary': 'bg-slate-600 text-white shadow-lg shadow-slate-500/20 hover:bg-slate-700 hover:shadow-slate-500/30',
@@ -29,11 +29,11 @@ const uiStyle = {
   },
   active: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700',
   sizes: {
-    'xs': 'px-3 py-1.5 text-[10px]',
-    'sm': 'px-4 py-2 text-[10px]',
-    'md': 'px-6 py-3 text-xs',
-    'lg': 'px-8 py-4 text-sm',
-    'xl': 'px-10 py-5 text-base'
+    'xs': 'px-3 h-6 text-[10px]',
+    'sm': 'px-4 h-8 text-[10px]',
+    'md': 'px-6 h-10 text-xs',
+    'lg': 'px-8 h-12 text-sm',
+    'xl': 'px-10 h-14 text-base'
   },
   squareSizes: {
     'xs': 'w-6 h-6 text-[10px]',

@@ -1,5 +1,5 @@
 <template>
-  <modal-box ref="imageModalBox" data-show-footer="true" data-width="800px">
+  <modal-box ref="imageModalBox" data-show-footer="true" data-size="xl">
     <template #title>
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between w-full gap-4">
         <span class="text-xl font-bold text-gray-800">Gallery</span>

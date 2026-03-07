@@ -1,18 +1,12 @@
 <template>
-  <div class="inline-block">
-    <split-button
+  <div class="inline-block relative min-w-[150px]">
+    <hc-select
       v-if="hasLanguage()"
-      :data-options="dataLanguages"
-      @change="setLanguage"
-      :data-parser="parseLang"
-      :data-selected="currentIndex"
-      data-btn-css="bg-white border border-gray-200 text-gray-700 hover:border-blue-300 shadow-sm h-10 px-5"
-    >
-      <div class="flex items-center gap-2 px-1">
-          <i class="fa fa-globe text-[10px] text-gray-400"></i>
-          <span class="font-black text-[10px] uppercase tracking-widest">Switch Language</span>
-      </div>
-    </split-button>
+      :options="parsedLanguages"
+      v-model="currentLang"
+      @update:modelValue="setLanguage"
+      size="md"
+    />
   </div>
 </template>
 
@@ -20,7 +14,7 @@
 import { ref, computed } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
-import SplitButton from "./library/split-button.vue";
+import HcSelect from "../ui-kit/HcSelect.vue";
 
 const props = defineProps(["dataLanguages", "dataSelectedLanguage"]);
 
@@ -31,30 +25,21 @@ const currentLang = ref(
     : parseInt(props.dataSelectedLanguage)
 );
 
-const currentIndex = computed(() => {
-  if (languages.value != null) {
-    for (let i = 0; i < languages.value.length; i++) {
-      let item = languages.value[i];
-
-      if (item.id == currentLang.value) {
-        return i;
-      }
-    }
-  }
-  return 0;
+const parsedLanguages = computed(() => {
+  if (!languages.value) return [];
+  return languages.value.map(lang => ({
+    label: lang.name,
+    value: lang.id
+  }));
 });
 
 const hasLanguage = () => {
   return languages.value != null && languages.value.length > 1;
 };
 
-const parseLang = (row) => {
-  return { label: row.name, value: row.id };
-};
-
-const setLanguage = (data) => {
+const setLanguage = (value) => {
   let ajaxController = AdminConfig.admin_path(
-    `ajax/setLanguage/${data.value}`
+    `ajax/setLanguage/${value}`
   );
 
   axios

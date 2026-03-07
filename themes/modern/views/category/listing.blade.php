@@ -13,19 +13,14 @@
             data-more-actions="{{json_encode(isset($moreActionBarItems) ? $moreActionBarItems : [])}}"
             data-has-lang-method="{{$hasLangMethod}}"
             data-cms-modules="{{json_encode(request()->module_info)}}"
-            data-layout-type="{{ Session::get('layout') }}"
+            data-layout-type="{{ Session::get(\HashtagCms\Core\Utils\CacheKeys::CMS_LAYOUT) }}"
             data-show-search="true"
     >
 
     </action-bar>
 
     @if($paginator)
-        <category-platform
-        data-platforms="{{json_encode($extraData["platforms"])}}"
-
-        >
-
-        </category-platform>
+        <category-platform data-platforms="{{json_encode($extraData["platforms"])}}"></category-platform>
 
         <table-view
                 data-list="{{json_encode($paginator->items())}}"
@@ -40,16 +35,20 @@
                 data-show-delete-popup="{{((bool)htcms_admin_config('show_delete_popup')) ? 'true' : 'false'}}"
                 data-edit-handled-by-other-component="true"
                 data-min-results-needed="{{(isset($minResults) ? $minResults : -1)}}"
-                data-layout-type="{{ Session::get('layout') }}"
+                data-layout-type="{{ Session::get(\HashtagCms\Core\Utils\CacheKeys::CMS_LAYOUT) }}"
         >
         </table-view>
 
         @include(htcms_admin_get_view_path('common.pagination'))
 
     @else
-        <div class="panel panel-default" role="alert">
-            <div class="panel-heading">Error!</div>
-            <div class="panel-body alert-danger"><p>Data source may be missing.</p></div>
+        <div class="bg-white rounded-2xl shadow-xl shadow-red-500/5 border border-red-100 overflow-hidden" role="alert">
+            <div class="px-6 py-4 bg-red-50 border-b border-red-100">
+                <h3 class="text-sm font-black uppercase tracking-widest text-red-800">Error!</h3>
+            </div>
+            <div class="p-8">
+                <p class="text-red-600 font-medium">Data source may be missing. Please verify your configuration.</p>
+            </div>
         </div>
     @endif
 

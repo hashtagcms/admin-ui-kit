@@ -4,6 +4,8 @@
       <li
         v-for="(current, idx) in allData"
         :key="current.id"
+        :data-id="current.id"
+        data-is-parent="true"
         class="parent bg-white border border-gray-100 rounded-lg shadow-sm overflow-hidden transition-all duration-300 group"
         v-if="current.module_pid == 0"
       >
@@ -19,10 +21,10 @@
         </div>
 
         <div v-if="hasChild(current)" v-show="activeIndex === idx" class="bg-gray-50/50 border-t border-gray-100 animate-slideDown">
-            <ul class="divide-y divide-gray-100/50">
-                <li v-for="child in current.child" :key="child.id" class="px-16 py-3 hover:bg-white transition-colors">
+            <ul class="divide-y divide-gray-100/50 js_sortable">
+                <li v-for="child in current.child" :key="child.id" :data-id="child.id" data-is-parent="false" class="px-16 py-3 hover:bg-white transition-colors group/child">
                     <div class="flex items-center gap-3">
-                        <div class="w-1.5 h-1.5 rounded-full bg-blue-400/50"></div>
+                        <i class="fa fa-grip-lines text-gray-200 group-hover/child:text-blue-400 transition-colors cursor-grab active:cursor-grabbing text-[10px]"></i>
                         <span class="text-xs font-bold text-gray-500">{{ child.name }}</span>
                     </div>
                 </li>
@@ -93,23 +95,29 @@ const updateIndex = (data) => {
 };
 
 const sortingCallback = (evt) => {
-  const data = [];
-  const items = document.querySelectorAll(".parent");
+  // Capture ALL items in the current DOM order to persist the whole hierarchy
+  // Using .js_sortable li[data-id] to pick up both parents and nested children
+  const items = document.querySelectorAll(".js_sortable li[data-id]");
+  const allRows = [];
+  
+  let parentCounter = 1;
+  let childCounter = 1;
 
-  items.forEach((item, index) => {
-    const textSpan = item.querySelector(".text-sm");
-    const text = textSpan ? textSpan.innerText : "";
-    const found = allData.value.find((d) => d.module_pid == 0 && d.name === text);
-    if (found) {
-      data.push({
-        id: found.id,
-        position: index,
-        name: found.name,
-      });
+  items.forEach((item) => {
+    const isParentEl = item.getAttribute("data-is-parent") === "true";
+    const id = parseInt(item.dataset.id, 10);
+    
+    // For hierarchies like CmsModule, child positions reset per parent
+    if (isParentEl) {
+      childCounter = 1; // Reset for this parent's nested children
+      allRows.push({ id, position: parentCounter++ });
+    } else {
+      allRows.push({ id, position: childCounter++ });
     }
   });
 
-  updateIndex(data);
+  console.log("Saving flat data (parents + children) wrapped in 'data':", allRows);
+  updateIndex({ data: allRows });
 };
 
 const enableSorting = () => {
@@ -117,15 +125,16 @@ const enableSorting = () => {
     if (sortable.value != null) {
       sortable.value.destroy();
     }
-    const el = document.getElementById("sortableField");
-    if (el) {
-      sortable.value = Sortable.create(el, {
-        animation: 300,
-        ghostClass: "bg-blue-50",
-        dragClass: "shadow-lg",
-        onEnd: sortingCallback,
-      });
-    }
+    // Enable sorting on the parent list and all nested child lists
+    const lists = document.querySelectorAll(".js_sortable");
+    lists.forEach((el) => {
+        Sortable.create(el, {
+            animation: 300,
+            ghostClass: "bg-blue-50",
+            dragClass: "shadow-lg",
+            onEnd: sortingCallback,
+        });
+    });
   });
 };
 

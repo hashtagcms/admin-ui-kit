@@ -1,7 +1,6 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect } from 'vitest';
 import TabView from '@hashtagcms/theme/neo/components/tab-view.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
 
 describe('Neo: TabView.vue', () => {
 
@@ -80,15 +79,14 @@ describe('Neo: TabView.vue', () => {
   });
 
   describe('Real Site Settings TabView', () => {
-    const dataProps = loadFakeData('tab-view.txt');
-    const props = {};
-    for (const key in dataProps) {
-        if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-            props[key] = JSON.stringify(dataProps[key]);
-        } else {
-            props[key] = String(dataProps[key]);
-        }
-    }
+    const props = {
+      dataTabs: JSON.stringify([
+        { label: 'Platforms', href: '/admin/site/settings/1/platforms' },
+        { label: 'Hooks', href: '/admin/site/settings/1/hooks' },
+        { label: 'Languages', href: '/admin/site/settings/1/languages' }
+      ]),
+      dataActiveTab: 'Languages'
+    };
 
     it('renders all site setting tabs from fake data', () => {
       const wrapper = shallowMount(TabView, { props });

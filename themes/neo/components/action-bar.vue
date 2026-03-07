@@ -11,6 +11,7 @@
             <h4 class="moduleTitle">{{ getTitle(controllerTitle) }}</h4>
           </div>
           <div class="input-group actionToolbar">
+            <cms-module-dropdown :data-modules="cmsModules" :data-current-module="controllerName"></cms-module-dropdown>
             <language-button
               v-if="hasLangMethod"
               :data-languages="dataLanguages"
@@ -113,7 +114,7 @@ const instance = getCurrentInstance();
 
 // State
 const canAdd = ref(true);
-const showSearchButton = ref(
+const showSearchButton = computed(() =>
   !(
     typeof props.dataShowSearch === "undefined" ||
     props.dataShowSearch === "" ||
@@ -121,22 +122,24 @@ const showSearchButton = ref(
   )
 );
 const showSearchPanel = ref(false);
-const isActive = ref("btn btn-outline-secondary");
+const isActive = computed(() => showSearchPanel.value === true ? "btn btn-success" : "btn btn-outline-secondary");
 const searchAnim = ref("");
-const moreActionButtons = ref(SafeJsonParse(props.dataMoreActions, []));
-const showAdd = ref(typeof props.dataShowAdd === "undefined" || props.dataShowAdd === "true");
-const hasLangMethod = ref(
+const moreActionButtons = computed(() => SafeJsonParse(props.dataMoreActions, []));
+const showAdd = computed(() => typeof props.dataShowAdd === "undefined" || props.dataShowAdd === "true");
+const hasLangMethod = computed(() =>
   !(typeof props.dataHasLangMethod === "undefined" || props.dataHasLangMethod === "false")
 );
-const cmsModules = ref(SafeJsonParse(props.dataCmsModules, {}));
-const selectedParams = ref(typeof props.dataSelectedParams === "undefined" ? "" : props.dataSelectedParams);
-const controllerName = ref(typeof props.dataControllerName === "undefined" ? "" : props.dataControllerName);
-const controllerTitle = ref(typeof props.dataControllerTitle === "undefined" ? "" : props.dataControllerTitle);
-const fields = ref(typeof props.dataFields === "undefined" || props.dataFields === "" ? [] : props.dataFields);
-const actionFields = ref(
-  typeof props.dataActionFields === "undefined" || props.dataActionFields === "" ? [] : props.dataActionFields
+const cmsModules = computed(() => SafeJsonParse(props.dataCmsModules, {}));
+const selectedParams = computed(() => typeof props.dataSelectedParams === "undefined" ? "" : props.dataSelectedParams);
+const controllerName = computed(() => typeof props.dataControllerName === "undefined" ? "" : props.dataControllerName);
+const controllerTitle = computed(() => typeof props.dataControllerTitle === "undefined" ? "" : props.dataControllerTitle);
+const fields = computed(() =>
+  typeof props.dataFields === "string" ? SafeJsonParse(props.dataFields, []) : props.dataFields || []
 );
-const showBack = ref(props.dataShowBack === "true");
+const actionFields = computed(() =>
+  typeof props.dataActionFields === "string" ? SafeJsonParse(props.dataActionFields, []) : props.dataActionFields || []
+);
+const showBack = computed(() => props.dataShowBack === "true");
 const layoutType = ref(
   typeof props.dataLayoutType === "undefined" || props.dataLayoutType === "" ? "table" : props.dataLayoutType
 );

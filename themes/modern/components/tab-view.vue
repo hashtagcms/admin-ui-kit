@@ -11,8 +11,7 @@
             role="tab"
             :aria-selected="isActive(tab)"
             :aria-controls="`panel-${getTabId(tab)}`"
-            :class="[
-              'inline-block py-4 px-1 border-b-[3px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95',
+            :class="['inline-block py-4 px-1 border-b-[3px] text-[11px] font-black uppercase tracking-widest transition-all duration-300 hover:scale-105 active:scale-95',
               isActive(tab) 
                 ? 'border-blue-600 text-blue-600 rounded-t-sm' 
                 : 'border-transparent text-gray-400 hover:text-gray-600 hover:border-gray-200'

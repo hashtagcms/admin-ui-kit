@@ -15,7 +15,7 @@
     </span>
     
     <!-- Left Icon -->
-    <span v-if="$slots['icon-left'] || icon" :class="['inline-flex transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12', active ? 'scale-110 rotate-12' : '', $slots.default || iconRight ? 'mr-2' : '']">
+    <span v-if="$slots['icon-left'] || icon" :class="['inline-flex transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12', active ? 'scale-110 rotate-12' : '', ($slots.default && !isSquare) || iconRight ? 'mr-2' : '']">
       <slot name="icon-left">
         <i v-if="icon" :class="icon"></i>
       </slot>

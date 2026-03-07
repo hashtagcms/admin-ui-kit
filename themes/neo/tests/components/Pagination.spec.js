@@ -2,7 +2,7 @@ import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import Pagination from '@hashtagcms/theme/neo/components/pagination.vue';
 import { EventBus } from '@hashtagcms/helpers/event-bus';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 vi.mock('@hashtagcms/helpers/event-bus', () => ({
   EventBus: {
@@ -13,20 +13,17 @@ vi.mock('@hashtagcms/helpers/event-bus', () => ({
 
 describe('Pagination.vue', () => {
     
-  const dataProps = loadFakeData('pagination-view.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataPaginator: JSON.stringify(countryData.paginator),
+    dataTotal: String(countryData.paginator.total),
+    dataFirstItem: String(countryData.paginator.from),
+    dataLastItem: String(countryData.paginator.to)
+  };
 
   it('renders pagination links correctly', () => {
     const wrapper = shallowMount(Pagination, { props });
     
-    // pagination-view.txt: total 244, 20 per page. 1-20 of 244.
+    // countryData.paginator: total 244, from 1, to 20.
     expect(wrapper.find('.counters').text()).toContain('1 - 20 of 244');
     
     const links = wrapper.findAll('.page-link');

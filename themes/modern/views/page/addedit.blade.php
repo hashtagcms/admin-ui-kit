@@ -68,394 +68,250 @@
     @endphp
 
 
-    <div class="row">
-        <div class="admin-form">
+    <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden max-w-5xl mx-auto">
+        <!-- Card Header -->
+        <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50 flex items-center justify-between">
+            <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Page Content Management</h3>
+            <span class="text-[10px] font-black uppercase text-blue-600 bg-blue-50 px-3 py-1 rounded-full">{{ $content_type }} Page</span>
+        </div>
 
-            <form action="{{htcms_get_save_path(request()->module_info->controller_name)}}" method="post"
-                  class="form-horizontal" role="form" enctype="multipart/form-data">
+        <form action="{{htcms_get_save_path(request()->module_info->controller_name)}}" method="post" enctype="multipart/form-data" id="addEditForm">
+            <div class="p-8 lg:p-12 space-y-16">
                 {{csrf_field()}}
-
                 {!! FormHelper::input('hidden', 'id', $id) !!}
-
                 {!! FormHelper::input('hidden', 'backURL', $backURL) !!}
-
                 {!! FormHelper::input('hidden', 'actionPerformed', $actionPerformed) !!}
-
                 {!! FormHelper::input('hidden', 'insert_by', $insert_by) !!}
                 {!! FormHelper::input('hidden', 'update_by', $insert_by) !!}
-
                 {!! FormHelper::input('hidden', 'site_id', $site_id) !!}
+                {!! FormHelper::input('hidden', 'content_type', $content_type) !!}
+                {!! FormHelper::input('hidden', 'alias', $alias) !!}
+                {!! FormHelper::input('hidden', 'lang_active_key', $lang["active_key"]) !!}
+                {!! FormHelper::input('hidden', 'link_navigation', $link_navigation) !!}
 
-                <div class="form-group row hide">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('content_type', 'Content Type') !!}
+                <!-- Section 1: Core Identity -->
+                <section data-collapsible="page-core-identity" data-collapsed="false" class="rounded-2xl border border-slate-100 overflow-hidden">
+                    <!-- Trigger -->
+                    <div data-collapsible-trigger
+                         class="flex items-center gap-4 px-6 py-4 bg-slate-50/60 hover:bg-slate-100/60 cursor-pointer select-none transition-colors">
+                        <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa fa-tag text-xs"></i>
+                        </div>
+                        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-700 flex-1">Core Identity</h4>
+                        <i data-collapsible-chevron class="fa fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
                     </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::select('content_type', $contentTypes, array('class'=>'form-select select-sm'), $content_type, "plain_array", "") !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('category_id', 'Content Category') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::select('category_id', $contentCategories, array('class'=>'form-select select-sm'), $category_id,  array("value"=>"id", "label"=>"lang.name"), "Select") !!}
-                    </div>
-                </div>
-
-                <div id="parent_div" class="form-group row" style="display: none">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('parent_id', 'Parent Category') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::select('parent_id', $contentCategories, array('class'=>'form-select select-sm'), $parent_id,  array("value"=>"id", "label"=>"lang.name"), "Select") !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('lang_name', 'Name') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::input('text', 'lang_name', $lang["name"] , array('class'=>'form-control', 'required'=>'required')) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('lang_title', 'Title') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::input('text', 'lang_title', $lang["title"] , array('class'=>'form-control', 'required'=>'required')) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row hide">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('alias', 'Alias') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::input('text', 'alias', $alias , array('class'=>'form-control')) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row hide">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('lang_active_key', 'Active Key') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::input('text', 'lang_active_key', $lang["active_key"] , array('class'=>'form-control')) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('platform_id', 'Platform') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::select('platform_id', $platforms, array('class'=>'form-select select-sm'), $platform_id, array("label"=>"name","value"=>"id")) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('link_rewrite', 'Url') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::input('text', 'link_rewrite', $link_rewrite , array('class'=>'form-control', 'required'=>'required')) !!}
-                    </div>
-
-                </div>
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('menu_placement', 'Menu Group') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-
-                        {!! FormHelper::select('menu_placement', $menuPlacements, array('class'=>'form-select select-sm'), $menu_placement, "plain_array") !!}
-
-                    </div>
-
-                </div>
-
-
-                <div class="form-group row hide">
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('link_navigation', 'Full Url [optional]') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::input('text', 'link_navigation', $link_navigation , array('class'=>'form-control')) !!}
-                    </div>
-                </div>
-
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('lang_description', 'Description') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::textarea('lang_description', htmlentities($lang["description"]), array('class'=>'form-control', 'rows'=>10)) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('lang_page_content', 'Body') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::textarea('lang_page_content', htmlentities($lang["page_content"]), array('class'=>'form-control', 'rows'=>20)) !!}
-                    </div>
-
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('header_content', 'Header Content') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::textarea('header_content', $header_content, array('class'=>'form-control','rows'=>'5','cols'=>'80')) !!}
-                    </div>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('footer_content', 'Footer Content') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::textarea('footer_content', $footer_content, array('class'=>'form-control','rows'=>'5','cols'=>'80')) !!}
-                    </div>
-
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('exclude_in_listing', 'Exclude in Listing?') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::checkbox('exclude_in_listing', $exclude_in_listing) !!}
-                    </div>
-
-                </div>
-
-                <div class="form-group row">
-                    <fieldset class="fieldset">
-                        <legend>SEO Settings</legend>
-
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_target', 'Target') !!}
+                    <!-- Body -->
+                    <div data-collapsible-body style="transition: max-height 0.35s ease, overflow 0s 0.35s;">
+                        <div class="p-6 space-y-6">                                
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_name', 'Name', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'lang_name', $lang["name"] , array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'required'=>'required', 'placeholder' => 'Enter Name')) !!}
                             </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_title', 'Title', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'lang_title', $lang["title"] , array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'required'=>'required', 'placeholder' => 'Enter Title')) !!}
+                            </div>
+    
+                            <div class="space-y-2">
+                                {!! FormHelper::label('link_rewrite', 'Link Rewrite (page url)', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'link_rewrite', $link_rewrite , array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'required'=>'required', 'placeholder' => 'Enter Rewrite')) !!}
+                            </div>                            
+                            <div class="space-y-2">
+                                {!! FormHelper::label('category_id', 'Content Category', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::select('category_id', $contentCategories, array('class'=>'form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'required'=>'required'), $category_id,  array("value"=>"id", "label"=>"lang.name"), "Select") !!}
+                                <p class="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                                    <i class="fa fa-info-circle mr-1 text-blue-400"></i>
+                                    Only categories with <code class="font-mono bg-slate-100 text-pink-500 px-1.5 py-0.5 rounded text-[9px]">{link_rewrite}</code> or <code class="font-mono bg-slate-100 text-pink-500 px-1.5 py-0.5 rounded text-[9px]">{link_rewrite?}</code> patterns are available here. Your page URL will be structured as: <code class="font-mono bg-slate-100 text-blue-500 px-1.5 py-0.5 rounded text-[9px]">{category_link_rewrite}/{this_page_link_rewrite}</code>.
+                                </p>
+                            </div>
+                            <div id="parent_div" class="space-y-2" style="display: none">
+                                {!! FormHelper::label('parent_id', 'Parent Page/Category', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::select('parent_id', $contentCategories, array('class'=>'form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900'), $parent_id,  array("value"=>"id", "label"=>"lang.name"), "Select") !!}
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('platform_id', 'Target Platform', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::select('platform_id', $platforms, array('class'=>'form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900'), $platform_id, array("label"=>"name","value"=>"id")) !!}
+                            </div>
+                            <div class="space-y-2">
+                                 {!! FormHelper::label('menu_placement', 'Menu Group Assignment', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                 {!! FormHelper::select('menu_placement', $menuPlacements, array('class'=>'form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900'), $menu_placement, "plain_array") !!}
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-                            <div class="col-sm-10">
-                                {!! FormHelper::select('lang_target', $targetTypes, array('class'=>'form-select select-sm'), $lang["target"], "plain_array") !!}
+                <!-- Section 2: Rich Content & Media -->
+                <section data-collapsible="page-rich-content" data-collapsed="false" class="rounded-2xl border border-slate-100 overflow-hidden">
+                    <div data-collapsible-trigger
+                         class="flex items-center gap-4 px-6 py-4 bg-slate-50/60 hover:bg-slate-100/60 cursor-pointer select-none transition-colors">
+                        <div class="w-8 h-8 bg-emerald-100 text-emerald-600 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa fa-file-text text-xs"></i>
+                        </div>
+                        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-700 flex-1">Rich Content &amp; Media</h4>
+                        <i data-collapsible-chevron class="fa fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                    </div>
+                    <div data-collapsible-body style="transition: max-height 0.35s ease, overflow 0s 0.35s;">
+                        <div class="p-6 space-y-8">
+                             <div class="space-y-2">
+                                {!! FormHelper::label('lang_description', 'Teaser / Abstract (Short Summary)', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::textarea('lang_description', htmlentities($lang["description"]), array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'id' => 'lang_description', 'rows' => 10)) !!}
+                            </div>
+        
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_page_content', 'Full Page Body Content', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                <div class="rounded-xl overflow-hidden border border-slate-200 shadow-sm">
+                                    {!! FormHelper::textarea('lang_page_content', htmlentities($lang["page_content"]), array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'id' => 'lang_page_content', 'rows' => 20)) !!}
+                                </div>
+                            </div>                            
+
+                            <div class="pt-6 border-t border-slate-100 space-y-6">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Media Assets</span>
+                                <div class="space-y-6">
+                                    <div class="space-y-4">
+                                        {!! FormHelper::label('attachment', 'Main Download Attachment', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 overflow-hidden">
+                                            {!! FormHelper::file('attachment', $attachment, array('accept'=>'*'), TRUE, 100) !!}
+                                        </div>
+                                    </div>
+                                    <div class="space-y-4">
+                                        {!! FormHelper::label('img', 'Feature Hero Image', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-4 overflow-hidden">
+                                            {!! FormHelper::file('img', $img, array('accept'=>'image/*'), TRUE, 100) !!}
+                                            <div class="relative py-2 text-center text-[10px] text-slate-400 uppercase font-black tracking-[0.2em]">-- OR RELATIVE PATH --</div>
+                                            {!! FormHelper::input('text', 'image_path', '', array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Image Path')) !!}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: SEO Optimization -->
+                <section data-collapsible="page-seo" data-collapsed="true" class="rounded-2xl border border-slate-100 overflow-hidden">
+                    <div data-collapsible-trigger
+                         class="flex items-center gap-4 px-6 py-4 bg-slate-50/60 hover:bg-slate-100/60 cursor-pointer select-none transition-colors">
+                        <div class="w-8 h-8 bg-purple-100 text-purple-600 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa fa-google text-xs"></i>
+                        </div>
+                        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-700 flex-1">SEO & Configuration</h4>
+                        <i data-collapsible-chevron class="fa fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
+                    </div>
+                    <div data-collapsible-body style="transition: max-height 0.35s ease, overflow 0s 0.35s;">
+                        <div class="p-6 space-y-6">
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_target', 'Hyperlink Target', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::select('lang_target', $targetTypes, array('class'=>'form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900'), $lang["target"], "plain_array") !!}
+                            </div>
+                             <div class="space-y-2">
+                                {!! FormHelper::label('lang_link_relation', 'Link Relationship (Rel)', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::select('lang_link_relation', $relationTypes, array('class'=>'form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900'), $lang["link_relation"],"plain_array") !!}
+                            </div>
+    
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_meta_title', 'Meta Title', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'lang_meta_title', $lang["meta_title"], array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Meta Title')) !!}
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_meta_keywords', 'Meta Keywords', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'lang_meta_keywords', $lang["meta_keywords"], array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Meta Keywords')) !!}
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_meta_description', 'Meta Description', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::textarea('lang_meta_description', $lang["meta_description"], array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'rows'=>3)) !!}
+                            </div>
+    
+                             <div class="space-y-2">
+                                {!! FormHelper::label('lang_meta_robots', 'Meta Robots', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'lang_meta_robots', $lang["meta_robots"], array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Meta Robots')) !!}
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('lang_meta_canonical', 'Canonical URL', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'lang_meta_canonical', $lang["meta_canonical"], array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Meta Canonical')) !!}
+                            </div>
+                            <div class="pt-6 border-t border-slate-100 space-y-6">
+                                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block">Code Injections</span>
+                                <div class="space-y-6">
+                                    <div class="space-y-2">
+                                        {!! FormHelper::label('header_content', 'Custom Header (scripts/tags)', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                        {!! FormHelper::textarea('header_content', $header_content, array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'rows'=>4)) !!}
+                                    </div>
+                                    <div class="space-y-2">
+                                        {!! FormHelper::label('footer_content', 'Custom Footer (scripts/tags)', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                        {!! FormHelper::textarea('footer_content', $footer_content, array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'rows'=>4)) !!}
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_link_relation', 'Relation') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::select('lang_link_relation', $relationTypes, array('class'=>'form-select select-sm'), $lang["link_relation"],"plain_array") !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_meta_title', 'Page Title') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('text', 'lang_meta_title', $lang["meta_title"], array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_meta_keywords', 'Meta Keywords') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('text', 'lang_meta_keywords', $lang["meta_keywords"], array('class'=>'form-control')) !!}
-                            </div>
-
-                        </div>
-
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_meta_description', 'Meta Description') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::textarea('lang_meta_description', $lang["meta_description"], array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_meta_robots', 'Meta Robots') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('text', 'lang_meta_robots', $lang["meta_robots"], array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('lang_meta_canonical', 'Meta Canonical') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('text', 'lang_meta_canonical', $lang["meta_canonical"], array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-                    </fieldset>
-                </div>
-
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('attachment', 'Attachment') !!}
                     </div>
+                </section>
 
-                    <div class="col-sm-10">
-                        {!! FormHelper::file('attachment', $attachment, array('accept'=>'*'), TRUE, 100) !!}
+                <!-- Section 4: Governance & Advanced -->
+                <section data-collapsible="page-governance" data-collapsed="true" class="rounded-2xl border border-slate-100 overflow-hidden">
+                    <div data-collapsible-trigger
+                         class="flex items-center gap-4 px-6 py-4 bg-slate-50/60 hover:bg-slate-100/60 cursor-pointer select-none transition-colors">
+                        <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center shrink-0">
+                            <i class="fa fa-sliders text-xs"></i>
+                        </div>
+                        <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-700 flex-1">Governance & Publishing</h4>
+                        <i data-collapsible-chevron class="fa fa-chevron-down text-slate-400 text-xs transition-transform duration-300"></i>
                     </div>
-
-                </div>
-                <div class="form-group row">
-
-                    <div class="col-sm-2">
-                        {!!  FormHelper::label('img', 'Image') !!}
-                    </div>
-
-                    <div class="col-sm-10">
-                        {!! FormHelper::file('img', $img, array('accept'=>'image/*'), TRUE, 100) !!}
-                        <div class="text-left"> -- OR Image Path -- </div>
-                        <div>
-                            {!! FormHelper::input('text', 'image_path', '', array('class'=>'form-control')) !!}
+                    <div data-collapsible-body style="transition: max-height 0.35s ease, overflow 0s 0.35s;">
+                        <div class="p-6 space-y-6">
+                             <div class="space-y-2">
+                                {!! FormHelper::label('author', 'Attributed Author', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'author', $author, array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Author')) !!}
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('content_source', 'Information Source / URL', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('text', 'content_source', $content_source, array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900', 'placeholder' => 'Enter Content Source')) !!}
+                            </div>
+    
+                             <div class="space-y-2">
+                                {!! FormHelper::label('publish_at', 'Scheduled Launch Time', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('datetime-local', 'publish_at', $publish_at, array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900')) !!}
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('expire_at', 'Scheduled Expiration Time', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                {!! FormHelper::input('datetime-local', 'expire_at', $expire_at, array('class'=>'form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900')) !!}
+                            </div>
+    
+                            <div class="space-y-4 pt-4">
+                                <div class="flex items-center gap-3">
+                                    {!! FormHelper::checkbox('enable_comments', $enable_comments) !!}
+                                    {!! FormHelper::label('enable_comments', 'Enable Engagement (Comments)', array('class' => 'text-sm font-medium text-slate-700')) !!}
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    {!! FormHelper::checkbox('required_login', $required_login) !!}
+                                    {!! FormHelper::label('required_login', 'Restrict Accessibility (Requires Login)', array('class' => 'text-sm font-medium text-slate-700')) !!}
+                                </div>                                
+                                <div class="flex items-center gap-3">
+                                    {!! FormHelper::checkbox('exclude_in_listing', $exclude_in_listing) !!}
+                                    {!! FormHelper::label('exclude_in_listing', 'Hide from Link Listings/Archives', array('class' => 'text-sm font-medium text-slate-700')) !!}
+                                </div>                                
+                            </div>
+                            <div class="space-y-2">
+                                {!! FormHelper::label('publish_status', 'Launch Status', array('class' => 'text-sm font-medium text-slate-700 block')) !!}
+                                <div class="flex items-center gap-3 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                    {!! FormHelper::input('checkbox', 'publish_status', $publish_status) !!}
+                                    <span class="text-xs font-black uppercase text-slate-600">Published</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                </div>
-
-                <div class="form-group row">
-                    <fieldset class="fieldset">
-                        <legend>Publishing Options</legend>
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('author', 'Author') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('text', 'author', $author, array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-                        <div class="form-group row">
-
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('content_source', 'Content Source') !!}
-                            </div>
-
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('text', 'content_source', $content_source, array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('publish_at', 'Publish Date') !!}
-                            </div>
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('datetime-local', 'publish_at', $publish_at, array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('expire_at', 'Expire Date') !!}
-                            </div>
-                            <div class="col-sm-10">
-                                {!! FormHelper::input('datetime-local', 'expire_at', $expire_at, array('class'=>'form-control')) !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('enable_comments', 'Enable Comments') !!}
-                            </div>
-                            <div class="col-sm-10">
-                                {!! FormHelper::checkbox('enable_comments', $enable_comments) !!}
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('required_login', 'Required Login?') !!}
-                            </div>
-                            <div class="col-sm-10">
-                                {!! FormHelper::checkbox('required_login', $required_login) !!}
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-2">
-                                {!!  FormHelper::label('publish_status', 'Published') !!}
-                            </div>
-                            <div class="col-sm-10">
-                                {!! FormHelper::checkbox('publish_status', $publish_status) !!}
-                            </div>
-                        </div>                        
-                    </fieldset>
-                </div>
-                <div class="row">
-                    <div class="form-group center-align">
-                        <input type="submit" name="submit" value="Save" class="btn btn-success btn-from-submit"/> <a href="{{$backURL ?? request()->headers->get('referer')}}" class="btn btn-outline-secondary">Cancel</a>
-                    </div>
-                </div>
-            </form>
-            <image-gallery ref="imageGallery"></image-gallery>
-        </div>
+                </section>
+            </div>
+            <!-- Card Footer -->
+            <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-4">
+                <a href="{{$backURL ?? request()->headers->get('referer')}}" class="w-full sm:w-auto text-center px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1">Cancel</a>
+                <button type="submit" name="submit" class="w-full sm:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2">
+                    <i class="fa fa-save opacity-50"></i>
+                    Save
+                </button>
+            </div>
+        </form>
+        <image-gallery ref="imageGallery"></image-gallery>
     </div>
     @include(htcms_admin_get_view_path('common.validationerror-js'))
 @endsection
@@ -469,7 +325,18 @@
             try {
                 EditorHelper.makeRichEditor("#lang_page_content");
                 EditorHelper.makeRichEditor("#lang_description", {height:300});
-                PageManager.init("<?php echo $actionPerformed; ?>", "<?php echo $content_type ?>", "<?php echo $id ?>");
+                PageManager.init("<?php echo $actionPerformed; ?>", "<?php echo $content_type ?>", "<?php echo $id ?>", {
+                    dependencies: [
+                        {
+                            onChangeId: "lang_name",
+                            shouldUpdate: [
+                                { element: "lang_title", formatter: 'capitalize' },
+                                { element: "lang_active_key", formatter: 'lowercase_clean' },
+                                { element: "link_rewrite", formatter: 'lowercase_clean' }
+                            ]
+                        }
+                    ]
+                });
             } catch (e) {
                 console.error(e.message, e.lineNumber);
             }

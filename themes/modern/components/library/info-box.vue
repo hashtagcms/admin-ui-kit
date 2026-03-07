@@ -5,14 +5,13 @@
     class="block group no-underline"
   >
     <hc-card 
-      :class="[
-        'hover:shadow-xl hover:shadow-blue-500/10 active:scale-95 transition-all duration-300',
+      :class="['hover:shadow-xl hover:shadow-blue-500/10 active:scale-95 transition-all duration-300',
         link !== '' ? 'cursor-pointer' : ''
       ]" 
       body-class="flex items-center gap-6"
     >
-      <div :class="[colorClasses.icon, 'w-14 h-14 flex shrink-0 items-center justify-center rounded-lg transition-transform group-hover:rotate-12 shadow-lg']">
-          <i style="font-style: normal" :class="[icon, 'text-sm font-black uppercase tracking-tighter leading-none']">
+      <div :class="[colorClasses.icon,'w-10 h-10 flex shrink-0 items-center justify-center rounded-lg transition-transform group-hover:rotate-12 shadow-lg']">
+          <i style="font-style: normal" :class="[icon,'text-sm font-black uppercase tracking-tighter leading-none']">
               {{ getIconText() }}
           </i>
       </div>

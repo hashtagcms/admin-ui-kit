@@ -1,19 +1,17 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import Pagination from '@hashtagcms/theme/modern/components/pagination.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 describe('Modern: Pagination.vue', () => {
-
-  const dataProps = loadFakeData('pagination-view.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+    
+  const props = {
+    dataPaginator: JSON.stringify(countryData.paginator),
+    dataTotal: String(countryData.paginator.total),
+    dataFirstItem: String(countryData.paginator.from),
+    dataLastItem: String(countryData.paginator.to),
+    dataControllerName: countryData.controller
+  };
 
   it('renders correctly with modern counters and results', () => {
     const wrapper = shallowMount(Pagination, { props });

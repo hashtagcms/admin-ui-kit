@@ -25,9 +25,9 @@ const uiStyle = {
   disabled: "opacity-50 cursor-not-allowed bg-gray-50",
   enabled: "hover:border-gray-300",
   sizes: {
-    'sm': 'py-2 rounded-md',
-    'md': 'py-3.5 rounded-lg',
-    'lg': 'py-5 rounded-xl'
+    'sm': 'h-8 py-0 rounded-md',
+    'md': 'h-10 py-0 rounded-lg',
+    'lg': 'h-12 py-0 rounded-xl'
   },
   variants: {
     'primary': 'border-gray-100 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900',

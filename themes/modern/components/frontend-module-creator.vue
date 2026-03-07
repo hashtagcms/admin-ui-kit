@@ -19,7 +19,7 @@
                   @blur="fillCopiedData"
                   id="name"
                   v-model="form.name"
-                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
+                  class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
                   name="name"
                   placeholder="e.g. Header Module"
                   required
@@ -44,7 +44,7 @@
                 <input
                   id="alias"
                   v-model="form.alias"
-                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
+                  class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
                   name="alias"
                   placeholder="MODULE_ALIAS_HERE"
                   required
@@ -58,7 +58,7 @@
                 <input
                   id="view_name"
                   v-model="form.view_name"
-                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
+                  class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
                   name="view_name"
                   placeholder="e.g. components/header"
                   required
@@ -82,7 +82,7 @@
                 <input
                   id="cache_group"
                   v-model="form.cache_group"
-                  class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
+                  class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
                   maxlength="60"
                   name="cache_group"
                   placeholder="Cache group name"
@@ -100,15 +100,18 @@
               <div class="space-y-6">
                   <div class="space-y-2">
                     <label class="text-sm font-medium text-slate-700 block" for="data_type">Data Type</label>
-                    <select
+                    <HcAutoSuggest
                       id="data_type"
                       v-model="form.data_type"
-                      class="form-select w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4"
-                      @change="checkForService(form.data_type)"
+                      placeholder="Enter or search Data Type..."
+                      :data="dataTypeOptions"
+                      display-field="data_type"
+                      :min-chars="0"
                     >
-                      <option value="">Select Data Type</option>
-                      <option v-for="dataType in allDataTypes" :key="dataType" :value="dataType">{{ dataType }}</option>
-                    </select>
+                        <template #icon-left>
+                            <i class="fa fa-database"></i>
+                        </template>
+                    </HcAutoSuggest>
                     <!-- Data type info panel -->
                     <div v-if="form.data_type" class="mt-3 rounded-xl border overflow-hidden" :class="activeTypeInfo.borderClass">
                       <div class="flex items-center gap-2 px-4 py-2" :class="activeTypeInfo.headerClass">
@@ -128,11 +131,15 @@
                     <textarea
                       id="data_handler"
                       v-model="form.data_handler"
-                      class="form-control w-full rounded-xl border-slate-200 bg-slate-50 font-mono text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-4 px-5 min-h-[100px]"
+                      class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 font-mono min-h-[100px]"
                       name="data_handler"
                       :placeholder="activeTypeInfo.placeholder"
                     ></textarea>
                   </div>
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Data Key Map</label>
+                    <input v-model="form.data_key_map" class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900" placeholder=":id, :site_id..." />
+                </div>
               </div>
           </div>
 
@@ -142,18 +149,18 @@
               <div class="space-y-6">
                   <div class="space-y-2">
                     <label class="text-sm font-medium text-slate-700 block">HTTP Method</label>
-                    <select v-model="form.method_type" class="form-select w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4">
+                    <select v-model="form.method_type" class="form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900">
                       <option value="">Select</option>
                       <option v-for="mt in allMethodTypes" :key="mt.value" :value="mt.value">{{ mt.name }}</option>
                     </select>
                   </div>
                   <div class="space-y-2">
                     <label class="text-sm font-medium text-slate-700 block">Query Params</label>
-                    <input v-model="form.service_params" class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4" placeholder="param1=val&param2=val" />
+                    <input v-model="form.service_params" class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900" placeholder="param1=val&param2=val" />
                   </div>
                   <div class="space-y-2">
                     <label class="text-sm font-medium text-slate-700 block">Custom Headers (JSON)</label>
-                    <textarea v-model="form.headers" placeholder='{"Authorization": "Bearer..."}' class="form-control w-full rounded-xl border-slate-200 bg-slate-50 font-mono text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-4 px-5 min-h-[80px]" />
+                    <textarea v-model="form.headers" placeholder='{"Authorization": "Bearer..."}' class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 font-mono min-h-[80px]" />
                   </div>
               </div>
           </div>
@@ -164,11 +171,11 @@
               <div class="space-y-6">
                   <div class="space-y-2">
                       <label class="text-sm font-medium text-slate-700 block">Raw SQL Query</label>
-                      <textarea v-model="form.query_statement" class="form-control w-full rounded-xl border-slate-200 bg-slate-50 font-mono text-xs focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-4 px-5 min-h-[100px]" placeholder="SELECT..." />
+                      <textarea v-model="form.query_statement" class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 font-mono min-h-[100px]" placeholder="SELECT..." />
                   </div>
                   <div class="space-y-2">
                       <label class="text-sm font-medium text-slate-700 block">Result Mapping</label>
-                      <select v-model="form.query_as" class="form-select w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4">
+                      <select v-model="form.query_as" class="form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900">
                           <option value="">Select Mapping</option>
                           <option v-for="qdt in allQueryDataTypes" :key="qdt.value" :value="qdt.value">{{ qdt.name }}</option>
                       </select>
@@ -180,19 +187,19 @@
           <div class="space-y-4 border-t border-slate-50 pt-10">
               <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">Attributes</h3>
               <div class="flex flex-wrap gap-3">
-                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group">
                       <input v-model="form.is_seo_module" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
                       <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">SEO Module</span>
                   </label>
-                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group">
                       <input v-model="form.is_mandatory" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
                       <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">Mandatory</span>
                   </label>
-                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group">
                       <input v-model="form.shared" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
                       <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">Shared</span>
                   </label>
-                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group shadow-sm">
+                  <label class="flex flex-col items-center justify-center p-3 bg-white rounded-sm border border-slate-200 cursor-pointer hover:border-blue-500 transition-all gap-2 group">
                       <input v-model="form.live_edit" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-slate-300" />
                       <span class="text-[10px] font-black text-slate-400 group-hover:text-slate-800 uppercase tracking-tighter" :style="checkBoxAlignment">Live Edit</span>
                   </label>
@@ -207,7 +214,7 @@
                     <HcAutoSuggest
                         v-model="form.linked_module"
                         label="Linked Module Alias"
-                        placeholder="ALIAS_OF_TARGET"
+                        placeholder="Module Alias"
                         :endpoint="props.dataFormAction.replace('/store', '/getModuleAlias')"
                         display-field="alias"
                         :min-chars="2"
@@ -216,14 +223,10 @@
                             <i class="fa fa-link"></i>
                         </template>
                     </HcAutoSuggest>
-                </div>
-                <div class="space-y-2">
-                    <label class="text-sm font-medium text-slate-700 block">Data Key Map</label>
-                    <input v-model="form.data_key_map" class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4" placeholder=":id, :site_id..." />
-                </div>
+                </div>                
                 <div class="space-y-2">
                   <label class="text-sm font-medium text-slate-700 block">Contextual Description</label>
-                  <textarea v-model="form.description" class="form-control w-full rounded-xl border-slate-200 focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all py-3 px-4 min-h-[80px]" placeholder="Purpose of this module..." />
+                  <textarea v-model="form.description" class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 pl-3 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 min-h-[80px]" placeholder="Purpose of this module..." />
                 </div>
               </div>
           </div>
@@ -232,10 +235,10 @@
           <div v-show="showAllUpdateSection" class="p-6 bg-rose-50/50 rounded-2xl border border-dashed border-rose-200 space-y-4">
               <label class="flex items-center gap-3 cursor-pointer group">
                   <input v-model="form.update_inAllSites" type="checkbox" class="w-5 h-5 text-rose-600 border-rose-300 rounded focus:ring-rose-500" />
-                  <span class="text-sm font-black text-rose-700" :style="checkBoxAlignment">Sync Changes Across All Sites</span>
+                  <span class="text-sm font-black text-rose-700" :style="checkBoxAlignment">{{ syncLabel }}</span>
               </label>
               <div class="bg-rose-100/50 text-[11px] text-rose-700 p-4 rounded-xl border border-rose-100 leading-relaxed font-bold">
-                  <i class="fa fa-exclamation-triangle mr-1"></i> WARNING: This action will overwrite module metadata on multiple sites. Use only for global structural changes.
+                  <i class="fa fa-exclamation-triangle mr-1"></i> {{ syncWarning }}
               </div>
           </div>
 
@@ -246,7 +249,7 @@
         <div v-if="errorMessage !== ''" class="w-full bg-rose-50 text-rose-700 px-4 py-3 rounded-xl border border-rose-100 text-xs font-black flex items-center gap-3">
            <i class="fa fa-exclamation-triangle"></i> {{ errorMessage }}
         </div>
-        <a :href="dataBackUrl" class="w-full sm:w-auto text-center px-6 py-2.5 text-xs font-black uppercase tracking-widest text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1">Cancel</a>
+        <a :href="dataBackUrl" class="w-full sm:w-auto text-center px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1">Cancel</a>
         <button
           class="w-full sm:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2"
           name="submit"
@@ -272,8 +275,8 @@ const props = defineProps([
   "dataSite",
   "dataResults",
   "dataActionPerformed",
-  "dataDataTypes",
-  "dataDataTypesInfo",
+  "dataModuleTypes",
+  "dataMethodTypes",
   "dataFormAction",
   "dataSiteId",
 ]);
@@ -288,13 +291,15 @@ const allQueryDataTypes = [
 const conventional = ref(false);
 const formData = ref(SafeJsonParse(props.dataResults, []));
 const siteData = ref(SafeJsonParse(props.dataSite, []));
-const showExtraData = reactive({ show: false });
-const allDataTypes = ref(SafeJsonParse(props.dataDataTypes, []));
+const moduleTypes = ref(SafeJsonParse(props.dataModuleTypes, []));
+const dataTypeOptions = computed(() => {
+    return moduleTypes.value.map(type => ({ data_type: type.name }));
+});
 const checkBoxAlignment = CheckBoxAlignment;
-const allMethodTypes = [
+const allMethodTypes = ref(SafeJsonParse(props.dataMethodTypes, [
   { name: "GET", value: "GET" },
   { name: "POST", value: "POST" },
-];
+]));
 
 const form = reactive(new Form({
   id: 0,
@@ -326,90 +331,41 @@ const form = reactive(new Form({
 
 const errors = reactive({});
 const errorMessage = ref("");
-// Hardcoded data type definitions — single source of truth for all 7 types
-const DATA_TYPE_DEFINITIONS = {
-  // Fallback shown for any unknown/future type — never causes an error
-  _default: {
-    icon: 'fa fa-info-circle',
-    borderClass: 'border-gray-200',
-    headerClass: 'bg-gray-100 text-gray-500',
-    bodyClass: 'bg-gray-50 text-gray-500',
-    fieldHint: 'Check documentation',
-    placeholder: 'Enter handler value...',
-    description: 'No description is available for this data type yet. Please refer to the HashtagCMS documentation for usage details.',
-  },
-  Static: {
-    icon: 'fa fa-database',
-    borderClass: 'border-slate-200',
-    headerClass: 'bg-slate-100 text-slate-700',
-    bodyClass: 'bg-slate-50 text-slate-600',
-    fieldHint: 'Data Handler → CONTENT_ALIAS',
-    placeholder: 'e.g. HERO_BANNER_CONTENT',
-    description: 'Reads data from the static_module_contents table. Enter the CONTENT_ALIAS value in the Data Handler field to identify which static content to load.',
-  },
-  Query: {
-    icon: 'fa fa-code',
-    borderClass: 'border-violet-200',
-    headerClass: 'bg-violet-100 text-violet-700',
-    bodyClass: 'bg-violet-50 text-violet-600',
-    fieldHint: 'Data Handler → MySQL query',
-    placeholder: 'e.g. SELECT * FROM articles WHERE site_id=:site_id AND status=1',
-    description: 'Write a raw MySQL SELECT query directly in the Data Handler field. The system will execute it and pass the result set to the view.',
-  },
-  Service: {
-    icon: 'fa fa-globe',
-    borderClass: 'border-blue-200',
-    headerClass: 'bg-blue-100 text-blue-700',
-    bodyClass: 'bg-blue-50 text-blue-600',
-    fieldHint: 'Data Handler → Service URL',
-    placeholder: 'e.g. https://api.example.com/v1/articles',
-    description: 'Write the external service/API URL in the Data Handler field. The system will call that endpoint and pass the JSON response to the view.',
-  },
-  Custom: {
-    icon: 'fa fa-puzzle-piece',
-    borderClass: 'border-orange-200',
-    headerClass: 'bg-orange-100 text-orange-700',
-    bodyClass: 'bg-orange-50 text-orange-600',
-    fieldHint: 'Data Handler → Class reference (optional)',
-    placeholder: 'e.g. App\\Handlers\\MyHandler (optional — leave blank to render view only)',
-    description: 'Renders the module view directly. A PHP class reference is optional — if provided, its return value is passed to the view as data. If left blank, the view still renders and you can handle everything in the frontend.',
-  },
-  QueryService: {
-    icon: 'fa fa-exchange',
-    borderClass: 'border-teal-200',
-    headerClass: 'bg-teal-100 text-teal-700',
-    bodyClass: 'bg-teal-50 text-teal-600',
-    fieldHint: 'Data Handler → URL  |  Query → MySQL',
-    placeholder: 'e.g. https://api.example.com/v1/search',
-    description: 'Hybrid type: put the external service URL in the Data Handler field, and write the MySQL query in the Query field. Both are executed and merged before passing to view.',
-  },
-  UrlService: {
-    icon: 'fa fa-link',
-    borderClass: 'border-cyan-200',
-    headerClass: 'bg-cyan-100 text-cyan-700',
-    bodyClass: 'bg-cyan-50 text-cyan-600',
-    fieldHint: 'Data Handler → Service URL (URL params auto-injected)',
-    placeholder: 'e.g. https://api.example.com/v1/detail',
-    description: 'Similar to Service, but automatically reads parameters from the current request URL and appends them to the API call. Useful for detail/search pages where the URL drives the query.',
-  },
-  ServiceLater: {
-    icon: 'fa fa-clock-o',
-    borderClass: 'border-amber-200',
-    headerClass: 'bg-amber-100 text-amber-700',
-    bodyClass: 'bg-amber-50 text-amber-600',
-    fieldHint: 'Data Handler → Service URL (passed to view, not called)',
-    placeholder: 'e.g. https://api.example.com/v1/products',
-    description: 'The system will NOT call the API immediately. Instead, it passes the service URL directly to the view so the frontend can call it on demand.',
-  },
+// Hardcoded fallback for unknown/new types
+const DEFAULT_TYPE_INFO = {
+  icon: 'fa fa-info-circle',
+  borderClass: 'border-slate-200',
+  headerClass: 'bg-slate-100 text-slate-700',
+  bodyClass: 'bg-slate-50 text-slate-600',
+  fieldHint: 'Please check documentation',
+  placeholder: 'Enter handler value...',
+  description: 'No specific help information is available for this type yet.',
 };
 
-// Always resolves — never returns undefined. Falls back to _default for unknown types.
-const activeTypeInfo = computed(() => DATA_TYPE_DEFINITIONS[form.data_type] ?? DATA_TYPE_DEFINITIONS._default);
+// Map dynamic data to the format expected by the template
+const activeTypeInfo = computed(() => {
+    const typeName = form.data_type;
+    const info = moduleTypes.value.find(t => t.name === typeName);
+
+    if (!info) return DEFAULT_TYPE_INFO;
+
+    // We can potentially store these in DB too, but for now we use consistent styling
+    // or drive it from the type name if we want specific colors.
+    return {
+        icon: info.icon || DEFAULT_TYPE_INFO.icon,
+        borderClass: 'border-slate-200',
+        headerClass: 'bg-slate-100 text-slate-700',
+        bodyClass: 'bg-slate-50 text-slate-600',
+        fieldHint: info.field_hint || DEFAULT_TYPE_INFO.fieldHint,
+        placeholder: info.placeholder || DEFAULT_TYPE_INFO.placeholder,
+        description: info.description || DEFAULT_TYPE_INFO.description,
+    };
+});
 
 const saveURL = ref(props.dataFormAction);
 
 const showQueryForm = computed(() => {
-  return form.data_type?.toLowerCase().indexOf("queryservice") > -1;
+  return form.data_type?.toLowerCase().indexOf("queryservice") > -1 || (form.data_type?.toLowerCase() !== "query" && form.data_type?.toLowerCase().indexOf("query") > -1);
 });
 
 const showServiceForm = computed(() => {
@@ -417,7 +373,17 @@ const showServiceForm = computed(() => {
 });
 
 const showAllUpdateSection = computed(() => {
-  return props.dataActionPerformed === "edit" && siteData.value.length > 1;
+  return siteData.value.length > 1;
+});
+
+const syncLabel = computed(() => {
+  return props.dataActionPerformed === "edit" ? "Sync Changes Across All Sites" : "Create Module in All Sites";
+});
+
+const syncWarning = computed(() => {
+    return props.dataActionPerformed === "edit" 
+        ? "WARNING: This action will overwrite module metadata on multiple sites. Use only for global structural changes."
+        : "NOTE: This will create a copy of this module in all available sites using the same alias.";
 });
 
 const setFormData = (data) => {
@@ -458,9 +424,7 @@ const goConventional = () => {
     }
 };
 
-const checkForService = (dataType) => {
-    showExtraData.show = dataType !== "" && (dataType.indexOf("Service") > -1 || dataType.indexOf("service") > -1);
-};
+// Check for service is now handled by computed properties showQueryForm and showServiceForm
 
 const showError = (res) => {
     for (let i in res.errors) {

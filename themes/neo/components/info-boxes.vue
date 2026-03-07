@@ -45,7 +45,7 @@ const hasAccess = (module_id) => {
     return true;
   }
   for (let i = 0; i < modulesAllowed.value.length; i++) {
-    if (modulesAllowed.value[i].module_id == module_id) {
+    if (modulesAllowed.value[i].id == module_id) {
       return true;
     }
   }

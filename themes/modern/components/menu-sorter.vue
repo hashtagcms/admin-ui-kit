@@ -206,36 +206,35 @@ const submit = (requestType, url, data, cName) => {
   });
 };
 
-const updateIndex = (isParentFlag = false) => {
-  // Keeping .item as per original but it might be a bug in original code
-  let items = document.querySelectorAll(".item");
-  let datas = [];
-  let nameToUse = isParentFlag === true
-    ? controllerName.value
-    : controlerChildName.value !== ""
-      ? controlerChildName.value
-      : controllerName.value;
+const updateIndex = () => {
+  // Collect ALL li elements — both parent and child — in current DOM order
+  const items = document.querySelectorAll(".js_sortable li[data-id]");
 
-  let saveAll = controlerChildName.value === "";
-  let counter = 1;
+  const allRows = [];
+  let parentCounter = 1;
+  let childCounter  = 1;
 
   items.forEach((current) => {
-    if (saveAll === true) {
-      let id = current.getAttribute("data-id");
-      datas.push({ position: counter, where: { id: parseInt(id) } });
-      counter++;
+    const isParentEl = current.getAttribute("data-is-parent") === "true";
+    const id         = parseInt(current.getAttribute("data-id"), 10);
+
+    if (isParentEl) {
+      // New parent group → reset the child counter so each parent's children
+      // are numbered 1..N independently
+      childCounter = 1;
+      allRows.push({ id, position: parentCounter++ });
     } else {
-      let isParentElement = current.getAttribute("data-is-parent");
-      let id = current.getAttribute("data-id");
-      if (isParentFlag.toString() === isParentElement.toString()) {
-        datas.push({ position: counter, where: { id: parseInt(id) } });
-        counter++;
-      }
+      allRows.push({ id, position: childCounter++ });
     }
   });
 
-  let updateIndexUrl = AdminConfig.admin_path(nameToUse + "/updateIndex");
-  submit("post", updateIndexUrl, datas, nameToUse);
+  console.log("Saving flat data (parents + children):", allRows);
+
+  // Single API call to the primary controller with the combined flat array wrapped in 'data'
+  if (allRows.length > 0 && controllerName.value) {
+    const url = AdminConfig.admin_path(controllerName.value + "/updateIndex");
+    submit("post", url, { data: allRows }, controllerName.value);
+  }
 };
 
 const setData = (data) => {

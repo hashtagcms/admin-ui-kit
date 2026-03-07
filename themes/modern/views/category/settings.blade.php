@@ -3,8 +3,6 @@
 @section('content')
 
     <title-bar data-title="{!! htcms_get_module_name(request()->module_info) !!} - Settings" data-back-url="{{htcms_admin_path('category')}}" data-show-copy="false"  data-show-paste="false"></title-bar>
-
-
     <category-settings
             data-site-id="{{htcms_get_siteId_for_admin()}}"
             data-platform-id="{{$platform_id}}"

@@ -46,117 +46,223 @@ export const PageManager = {
   action: null,
   content_type: null,
   id: null,
-  init: function (action, content_type, id) {
+  config: {
+      dependencies: []
+  },
+  
+  init: function (action, content_type, id, config = {}) {
     this.action = action;
     this.content_type = content_type;
     this.id = id;
+    this.config = { ...this.config, ...config };
 
-    if (PageManager.action === "add") {
-      document
-        .getElementById("lang_name")
-        .addEventListener("change", PageManager.autoUpdateFields);
-      document
-        .getElementById("lang_title")
-        .addEventListener("change", PageManager.autoUpdateUrls);
-      document
-        .getElementById("link_rewrite")
-        .addEventListener("keyup", PageManager.linkRewriteUpdated);
-      document
-        .getElementById("category_id")
-        .addEventListener("change", PageManager.getParentCategory);
-    } else {
+    this.attachDependencyListeners();
+
+    if (this.action !== "add") {
       this.getParentCategory();
     }
   },
-  isBlank: function (elem) {
-    return document.getElementById(elem).value.replace(/\s/g, "") === "";
+
+  attachDependencyListeners: function() {
+      // Loop over configured dependencies and attach elegant listeners automatically
+      if (Array.isArray(this.config.dependencies) && this.config.dependencies.length > 0) {
+          this.config.dependencies.forEach(dep => {
+              const sourceElem = document.getElementById(dep.onChangeId);
+              if (!sourceElem) return;
+
+              sourceElem.addEventListener('change', (e) => {
+                  const val = e.target.value;
+                  if (!dep.shouldUpdate || !Array.isArray(dep.shouldUpdate)) return;
+                  
+                  dep.shouldUpdate.forEach(target => {
+                      const targetElem = document.getElementById(target.element);
+                      // By default, only update if the target is blank OR if the target is specified to force override
+                      if (targetElem && (this.isBlank(target.element) || target.forceUpdate)) {
+                          let finalVal = val;
+                          if (target.formatter && typeof target.formatter === 'function') {
+                              finalVal = target.formatter(val);
+                          } else if (target.formatter === 'uppercase_clean') {
+                              finalVal = CleanForUrl(val.toUpperCase(), "_").substr(0, 60);
+                          } else if (target.formatter === 'lowercase_clean') {
+                              finalVal = CleanForUrl(val.toLowerCase(), "-").substr(0, 128);
+                          } else if (target.formatter === 'capitalize') {
+                              finalVal = val.charAt(0).toUpperCase() + val.slice(1);
+                          }
+                          
+                          targetElem.value = finalVal;
+                      }
+                  });
+              });
+          });
+      } else {
+          // Keep legacy overrides for safety during migration
+          const langName = document.getElementById("lang_name");
+          if (langName) {
+               langName.addEventListener("change", this.autoUpdateFields.bind(this));
+          }
+          
+          const langTitle = document.getElementById("lang_title");
+          if (langTitle) {
+              langTitle.addEventListener("change", this.autoUpdateUrls.bind(this));
+          }
+      }
+
+      const linkRewrite = document.getElementById("link_rewrite");
+      if (linkRewrite) {
+          linkRewrite.addEventListener("keyup", this.linkRewriteUpdated.bind(this));
+      }
+
+      const categoryId = document.getElementById("category_id");
+      if (categoryId) {
+          categoryId.addEventListener("change", this.getParentCategory.bind(this));
+      }
   },
 
-  autoUpdateFields: function () {
-    let value = this.value;
+  isBlank: function (elemId) {
+    const el = document.getElementById(elemId);
+    return el ? el.value.replace(/\s/g, "") === "" : true;
+  },
+
+  autoUpdateFields: function (e) {
+    let value = typeof e === "string" ? e : (e.target ? e.target.value : this.value);
+    if (!value) return;
+    
     try {
-      if (PageManager.isBlank("lang_title")) {
-        document.getElementById("lang_title").value =
-          value[0].toUpperCase() + value.slice(1);
-        document.getElementById("alias").value = CleanForUrl(
-          value.toUpperCase(),
-          "_",
-        );
+      if (this.isBlank("lang_title")) {
+        const langTitle = document.getElementById("lang_title");
+        if(langTitle) langTitle.value = value.charAt(0).toUpperCase() + value.slice(1);
+        
+        const alias = document.getElementById("alias");
+        if(alias) alias.value = CleanForUrl(value.toUpperCase(), "_");
+        
         let active_key = CleanForUrl(value.toLowerCase(), "-");
-        document.getElementById("lang_active_key").value = active_key;
-        document.getElementById("link_rewrite").value = active_key;
+        
+        const langActiveKey = document.getElementById("lang_active_key");
+        if(langActiveKey) langActiveKey.value = active_key;
+        
+        const linkRewrite = document.getElementById("link_rewrite");
+        if(linkRewrite && linkRewrite.edited !== true) linkRewrite.value = active_key;
       }
-    } catch (e) {
-      console.error(e.message);
+    } catch (err) {
+      console.error(err.message);
     }
   },
-  autoUpdateUrls: function () {
-    let value = this.value;
-    if (document.getElementById("link_rewrite").edited !== true) {
-      value = CleanForUrl(value.toUpperCase(), "_");
-      value = value.substr(0, 60); //it's limit
-      document.getElementById("alias").value = value;
+  
+  autoUpdateUrls: function (e) {
+    let value = typeof e === "string" ? e : (e.target ? e.target.value : this.value);
+    if (!value) return;
+    
+    const linkRewrite = document.getElementById("link_rewrite");
+    if (!linkRewrite || linkRewrite.edited !== true) {
+      let aliasVal = CleanForUrl(value.toUpperCase(), "_");
+      aliasVal = aliasVal.substr(0, 60); //it's limit
+      const alias = document.getElementById("alias");
+      if(alias) alias.value = aliasVal;
 
       let active_key = CleanForUrl(value.toLowerCase(), "-");
-      active_key = value.substr(0, 128); //it's limit
-      document.getElementById("lang_active_key").value = active_key;
-      document.getElementById("link_rewrite").value = active_key;
+      active_key = active_key.substr(0, 128); //it's limit
+      
+      const langActiveKey = document.getElementById("lang_active_key");
+      if(langActiveKey) langActiveKey.value = active_key;
+      
+      if(linkRewrite) linkRewrite.value = active_key;
     }
   },
+  
   linkRewriteUpdated: function () {
-    document.getElementById("link_rewrite").edited = true;
+    const linkRewrite = document.getElementById("link_rewrite");
+    if (linkRewrite) linkRewrite.edited = true;
   },
-  getParentCategory() {
+  
+  getParentCategory: function() {
     let parentcombo = document.getElementById("parent_id");
-    let category_id = document.getElementById("category_id").value;
-    document.getElementById("parent_id").value = "";
+    let categoryElem = document.getElementById("category_id");
+    if (!parentcombo || !categoryElem) return;
+    
+    let category_id = categoryElem.value;
+    parentcombo.value = "";
 
     parentcombo.length = 0;
-    parentcombo.options[0] = new Option("Select", "");
 
     if (category_id > 0) {
-      showHideBlock(true);
+      parentcombo.options[0] = new Option("Loading...", "");
+      this.showHideBlock(true);
+      
+      // If content_type is null/falsy from our config injection, use a default fallback
+      let resolvedContentType = this.content_type || 'category'; 
+      
       let path = adminConfig.admin_path("page/getParentCategory", {
-        content_type: PageManager.content_type,
+        content_type: resolvedContentType,
         category_id: category_id,
       });
       axios
         .get(path)
-        .then(function (res) {
-          //console.log(res);
-          updateCombo(res.data);
+        .then((res) => {
+          parentcombo.length = 0;
+          parentcombo.options[0] = new Option("Select", "");
+          this.updateCombo(res.data, parentcombo);
         })
-        .catch(function (res) {
-          //console.log(res);
-          showHideBlock(false);
+        .catch((res) => {
+          parentcombo.length = 0;
+          parentcombo.options[0] = new Option("Select", "");
+          this.showHideBlock(false);
         });
     } else {
-      showHideBlock(false);
-    }
-
-    function updateCombo(res) {
-      if (res.length > 0) {
-        let index = 1;
-        for (let i = 0; i < res.length; i++) {
-          let current = res[i];
-          if (current.id !== PageManager.id) {
-            parentcombo.options[index] = new Option(
-              current.lang.name,
-              current.id,
-            );
-            index++;
-          }
-        }
-      } else {
-        showHideBlock(false);
-      }
-    }
-
-    function showHideBlock(show) {
-      document.getElementById("parent_div").style.display =
-        show === true ? "" : "none";
+      parentcombo.options[0] = new Option("Select", "");
+      this.showHideBlock(false);
     }
   },
+  
+  updateCombo: function(res, parentcombo) {
+    let addedCount = 0;
+    if (res.length > 0) {
+      let index = 1;
+      for (let i = 0; i < res.length; i++) {
+        let current = res[i];
+        if (current.id != this.id) {
+          parentcombo.options[index] = new Option(
+            current.lang.name,
+            current.id,
+          );
+          index++;
+          addedCount++;
+        }
+      }
+    }
+    
+    this.showHideBlock(addedCount > 0);
+  },
+  
+  showHideBlock: function(show) {
+    const parentDiv = document.getElementById("parent_div");
+    if (!parentDiv) return;
+
+    if (!parentDiv.dataset.initialized) {
+        parentDiv.dataset.initialized = "true";
+        parentDiv.style.transition = 'max-height 0.4s ease-in-out, opacity 0.4s ease-in-out, margin 0.4s ease-in-out, padding 0.4s ease-in-out';
+        parentDiv.style.overflow = 'hidden';
+        if (parentDiv.style.display === 'none' || !show) {
+            parentDiv.style.maxHeight = '0px';
+            parentDiv.style.opacity = '0';
+        }
+    }
+
+    if (show) {
+        parentDiv.style.display = "";
+        requestAnimationFrame(() => {
+            parentDiv.style.maxHeight = '500px'; 
+            parentDiv.style.opacity = '1';
+        });
+    } else {
+        parentDiv.style.maxHeight = '0px';
+        parentDiv.style.opacity = '0';
+        setTimeout(() => {
+            if (parentDiv.style.opacity === '0') {
+                parentDiv.style.display = "none";
+            }
+        }, 400);
+    }
+  }
 };
 
 /**

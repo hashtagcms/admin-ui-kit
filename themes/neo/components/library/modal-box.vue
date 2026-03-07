@@ -43,12 +43,23 @@ const props = defineProps([
   "dataFooterCss",
   "dataModalCss",
   "dataWidth",
+  "dataSize",
 ]);
 
 const emit = defineEmits(["onClose"]);
 
+const getSizeClass = () => {
+  if (props.dataSize) {
+    if (props.dataSize === "sm") return "modal-sm";
+    if (props.dataSize === "md") return "";
+    if (props.dataSize === "lg") return "modal-lg";
+    if (props.dataSize === "xl") return "modal-xl";
+  }
+  return "modal-lg"; // Default for Neo
+};
+
 // State
-const modelCss = ref("modal modal-lg fade show");
+const modelCss = ref(`modal ${getSizeClass()} fade show`);
 const titleCss = ref(props.dataTitleCss || "");
 const contentCss = ref(props.dataContentCss || "");
 const footerCss = ref(props.dataFooterCss || "");
@@ -76,13 +87,13 @@ const modalWidth = computed(() => {
 const open = (data = {}) => {
   visible.value = true;
   backDropStyle.value = style.value = "display:block";
-  modelCss.value = "modal modal-lg fade show animated bounceInDown";
+  modelCss.value = `modal ${getSizeClass()} fade show animated bounceInDown`;
   toBeReturned.value = data;
 };
 
 const close = () => {
   visible.value = false;
-  modelCss.value = "modal modal-lg animated bounceOutUp";
+  modelCss.value = `modal ${getSizeClass()} animated bounceOutUp`;
   backDropStyle.value = "display:none";
 
   if (typeof toBeReturned.value === "function") {

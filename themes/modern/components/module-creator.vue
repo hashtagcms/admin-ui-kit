@@ -1,134 +1,166 @@
 <template>
-  <div class="max-w-6xl mx-auto space-y-8">
+  <div class="max-w-4xl mx-auto space-y-8">
+    <title-bar
+      data-title="Create New Module"
+      :data-back-url="dataBackUrl"
+      data-show-copy="false"
+      data-show-paste="false"
+    ></title-bar>
     <form
       :action="saveURL"
-      class="bg-white shadow-lg rounded-lg border border-gray-100 overflow-hidden"
+      class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden"
       method="post"
       role="form"
       v-on:keyup="hideErrorMessage($event)"
       v-on:submit.prevent="createModule"
     >
+      <!-- Dashboard Header -->
       <div class="px-8 py-6 border-b border-gray-100 bg-gray-50/50">
-          <h2 class="text-2xl font-black text-gray-800 tracking-tight">Create New Module</h2>
-          <p class="text-sm text-gray-500 mt-1">Define your module configuration and data source</p>
+          <h3 class="text-xs font-black uppercase tracking-[0.2em] text-slate-400">System Module Definition</h3>
       </div>
 
-      <div class="p-8 space-y-6">
-          <!-- File Creation Toggle -->
-          <div class="bg-blue-50/50 p-4 rounded-xl border border-blue-100/50">
+      <div class="p-8 lg:p-10 space-y-12">
+          <!-- Configuration Toggle -->
+          <div class="bg-blue-50/50 p-6 rounded-2xl border border-blue-100/50">
               <label class="flex items-center cursor-pointer group leading-none">
                 <div class="relative flex items-center">
                     <input
                       v-model="form.createFiles"
                       type="checkbox"
                       name="create-validator"
-                      class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded-md focus:ring-blue-500 transition-all shadow-sm"
+                      class="w-5 h-5 text-blue-600 bg-white border-gray-300 rounded-lg focus:ring-blue-500 transition-all shadow-sm"
                     />
                 </div>
-                <div style="position: relative; top: -5px; left: 7px;">
-                    <span class="text-sm font-bold text-gray-800 group-hover:text-blue-700 transition-colors">Generate Boilerplate Files</span>
-                    <p class="text-[11px] text-gray-500 mt-0.5">Automates creation of Controller, Model, View, and Validator.</p>
+                <div class="ml-4">
+                    <span class="text-xs font-black uppercase tracking-widest text-slate-800 group-hover:text-blue-600 transition-colors">Generate Logic & Scaffolding</span>
+                    <p class="text-[10px] text-slate-500 font-bold uppercase tracking-tight mt-1 opacity-70">Automates creation of Controller, Model, View, and Validator files.</p>
                 </div>
               </label>
           </div>
 
-          <!-- Basic Info Section -->
-          <div class="space-y-6">
-              <input v-model="form.display_name" type="hidden" />
+          <!-- Module Identity -->
+          <div class="space-y-8">
+              <div class="flex items-center gap-3">
+                  <i class="fa fa-cube text-blue-500"></i>
+                  <h4 class="text-[10px] font-black uppercase tracking-widest text-slate-800">Module Identity & Presentation</h4>
+              </div>
               
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Module Name</label>
-                <input
-                  v-model="form.name"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
-                  name="name"
-                  placeholder="e.g. BlogPost"
-                  required
-                  type="text"
-                  @blur="updateControllerName()"
-                />
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.name">{{ errors.name }}</div>
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Sub Title</label>
-                <input
-                  v-model="form.sub_title"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
-                  name="sub_title"
-                  placeholder="Optional descriptive title"
-                  type="text"
-                />
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.sub_title">{{ errors.sub_title }}</div>
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Controller Name</label>
-                <input
-                  v-model="form.controller_name"
-                  class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
-                  name="controller_name"
-                  placeholder="e.g. blog-posts"
-                  required
-                  type="text"
-                  @blur="updateControllerName(form.controller_name)"
-                />
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.controller_name">{{ errors.controller_name }}</div>
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Parent Module</label>
-                <select v-model="form.parent_id" class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm cursor-pointer">
-                  <option value="">No Parent (Root Level)</option>
-                  <option v-for="module in allModules" :key="module.id" :value="module.id">
-                    {{ module.name }}
-                  </option>
-                </select>
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.parent_id">{{ errors.parent_id }}</div>
-              </div>
-
-              <div class="space-y-1.5">
-                <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Icon CSS (FontAwesome)</label>
-                <div class="flex items-center gap-3">
-                    <div class="bg-gray-50 border border-gray-100 rounded-xl p-3 flex items-center justify-center min-w-[50px] shadow-inner">
-                        <i :class="form.icon_css || 'fa fa-cube'" class="text-gray-400 text-xl"></i>
-                    </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <input v-model="form.display_name" type="hidden" />
+                  
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Module Name</label>
                     <input
-                      v-model="form.icon_css"
-                      class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm"
-                      name="icon_css"
-                      placeholder="fa fa-pencil"
+                      v-model="form.name"
+                      class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
+                      name="name"
+                      placeholder="e.g. BlogPost"
                       required
                       type="text"
+                      @blur="updateControllerName()"
                     />
-                </div>
-                <div class="px-2 text-[11px] text-red-500 font-bold" v-if="errors.icon_css">{{ errors.icon_css }}</div>
+                    <div class="px-2 text-[10px] text-red-500 font-bold uppercase tracking-tight mt-1" v-if="errors.name">{{ errors.name }}</div>
+                  </div>
+
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Sub-Title / Description</label>
+                    <input
+                      v-model="form.sub_title"
+                      class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
+                      name="sub_title"
+                      placeholder="Optional descriptive title"
+                      type="text"
+                    />
+                    <div class="px-2 text-[10px] text-red-500 font-bold uppercase tracking-tight mt-1" v-if="errors.sub_title">{{ errors.sub_title }}</div>
+                  </div>
               </div>
 
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">List View</label>
-                <input v-model="form.list_view_name" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none block w-full px-3 py-2" placeholder="common/listing" />
+              <!-- Technical Core -->
+              <div class="space-y-8 pt-10 border-t border-slate-100">
+                  <div class="flex items-center gap-3 text-amber-600">
+                      <i class="fa fa-code"></i>
+                      <h4 class="text-[10px] font-black uppercase tracking-widest">Logic & Architecture</h4>
+                  </div>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-700 block">Controller Mapping</label>
+                        <input
+                          v-model="form.controller_name"
+                          class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
+                          name="controller_name"
+                          placeholder="e.g. blog-posts"
+                          required
+                          type="text"
+                          @blur="updateControllerName(form.controller_name)"
+                        />
+                        <div class="px-2 text-[10px] text-red-500 font-bold uppercase tracking-tight mt-1" v-if="errors.controller_name">{{ errors.controller_name }}</div>
+                      </div>
+
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-700 block">Organizational Parent</label>
+                        <select v-model="form.parent_id" class="form-select w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 cursor-pointer">
+                          <option value="">No Parent (Root Level)</option>
+                          <option v-for="module in allModules" :key="module.id" :value="module.id">
+                            {{ module.name }}
+                          </option>
+                        </select>
+                        <div class="px-2 text-[10px] text-red-500 font-bold uppercase tracking-tight mt-1" v-if="errors.parent_id">{{ errors.parent_id }}</div>
+                      </div>
+
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-700 block">Dashboard Icon (FontAwesome)</label>
+                        <div class="flex items-center gap-3">
+                            <div class="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-center justify-center min-w-[50px] shadow-inner text-slate-400">
+                                <i :class="form.icon_css ||'fa fa-cube'" class="text-lg"></i>
+                            </div>
+                            <input
+                              v-model="form.icon_css"
+                              class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900"
+                              name="icon_css"
+                              placeholder="fa fa-pencil"
+                              required
+                              type="text"
+                            />
+                        </div>
+                        <div class="px-2 text-[10px] text-red-500 font-bold uppercase tracking-tight mt-1" v-if="errors.icon_css">{{ errors.icon_css }}</div>
+                      </div>
+                  </div>
               </div>
 
-              <div class="space-y-1.5">
-                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Edit View</label>
-                <input v-model="form.edit_view_name" class="bg-white border border-gray-200 text-gray-700 text-xs rounded-lg focus:ring-2 focus:ring-blue-500/20 outline-none block w-full px-3 py-2" placeholder="addedit" />
+              <!-- Interface Routing -->
+              <div class="space-y-8 pt-10 border-t border-slate-100">
+                  <div class="flex items-center gap-3 text-emerald-600">
+                      <i class="fa fa-eye"></i>
+                      <h4 class="text-[10px] font-black uppercase tracking-widest">Interface Routing</h4>
+                  </div>
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-700 block">Listing Template</label>
+                        <input v-model="form.list_view_name" class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900" placeholder="common/listing" />
+                      </div>
+
+                      <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-700 block">Editor Template</label>
+                        <input v-model="form.edit_view_name" class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900" placeholder="addedit" />
+                      </div>
+                  </div>
               </div>
           </div>
 
           <!-- Data Source Section (Conditional) -->
-          <div v-if="form.createFiles" class="border-t border-gray-100 pt-8 space-y-6">
-              <div class="flex items-center gap-3 mb-4">
-                  <div class="h-8 w-1 bg-blue-600 rounded-full"></div>
-                  <h3 class="text-lg font-black text-gray-800">Master Data Configuration</h3>
+          <div v-if="form.createFiles" class="pt-10 border-t border-slate-100 space-y-8">
+              <div class="flex items-center gap-3 text-indigo-600">
+                  <i class="fa fa-database"></i>
+                  <h4 class="text-[10px] font-black uppercase tracking-widest">Master Data Configuration</h4>
               </div>
 
-              <div class="space-y-6">
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Main Table</label>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div class="space-y-2">
+                    <label class="text-sm font-medium text-slate-700 block">Main Table Source</label>
                     <select
                       v-model="mainModel.tableName"
-                      class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm cursor-pointer"
+                      class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 cursor-pointer"
                       @change="populateMainDataFields()"
                     >
                       <option value="">Choose Main Database Table</option>
@@ -137,18 +169,18 @@
                       </option>
                     </select>
                     <div v-if="mainModel.tableName" class="mt-2 ml-1">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-[10px] font-black bg-blue-50 text-blue-700 border border-blue-100 uppercase tracking-widest">
                           <i class="fa fa-code mr-1.5"></i> {{ getModelName(mainModel.tableName) }}
                         </span>
                     </div>
                   </div>
 
                   <div class="space-y-4">
-                    <div class="space-y-1.5">
-                        <label class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Relational Models</label>
+                    <div class="space-y-2">
+                        <label class="text-sm font-medium text-slate-700 block">Relational Models</label>
                         <select
                           v-model="relationModels.tableName"
-                          class="bg-white border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-sm cursor-pointer"
+                          class="form-control w-full bg-white border transition-all duration-300 outline-none font-bold text-xs tracking-tight py-3.5 rounded-xl px-4 hover:border-gray-300 border-gray-300 focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 text-gray-900 cursor-pointer"
                           @change="addRelationModel()"
                         >
                           <option value="">Add Joint Table Relation</option>
@@ -158,124 +190,127 @@
                         </select>
                     </div>
 
-                    <div v-if="hasRelation()" class="space-y-3">
-                        <div v-for="(rModel, index) in relationModels.models" :key="index" class="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm relative group overflow-hidden">
-                            <div class="flex flex-col gap-3">
-                                <div class="flex items-center justify-between">
-                                    <span class="text-xs font-black text-blue-600 truncate max-w-[150px]">{{ rModel.model.split('::')[0] }}</span>
+                    <div v-if="hasRelation()" class="grid grid-cols-1 gap-4">
+                        <div v-for="(rModel, index) in relationModels.models" :key="index" class="bg-slate-50 border border-slate-100 rounded-xl p-5 shadow-sm relative group overflow-hidden transition-all hover:bg-white hover:border-indigo-200">
+                            <div class="flex flex-col gap-4">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="text-[10px] font-black text-indigo-600 uppercase tracking-widest truncate max-w-[150px]">{{ rModel.model.split('::')[0] }}</span>
                                     <button
                                       type="button"
-                                      class="text-gray-400 hover:text-red-500 transition-colors"
+                                      class="text-slate-300 hover:text-red-500 transition-colors"
                                       @click="removeRelationModel(index, rModel.model)"
                                     >
-                                      <i class="fa fa-times-circle"></i>
+                                      <i class="fa fa-times-circle text-lg"></i>
                                     </button>
                                 </div>
-                                <div class="grid grid-cols-2 gap-2">
+                                <div class="grid grid-cols-2 gap-3">
                                      <input
                                       :value="rModel.relationAlias"
                                       @input="updateRelationModel($event, index, 'relationAlias')"
-                                      class="bg-white border border-gray-200 text-[11px] rounded-lg px-2 py-1.5 focus:border-blue-500 outline-none shadow-sm"
+                                      class="bg-white border border-slate-200 text-xs font-bold rounded-lg px-3 py-2 focus:border-indigo-500 outline-none transition-colors"
                                       placeholder="Alias"
                                     />
                                     <select
-                                      class="bg-white border border-gray-200 text-[11px] rounded-lg px-2 py-1.5 shadow-sm"
+                                      class="bg-white border border-slate-200 text-xs font-bold rounded-lg px-3 py-2 outline-none cursor-pointer"
                                       @change="updateRelationModel($event, index, 'relationType')"
                                     >
                                       <option value="hasMany">hasMany</option>
                                       <option value="belongsTo">belongsTo</option>
                                       <option value="hasOne">hasOne</option>
+                                      <option value="belongsToMany">belongsToMany</option>
+                                      <option value="hasOneThrough">hasOneThrough</option>
+                                      <option value="hasManyThrough">hasManyThrough</option>
                                     </select>
                                 </div>
-                                <label class="flex items-center cursor-pointer mt-1 leading-none">
-                                    <input v-model="rModel.isLanguage" type="checkbox" class="w-3.5 h-3.5 text-blue-600 rounded border-gray-300" />
-                                    <span class="text-[10px] font-bold text-gray-500" :style="checkBoxAlignment">I18n / Language?</span>
+                                <label class="flex items-center cursor-pointer mt-1 leading-none group/lang">
+                                    <input v-model="rModel.isLanguage" type="checkbox" class="w-4 h-4 text-indigo-600 rounded-lg border-slate-300" />
+                                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2 group-hover/lang:text-indigo-600 transition-colors">I18n / Language Table?</span>
                                 </label>
                             </div>
                         </div>
                     </div>
                   </div>
               </div>
+          </div>
 
-              <!-- Field Selector Grid -->
-              <div v-if="hasMainDataSource()" class="mt-8 space-y-4">
-                  <div class="flex items-center justify-between">
-                    <h4 class="text-xs font-black text-gray-400 uppercase tracking-widest ml-1">Select Fields to Include</h4>
-                  </div>
-                  
-                  <div class="space-y-4">
-                      <!-- Main Table Fields -->
-                      <div class="bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col h-[400px]">
-                          <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-blue-50/20">
-                             <span class="text-xs font-black text-blue-800 tracking-tight">{{ getModelName(mainModel.tableName).split('::')[0] }}</span>
-                             <button type="button" @click="selectAllField(mainModel)" class="text-[10px] font-black bg-blue-600 text-white px-2 py-1 rounded-md hover:bg-blue-700 transition-all">Add All</button>
-                          </div>
-                          <div class="flex-1 overflow-y-auto p-3 custom-scrollbar">
-                             <ul class="space-y-1">
-                                <li
-                                    v-for="field in mainModel.fields"
-                                    :key="field"
-                                    @click="selectField(field, mainModel)"
-                                    class="px-3 py-2.5 text-xs font-bold text-gray-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl cursor-not-allowed transition-all flex items-center justify-between group active:scale-[0.98] cursor-pointer"
-                                >
-                                    {{ field }}
-                                    <i class="fa fa-plus-circle text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </li>
-                             </ul>
-                          </div>
+          <!-- Field Selector Grid -->
+          <div v-if="hasMainDataSource()" class="mt-12 space-y-6 pt-10 border-t border-slate-100">
+              <div class="flex items-center justify-between">
+                <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">Select Fields to Include</h4>
+              </div>
+              
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <!-- Main Table Fields -->
+                  <div class="bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col h-[400px] overflow-hidden">
+                      <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-blue-50/20">
+                         <span class="text-[10px] font-black text-blue-700 uppercase tracking-widest">{{ getModelName(mainModel.tableName).split('::')[0] }}</span>
+                         <button type="button" @click="selectAllField(mainModel)" class="text-[9px] font-black bg-blue-600 text-white px-3 py-1.5 rounded-lg hover:bg-blue-700 transition-all uppercase tracking-widest">Add All</button>
                       </div>
+                      <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                         <ul class="space-y-1">
+                            <li
+                                v-for="field in mainModel.fields"
+                                :key="field"
+                                @click="selectField(field, mainModel)"
+                                class="px-4 py-3 text-xs font-bold text-slate-600 hover:bg-blue-50 hover:text-blue-700 rounded-xl transition-all flex items-center justify-between group cursor-pointer active:scale-[0.98]"
+                            >
+                                {{ field }}
+                                <i class="fa fa-plus-circle text-blue-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </li>
+                         </ul>
+                      </div>
+                  </div>
 
-                      <!-- Relation Fields -->
-                      <div
-                        v-for="(rModel, index) in relationModels.models"
-                        :key="index"
-                        class="bg-white border border-gray-200 rounded-lg shadow-sm flex flex-col h-[400px]"
-                      >
-                         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between bg-purple-50/20">
-                             <div class="flex flex-col">
-                                <span class="text-xs font-black text-purple-800 tracking-tight">{{ rModel.model.split('::')[0] }}</span>
-                                <span class="text-[9px] font-bold text-purple-400 mt-0.5 uppercase tracking-widest">via: {{ rModel.relationAlias }}</span>
-                             </div>
-                             <button type="button" @click="selectAllField(mainModel, rModel.relationAlias)" class="text-[10px] font-black bg-purple-600 text-white px-2 py-1 rounded-md hover:bg-purple-700 transition-all">Add All</button>
-                          </div>
-                          <div class="flex-1 overflow-y-auto p-3 custom-scrollbar">
-                             <ul class="space-y-1">
-                                <li
-                                    v-for="field in rModel.fields"
-                                    :key="field"
-                                    @click="selectField(field, mainModel, rModel.relationAlias)"
-                                    class="px-3 py-2.5 text-xs font-bold text-gray-600 hover:bg-purple-50 hover:text-purple-700 rounded-xl cursor-pointer transition-all flex items-center justify-between group active:scale-[0.98]"
-                                >
-                                    {{ field }}
-                                    <i class="fa fa-plus-circle text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
-                                </li>
-                             </ul>
-                          </div>
+                  <!-- Relation Fields -->
+                  <div
+                    v-for="(rModel, index) in relationModels.models"
+                    :key="index"
+                    class="bg-white border border-slate-100 rounded-2xl shadow-sm flex flex-col h-[400px] overflow-hidden"
+                  >
+                     <div class="px-6 py-4 border-b border-slate-50 flex items-center justify-between bg-purple-50/20">
+                         <div class="flex flex-col">
+                            <span class="text-[10px] font-black text-purple-700 uppercase tracking-widest">{{ rModel.model.split('::')[0] }}</span>
+                            <span class="text-[9px] font-bold text-purple-400 mt-0.5 uppercase tracking-tighter">via: {{ rModel.relationAlias }}</span>
+                         </div>
+                         <button type="button" @click="selectAllField(mainModel, rModel.relationAlias)" class="text-[9px] font-black bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 transition-all uppercase tracking-widest">Add All</button>
+                      </div>
+                      <div class="flex-1 overflow-y-auto p-4 custom-scrollbar">
+                         <ul class="space-y-1">
+                            <li
+                                v-for="field in rModel.fields"
+                                :key="field"
+                                @click="selectField(field, mainModel, rModel.relationAlias)"
+                                class="px-4 py-3 text-xs font-bold text-slate-600 hover:bg-purple-50 hover:text-purple-700 rounded-xl cursor-pointer transition-all flex items-center justify-between group active:scale-[0.98]"
+                            >
+                                {{ field }}
+                                <i class="fa fa-plus-circle text-purple-400 opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                            </li>
+                         </ul>
                       </div>
                   </div>
               </div>
 
               <!-- Selected Fields Area -->
-              <div v-if="mainModel.selected.length > 0" class="mt-8">
-                  <div class="bg-gray-900 rounded-lg p-8 shadow-lg border border-gray-800">
-                      <div class="flex items-center justify-between mb-6 border-b border-gray-800 pb-4">
+              <div v-if="mainModel.selected.length > 0" class="mt-12">
+                  <div class="bg-slate-900 rounded-2xl p-8 shadow-2xl border border-slate-800">
+                      <div class="flex items-center justify-between mb-8 border-b border-white/5 pb-6">
                           <div class="flex items-center gap-3">
-                              <div class="h-6 w-1 bg-green-500 rounded-full"></div>
-                              <h4 class="text-sm font-black text-white uppercase tracking-widest">Selected Schema <span class="text-gray-500 ml-2 font-medium">(Drag to reorder)</span></h4>
+                              <div class="h-6 w-1 bg-emerald-500 rounded-full"></div>
+                              <h4 class="text-[10px] font-black text-white uppercase tracking-widest">Selected Schema Definition <span class="text-slate-500 ml-2 font-medium normal-case">(Drag to reorder)</span></h4>
                           </div>
-                          <button type="button" @click="removeAllField(mainModel)" class="text-[10px] font-black text-red-400 hover:bg-red-400/10 px-3 py-1 rounded-lg border border-red-400/20 transition-all uppercase tracking-widest">Clear All</button>
+                          <button type="button" @click="removeAllField(mainModel)" class="text-[10px] font-black text-rose-400 hover:text-rose-300 transition-colors uppercase tracking-widest border border-rose-400/20 px-4 py-2 rounded-xl">Clear All</button>
                       </div>
-                      <ul id="selectedFields" class="flex flex-wrap gap-3 min-h-[50px]">
+                      <ul id="selectedFields" class="flex flex-wrap gap-4 min-h-[60px]">
                         <li
                             v-for="(val, index) in mainModel.selected"
                             :key="val"
                             :data-fieldname="val"
-                            class="bg-gray-800 border-2 border-transparent hover:border-blue-500/50 text-gray-300 px-4 py-2.5 rounded-xl text-[11px] font-black flex items-center gap-4 cursor-move hover:bg-gray-700 hover:text-white transition-all shadow-lg active:ring-2 active:ring-blue-500 group"
+                            class="bg-white/5 border border-white/10 hover:border-emerald-500/50 text-slate-300 px-5 py-3 rounded-xl text-xs font-black flex items-center gap-4 cursor-move hover:bg-white/10 hover:text-white transition-all shadow-xl active:ring-2 active:ring-emerald-500 group"
                         >
-                            <i class="fa fa-grip-vertical text-gray-600 group-hover:text-blue-400"></i>
+                            <i class="fa fa-grip-vertical text-slate-600 group-hover:text-emerald-400"></i>
                             {{ val }}
-                            <button type="button" @click="removeField(mainModel, index)" class="text-gray-600 hover:text-red-400 transition-colors ml-1">
-                                <i class="fa fa-times-circle text-base"></i>
+                            <button type="button" @click="removeField(mainModel, index)" class="text-slate-600 hover:text-rose-400 transition-colors ml-1">
+                                <i class="fa fa-times-circle text-lg"></i>
                             </button>
                         </li>
                     </ul>
@@ -284,30 +319,30 @@
           </div>
       </div>
 
-      <!-- Action Footer -->
-      <div class="px-8 py-10 bg-gray-50/50 border-t border-gray-100 flex flex-col items-center gap-6">
-        <div v-if="errorMessage !== ''" class="w-full max-w-xl bg-red-50 text-red-700 px-6 py-4 rounded-lg border border-red-100 text-sm font-black flex items-center gap-4 animate-shake shadow-sm">
-           <i class="fa fa-exclamation-triangle text-2xl"></i> {{ errorMessage }}
-        </div>
-        <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-          <button
-            class="w-full sm:w-auto px-16 py-4.5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 active:scale-95 text-lg tracking-tight"
-            name="submit"
-            type="submit"
+      <!-- Card Footer -->
+      <div class="px-8 py-6 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-end gap-4 overflow-hidden">
+          <div v-if="errorMessage !== ''" class="w-full sm:flex-1 bg-red-50 text-red-700 px-6 py-4 rounded-xl border border-red-100 text-[10px] font-black flex items-center gap-4 animate-shake transition-all uppercase tracking-widest">
+             <i class="fa fa-exclamation-triangle mr-1"></i> {{ errorMessage }}
+          </div>
+          
+          <a :href="dataBackUrl" class="w-full sm:w-auto text-center px-6 py-4 text-xs font-black uppercase tracking-widest text-slate-600 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors order-2 sm:order-1">Back</a>
+          
+          <button 
+            type="submit" 
+            name="submit" 
+            class="w-full sm:w-auto px-12 py-4 bg-blue-600 hover:bg-blue-700 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-blue-600/20 transition-all active:scale-95 flex items-center justify-center gap-2 order-1 sm:order-2"
           >
-            Create Module
+              <i class="fa fa-save opacity-50"></i>
+              Create Module
           </button>
-          <a :href="dataBackUrl" class="w-full sm:w-auto px-12 py-4.5 bg-white border border-gray-200 text-gray-500 font-bold rounded-lg hover:bg-gray-100 hover:text-gray-700 transition-all text-center">
-            Cancel
-          </a>
-        </div>
       </div>
     </form>
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, nextTick, getCurrentInstance } from "vue";
+import { ref, reactive, computed, nextTick, getCurrentInstance } from "vue";
+import TitleBar from "./title-bar.vue";
 import AdminConfig from "../../../helpers/admin-config";
 import axios from "axios";
 import { Toast, SafeJsonParse, CheckBoxAlignment } from "../../../helpers/common";
@@ -470,8 +505,11 @@ const addRelationModel = () => {
 
 const removeSelectedRelationFields = (alias) => {
   if (mainModel.selected.length > 0) {
-    mainModel.selected = mainModel.selected.filter(current => !current.startsWith(alias + "."));
+    mainModel.selected = mainModel.selected.filter(
+      (current) => !current.startsWith(alias + ".")
+    );
   }
+  form.dataWith = form.dataWith.filter((current) => current !== alias);
 };
 
 const updateRelationModel = (event, index, key) => {
@@ -492,6 +530,7 @@ const removeRelationModel = (index, model) => {
   relationModels.models.splice(index, 1);
   relationModels.tableName = "";
   removeSelectedRelationFields(alias);
+  updateWithData();
 };
 
 const hasRelation = () => relationModels.models.length > 0;

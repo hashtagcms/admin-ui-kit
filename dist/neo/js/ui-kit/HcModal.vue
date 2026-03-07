@@ -72,9 +72,20 @@ export default {
       return this.ui.sizes?.[this.size] || '';
     }
   },
+  mounted() {
+    window.addEventListener('keydown', this.handleKeydown);
+  },
+  unmounted() {
+    window.removeEventListener('keydown', this.handleKeydown);
+  },
   methods: {
     close() {
       this.$emit('update:modelValue', false);
+    },
+    handleKeydown(e) {
+      if (e.key === 'Escape' && this.modelValue) {
+        this.close();
+      }
     }
   }
 };

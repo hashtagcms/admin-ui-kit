@@ -1,6 +1,6 @@
-# HashtagCms Admin UI Kit
+# HashtagCMS Admin UI Kit
 
-Welcome to the official **HashtagCms Admin UI Kit** monorepo. This repository houses the core modular logic, UI components, and utility libraries that power the HashtagCms ecosystem.
+Welcome to the official **HashtagCMS Admin UI Kit** monorepo. This repository houses the core modular logic, UI components, and utility libraries that power the HashtagCMS ecosystem.
 
 ## 📦 Package
 
@@ -74,4 +74,4 @@ This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-_Built with ❤️ by [HashtagCms](https://github.com/hashtagcms)._
+_Built with ❤️ by [HashtagCMS](https://github.com/hashtagcms)._

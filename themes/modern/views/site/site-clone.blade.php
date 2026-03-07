@@ -11,18 +11,11 @@
                data-show-paste="false"
     ></title-bar>
 
-    <div class="row">
-        <div class="col-md-12">
-            <div class="margin-top-20">
-                <site-cloner
-                        data-all-sites="{{json_encode($siteInfo)}}"
-                >
-
-                </site-cloner>
-
-            </div>
-
-        </div>
+    <div class="mt-8">
+        <site-cloner
+                data-all-sites="{{json_encode($siteInfo)}}"
+        >
+        </site-cloner>
     </div>
 
 

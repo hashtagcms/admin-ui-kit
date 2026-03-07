@@ -2,7 +2,7 @@
   <div class="card mb-3 shadow info-box">
     <span :class="getColor() + ' info-box-icon'"
       ><i style="font-style: normal" :class="icon">{{ getIconText() }}</i></span
-    >
+    > 
     <div class="card-body">
       <h5 class="card-title">
         <a v-if="link !== ''" :href="link" class="info-box-text"

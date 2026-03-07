@@ -17,7 +17,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@100..900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
-    
+    <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="{{ htcms_admin_asset('css/app.css') }}" />
     
     <script>
@@ -51,6 +51,7 @@
         })();
     </script>
     @stack('links')
+    @stack('styles')
 </head>
 
 <body class="h-full overflow-hidden antialiased text-slate-900">
@@ -65,7 +66,7 @@
         <div class="flex flex-1 overflow-hidden relative">
             
             <!-- Sidebar -->
-            <aside class="js_left_panel transition-all duration-300 ease-in-out border-r border-slate-200">
+            <aside class="h-full bg-[#0F172A] text-white shrink-0 transition-all duration-300 js_left_panel ease-in-out border-r border-slate-200">
                 @include(htcms_admin_get_view_path('common.sidebar'))
             </aside>
             

@@ -1,19 +1,15 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import InfoBoxes from '@hashtagcms/theme/modern/components/info-boxes.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import layoutData from '../../../../tests/shared/fake-data/layout-index.json';
 
 describe('Modern: InfoBoxes.vue', () => {
-
-  const dataProps = loadFakeData('info-boxes.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+    
+  const props = {
+    dataModules: JSON.stringify(layoutData.allModules[3]), // Localization has children
+    dataModulesAllowed: JSON.stringify([]),
+    dataIsAdmin: "1"
+  };
 
   it('renders correctly with modern hover effects', () => {
     const wrapper = shallowMount(InfoBoxes, { props });

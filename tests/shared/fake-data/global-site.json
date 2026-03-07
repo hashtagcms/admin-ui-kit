@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "name": "Hashtag CMS",
+        "category_id": 1,
+        "theme_id": 1,
+        "platform_id": 1,
+        "lang_id": 1,
+        "country_id": 110,
+        "currency_id": 1,
+        "under_maintenance": 0,
+        "domain": "http:\/\/packages.testing:8003",
+        "context": "procms",
+        "favicon": "",
+        "lang_count": 2,
+        "created_at": "2026-03-06T05:41:51.000000Z",
+        "updated_at": "2026-03-06T10:16:25.000000Z",
+        "deleted_at": null
+    },
+    {
+        "id": 2,
+        "name": "Test Site",
+        "category_id": 5000,
+        "theme_id": 5000,
+        "platform_id": 1,
+        "lang_id": 1,
+        "country_id": 110,
+        "currency_id": 1,
+        "under_maintenance": 0,
+        "domain": "testsite.local:8005",
+        "context": "testsite",
+        "favicon": null,
+        "lang_count": null,
+        "created_at": "2026-03-06T10:16:16.000000Z",
+        "updated_at": "2026-03-06T10:16:26.000000Z",
+        "deleted_at": null
+    }
+]

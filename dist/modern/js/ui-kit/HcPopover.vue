@@ -89,6 +89,10 @@ export default {
         this.checkOverflow();
       }
     },
+    open() {
+      this.isOpen = true;
+      this.checkOverflow();
+    },
     close() {
       this.isOpen = false;
       this.xOffset = 0;

@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import TopNav from '@hashtagcms/theme/neo/components/top-nav.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -12,16 +12,11 @@ vi.mock('@hashtagcms/helpers/admin-config', () => ({
 
 describe('TopNav.vue', () => {
 
-  const dataProps = loadFakeData('top-nav.txt');
-  const props = {};
-  for (const key in dataProps) {
-      // TopNav simple props are strings mostly.
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataUsername: "Marghoob Suleman",
+    dataSiteName: siteData.siteInfo.name,
+    dataCurrentSiteId: String(siteData.siteInfo.id)
+  };
 
   it('renders site name and username', () => {
     const wrapper = shallowMount(TopNav, {
@@ -33,9 +28,9 @@ describe('TopNav.vue', () => {
         }
     });
 
-    expect(wrapper.text()).toContain('CMS - Admin'); // data-site-name
-    expect(wrapper.text()).toContain('Marghoob Suleman'); // data-username
-    expect(wrapper.find('img.cms-logo').attributes('height')).toBe('35');
+    expect(wrapper.text()).toContain('Hashtag CMS'); 
+    expect(wrapper.text()).toContain('Marghoob Suleman'); 
+    expect(wrapper.find('img.cms-logo').attributes('height')).toBe('50');
   });
 
   it('handles logout', async () => {

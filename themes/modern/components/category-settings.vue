@@ -8,7 +8,7 @@
       <div v-show="hasMicrosites" class="w-full md:w-64">
         <select
           v-model="micrositeId"
-          class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-inner cursor-pointer h-[46px]"
+          class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 block w-full px-4 py-3 outline-none transition-all shadow-inner cursor-pointer h-[46px]"
           @change="fetchNewData()"
         >
           <option value="0">Select a MicroSite</option>
@@ -20,7 +20,7 @@
       <div v-show="hasPlatformsMoreThanOne" class="w-full md:w-64">
         <select
           v-model="platformId"
-          class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 block w-full px-4 py-3 outline-none transition-all shadow-inner cursor-pointer h-[46px]"
+          class="bg-gray-50 border border-gray-200 text-gray-700 text-sm rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 block w-full px-4 py-3 outline-none transition-all shadow-inner cursor-pointer h-[46px]"
           @change="fetchNewData()"
         >
           <option value="">Select a Platform</option>
@@ -31,16 +31,16 @@
       </div>
       <div v-show="hasPlatformsMoreThanOne" class="md:ml-auto">
         <label style="display: flex;"
-          class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-5 h-[46px] hover:bg-white hover:border-blue-400 transition-all cursor-pointer group shadow-inner"
+          class="flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-xl px-5 h-[46px] hover:bg-white hover:border-indigo-400 transition-all cursor-pointer group shadow-inner"
           title="It will be inserted or deleted for all platforms if checked."
         >
           <input
             v-model="applicableForAllPlatforms"
             type="checkbox"
-            class="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500/20 cursor-pointer transition-all"
+            class="w-5 h-5 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500/20 cursor-pointer transition-all"
           />
           <div class="flex flex-col items-start whitespace-nowrap select-none">
-            <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest leading-none group-hover:text-blue-600 transition-colors">Global Sync</span>
+            <span class="text-[10px] font-black text-gray-600 uppercase tracking-widest leading-none group-hover:text-indigo-600 transition-colors">Global Sync</span>
             <span class="text-[9px] font-bold text-gray-400 uppercase italic mt-1 leading-none">All Platforms</span>
           </div>
         </label>
@@ -99,10 +99,10 @@
           <!-- Search Category -->
           <div v-if="showSearch('allCategories')" class="px-8 py-4 border-b border-gray-100 bg-gray-50/30">
               <div class="relative group">
-                  <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors"></i>
+                  <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-indigo-500 transition-colors"></i>
                   <input
                     v-model="searchKeyPlatformCategory"
-                    class="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 outline-none transition-all shadow-sm"
+                    class="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all shadow-sm"
                     placeholder="Search by ID or Category name..."
                     type="text"
                   />
@@ -119,28 +119,23 @@
               :data-cache-category="pc.cache_category"
               :data-category-id="pc.category_id"
               :data-theme-id="pc.theme_id"
-              class="px-8 py-5 flex items-center justify-between hover:bg-gray-50/50 transition-colors group js_item cursor-pointer"
+              class="px-8 py-2.5 flex items-center justify-between hover:bg-indigo-50/30 transition-all group cursor-grab active:cursor-grabbing js_item"
             >
               <div class="flex items-center gap-5">
                  <div class="flex items-center gap-3">
-                     <i class="fa fa-grip-vertical text-gray-300 group-hover:text-blue-400 transition-colors cursor-grab active:cursor-grabbing text-lg"></i>
-                     <input v-show="showCheckbox" v-model="pc.selected" type="checkbox" class="w-5 h-5 text-blue-600 rounded border-gray-300 shadow-sm" />
+                     <i class="fa fa-grip-vertical text-gray-300 group-hover:text-indigo-400 transition-colors cursor-grab active:cursor-grabbing text-lg"></i>
+                     <input v-show="showCheckbox" v-model="pc.selected" type="checkbox" class="w-5 h-5 text-indigo-600 rounded border-gray-300 shadow-sm" />
                  </div>
                   <div class="flex flex-col gap-0.5">
                     <div class="flex items-center gap-2">
                         <span class="text-sm font-black text-gray-800 tracking-tight">{{ pc.category_name }}</span>
-                        <span class="text-[10px] font-bold text-gray-300">#{{ pc.category_id }}</span>
+                        <span class="text-[10px] font-bold text-gray-300">ID: {{ pc.category_id }}</span> <span class="text-[10px] uppercase tracking-widest" v-if="pc.theme_id > 0">Theme: {{ getThemeName(pc.theme_id) }}</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <div v-if="pc.theme_id > 0" class="flex items-center gap-1.5">
-                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500 shadow-sm shadow-blue-500/50"></div>
-                            <span class="text-[10px] font-black text-blue-600/60 uppercase tracking-widest">{{ getThemeName(pc.theme_id) }}</span>
-                        </div>
-                        <div v-else class="flex items-center gap-1.5">
+                    <div class="flex items-center gap-3">                       
+                        <div v-if="pc.theme_id <= 0" class="flex items-center gap-1.5">
                             <div class="w-1.5 h-1.5 rounded-full bg-rose-400"></div>
                             <span class="text-[10px] font-black text-rose-400 uppercase tracking-widest">No Theme</span>
-                        </div>
-                        
+                        </div>                        
                         <div v-if="pc.cache_category" class="flex items-center gap-1.5">
                            <div class="w-1 h-1 rounded-full bg-gray-200"></div>
                            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] italic">{{ pc.cache_category }}</span>
@@ -149,13 +144,27 @@
                   </div>
               </div>
 
-              <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
-                  <button v-if="canDelete" class="p-2.5 text-gray-300 hover:text-red-600 hover:bg-red-100/50 hover:shadow-inner rounded-xl transition-all js_delete shadow-sm" title="Remove Category">
-                      <i class="fa fa-trash-o js_delete"></i>
-                  </button>
-                  <button v-if="canEdit" class="p-2.5 text-gray-300 hover:text-blue-600 hover:bg-blue-100/50 hover:shadow-inner rounded-xl transition-all shadow-sm" title="Configure Category" @click.stop="setCurrentSelection(pc, $event)">
-                      <i class="fa fa-ellipsis-v"></i>
-                  </button>
+              <div class="flex items-center gap-2 group-hover:opacity-100 transition-all scale-95 group-hover:scale-100">
+                  <hc-button 
+                    v-if="canDelete"
+                    variant="soft"
+                    size="sm"
+                    is-square 
+                    icon="fa fa-trash-o js_delete text-rose-500" 
+                    class="js_delete hover:!bg-rose-50 hover:!border-rose-200 transition-colors" 
+                    title="Remove Category"
+                    @click.stop="removeCategory(pc.category_id)"
+                  />
+                  <hc-button 
+                    v-if="canEdit" 
+                    variant="ghost" 
+                    size="sm" 
+                    is-square 
+                    icon="fa fa-ellipsis-v" 
+                    class="!text-gray-300 hover:!text-indigo-600 hover:!bg-indigo-50" 
+                    title="Configure Category" 
+                    @click.stop="setCurrentSelection(pc, $event)"
+                  />
               </div>
             </li>
           </ul>
@@ -168,7 +177,7 @@
             <div class="px-8 py-6 bg-gray-50/50 border-b border-gray-100">
                 <div class="space-y-1">
                     <div class="flex items-center gap-3">
-                        <div class="h-8 w-1 bg-blue-500 rounded-full"></div>
+                        <div class="h-8 w-1 bg-indigo-500 rounded-full"></div>
                         <h3 class="text-base font-black text-gray-800 tracking-tight uppercase tracking-widest">Available Pool</h3>
                     </div>
                     <div class="text-xs text-gray-500 pl-4 italic">Drag and drop to the "Active Categories" section or click on + Icon to add</div>
@@ -181,8 +190,8 @@
                     <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input
                       v-model="searchKeyCategory"
-                      class="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-4 focus:ring-blue-500/10 shadow-sm outline-none"
-                      placeholder="Find category..."
+                      class="w-full bg-white border border-gray-200 rounded-xl pl-12 pr-4 py-3 text-sm focus:ring-4 focus:ring-indigo-500/10 shadow-sm outline-none"
+                      placeholder="Search by ID or Category name..."
                       type="text"
                     />
                 </div>
@@ -193,15 +202,15 @@
                 v-for="category in filterData('allSiteCategories')"
                 :key="category.category_id"
                 :data-category-id="category.category_id"
-                class="px-8 py-5 flex items-center justify-between hover:bg-blue-50/30 transition-all group js_item cursor-grab active:cursor-grabbing"
+                class="px-8 py-2.5 flex items-center justify-between hover:bg-indigo-50/30 transition-all group js_item cursor-grab active:cursor-grabbing"
               >
                 <div class="flex items-center gap-3">
-                    <div class="w-6 h-6 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-100 text-[10px] font-black group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-700 transition-all">
+                    <div class="w-6 h-6 flex items-center justify-center rounded-lg bg-gray-50 border border-gray-100 text-[10px] font-black group-hover:bg-indigo-600 group-hover:text-white group-hover:border-indigo-700 transition-all">
                         {{ category.category_id }}
                     </div>
-                    <span class="text-sm font-bold text-gray-600 group-hover:text-blue-900 transition-colors">{{ category.category_name }}</span>
+                    <span class="text-sm font-bold text-gray-600 group-hover:text-indigo-900 transition-colors">{{ category.category_name }}</span>
                 </div>
-                <i class="fa fa-plus text-xs text-blue-300 group-hover:text-blue-600 transition-all translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 cursor-pointer" @click="addToCurrentPlatform(category)"></i>
+                <i class="fa fa-plus text-xs text-indigo-300 group-hover:text-indigo-600 transition-all translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 cursor-pointer" @click="addToCurrentPlatform(category)"></i>
               </li>
             </ul>
          </div>
@@ -214,19 +223,19 @@
             <template #content>
                 <div class="w-72 space-y-5 pointer-events-auto">
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-blue-500 ml-1 uppercase tracking-tighter">Target Theme Overlay</label>
-                        <select v-model="currentSelection.theme_id" class="w-full bg-white border border-gray-200 text-sm rounded-lg px-5 py-4 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm cursor-pointer hover:border-blue-300">
+                        <label class="text-[10px] font-black text-indigo-500 ml-1 uppercase tracking-tighter">Target Theme Overlay</label>
+                        <select v-model="currentSelection.theme_id" class="w-full bg-white border border-gray-200 text-sm rounded-lg px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-sm cursor-pointer hover:border-indigo-300">
                           <option value="">Select a Theme</option>
                           <option v-for="theme in siteThemes" :key="theme.id" :value="theme.id">{{ theme.name }}</option>
                         </select>
                     </div>
                     <div class="space-y-2">
-                        <label class="text-[10px] font-black text-blue-500 ml-1 uppercase tracking-tighter">Custom Cache Partition</label>
-                        <input v-model="currentSelection.cache_category" class="w-full bg-white border border-gray-200 text-sm rounded-lg px-5 py-4 outline-none focus:ring-4 focus:ring-blue-500/10 transition-all shadow-sm hover:border-blue-300" placeholder="e.g. partition_01" />
+                        <label class="text-[10px] font-black text-indigo-500 ml-1 uppercase tracking-tighter">Custom Cache Partition</label>
+                        <input v-model="currentSelection.cache_category" class="w-full bg-white border border-gray-200 text-sm rounded-lg px-5 py-4 outline-none focus:ring-4 focus:ring-indigo-500/10 transition-all shadow-sm hover:border-indigo-300" placeholder="e.g. partition_01" />
                     </div>
-                    <button class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] active:scale-95 text-[10px] uppercase tracking-widest mt-2" @click="setThemeEtc()">
-                      Save
-                    </button>
+                    <hc-button variant="primary" full-width size="md" class="mt-2" @click="setThemeEtc()">
+                      Save Configuration
+                    </hc-button>
                 </div>
             </template>
         </HcPopover>
@@ -240,6 +249,8 @@ import AdminConfig from "../../../helpers/admin-config";
 import Sortable from "sortablejs";
 import { Toast, SafeJsonParse } from "../../../helpers/common";
 import HcPopover from "../ui-kit/HcPopover.vue";
+import HcButton from "../ui-kit/HcButton.vue";
+import HcAlert from "../ui-kit/HcAlert.vue";
 
 const props = defineProps([
   "dataSiteId",
@@ -586,7 +597,7 @@ const selectAllData = (findIn = "allCategories", holder) => {
 
 const showSearch = (findIn = "allCategories") => {
   let whereArr = findIn === "allCategories" ? allCategories : allSiteCategories;
-  return whereArr.length > 10;
+  return whereArr.length > 7;
 };
 
 const filterData = (findIn = "allCategories") => {
@@ -624,8 +635,7 @@ const setCurrentSelection = (pc, event) => {
 
   setTimeout(() => {
     if (globalPopover.value) {
-      globalPopover.value.isOpen = true;
-      globalPopover.value.checkOverflow();
+      globalPopover.value.open();
     }
   }, 50);
 };

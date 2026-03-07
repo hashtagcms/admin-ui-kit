@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import SiteCloner from '@hashtagcms/theme/modern/components/site-cloner.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 
 vi.mock('axios');
 
@@ -9,8 +9,7 @@ describe('Modern: SiteCloner.vue', () => {
 
   const props = {
     dataAllSites: JSON.stringify([
-      { id: 1, name: 'Site A' },
-      { id: 2, name: 'Site B' }
+      { id: siteData.siteInfo.id, name: siteData.siteInfo.name }
     ])
   };
 

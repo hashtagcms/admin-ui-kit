@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import SiteCloner from '@hashtagcms/theme/neo/components/site-cloner.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -21,15 +21,12 @@ vi.stubGlobal('axios', mockAxios);
 
 describe('SiteCloner.vue', () => {
 
-  const dataProps = loadFakeData('site-cloner.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataAllSites: JSON.stringify([
+      { id: siteData.siteInfo.id, name: siteData.siteInfo.name },
+      { id: 2, name: 'Target Site' }
+    ])
+  };
 
   it('renders correctly', () => {
     const wrapper = shallowMount(SiteCloner, { props });

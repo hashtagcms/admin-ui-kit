@@ -2,7 +2,7 @@
 
 @section('content')
 <h1>{{request()->module_info->name}}</h1>
-<div class="row">
+<div class="flex flex-wrap -mx-4">
 
     @foreach($widgets as $widget)
     <div class="col-xs-6 col-md-4">

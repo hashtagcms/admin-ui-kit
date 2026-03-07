@@ -1,5 +1,5 @@
 <template>
-  <div v-if="visible" :class="ui.base" role="alert">
+  <div v-if="visible" :class="classes" role="alert">
     <div :class="ui.container">
       <div v-if="$slots.icon" :class="ui.iconWrapper">
         <slot name="icon"></slot>

@@ -12,9 +12,12 @@
 
       <input
         :id="id"
+        :name="name"
         type="text"
-        :value="modelValue"
+        :value="internalValue"
         @input="onInput"
+        @click="onClick"
+        @focus="onFocus"
         @keydown.down.prevent="onArrowDown"
         @keydown.up.prevent="onArrowUp"
         @keydown.enter.prevent="onEnter"
@@ -106,11 +109,14 @@ const props = defineProps({
     })
   },
   modelValue: { type: [String, Number], default: '' },
+  value: { type: [String, Number], default: '' },
+  name: { type: String, default: '' },
   label: { type: String, default: '' },
   placeholder: { type: String, default: '' },
   disabled: { type: Boolean, default: false },
   hint: { type: String, default: '' },
-  endpoint: { type: String, required: true },
+  endpoint: { type: String, required: false },
+  data: { type: Array, default: null },
   displayField: { type: String, default: 'name' },
   searchParam: { type: String, default: 'q' },
   minChars: { type: Number, default: 2 },
@@ -119,18 +125,24 @@ const props = defineProps({
 
 const emit = defineEmits(['update:modelValue', 'select']);
 
+const internalValue = ref(props.modelValue || props.value);
 const suggestions = ref([]);
 const showSuggestions = ref(false);
 const selectedIndex = ref(-1);
 const loading = ref(false);
 let debounceTimer = null;
 
+watch(() => props.modelValue, (newVal) => {
+    internalValue.value = newVal || props.value;
+});
+
 const onInput = (event) => {
     const val = event.target.value;
+    internalValue.value = val;
     emit('update:modelValue', val);
     
     clearTimeout(debounceTimer);
-    if (val.length < props.minChars) {
+    if (!props.data && val.length < props.minChars) {
         suggestions.value = [];
         showSuggestions.value = false;
         return;
@@ -138,22 +150,51 @@ const onInput = (event) => {
 
     debounceTimer = setTimeout(() => {
         fetchSuggestions(val);
-    }, 300);
+    }, 150);
 };
 
+const triggerFetchIfEmpty = () => {
+    if (!showSuggestions.value) {
+        const currentLen = (internalValue.value || '').length;
+        if (props.data || currentLen >= props.minChars) {
+            fetchSuggestions(internalValue.value || '');
+        }
+    }
+};
+
+const onClick = () => triggerFetchIfEmpty();
+const onFocus = () => triggerFetchIfEmpty();
+
 const fetchSuggestions = async (query) => {
+    if (props.data) {
+        const lowerQuery = (query || '').toLowerCase();
+        const filtered = props.data.filter(item => {
+            const val = typeof item === 'object' ? item[props.displayField] : item;
+            return String(val).toLowerCase().includes(lowerQuery);
+        });
+        suggestions.value = Array.isArray(filtered) ? filtered : [];
+        showSuggestions.value = suggestions.value.length > 0;
+        selectedIndex.value = -1;
+        return;
+    }
+
+    if (!props.endpoint) return;
+
     loading.value = true;
     try {
         const connector = props.endpoint.includes('?') ? '&' : '?';
         const url = `${props.endpoint}${connector}${props.searchParam}=${encodeURIComponent(query)}`;
         const response = await fetch(url);
         const data = await response.json();
-        suggestions.value = Array.isArray(data) ? data : (data.data || []);
+        
+        // Ensure array
+        suggestions.value = Array.isArray(data) ? data : (Array.isArray(data.data) ? data.data : []);
         showSuggestions.value = suggestions.value.length > 0;
         selectedIndex.value = -1;
     } catch (error) {
         console.error('Autocomplete fetch error:', error);
         suggestions.value = [];
+        showSuggestions.value = false;
     } finally {
         loading.value = false;
     }
@@ -165,6 +206,7 @@ const getDisplayValue = (item) => {
 
 const selectItem = (item) => {
     const value = getDisplayValue(item);
+    internalValue.value = value;
     emit('update:modelValue', value);
     emit('select', item);
     closeSuggestions();

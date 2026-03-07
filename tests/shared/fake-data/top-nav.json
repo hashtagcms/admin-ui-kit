@@ -1,0 +1,33 @@
+{
+    "username": "Marghoob Suleman",
+    "siteName": "Hashtag CMS",
+    "currentSite": 1,
+    "isAdmin": 1,
+    "siteCombo": true,
+    "logo": "modern/img/logo.png",
+    "logoHeight": 35,
+    "supportedSites": [
+        {
+            "id": 1,
+            "name": "Hashtag CMS",
+            "category_id": 1,
+            "theme_id": 1,
+            "platform_id": 1,
+            "lang_id": 1,
+            "country_id": 110,
+            "currency_id": 1,
+            "under_maintenance": 0            
+        },
+        {
+            "id": 2,
+            "name": "Test Site",
+            "category_id": 5000,
+            "theme_id": 5000,
+            "platform_id": 1,
+            "lang_id": 1,
+            "country_id": 110,
+            "currency_id": 1,
+            "under_maintenance": 0
+        }
+    ]
+}

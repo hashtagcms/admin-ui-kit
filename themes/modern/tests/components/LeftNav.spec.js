@@ -1,19 +1,14 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import LeftNav from '@hashtagcms/theme/modern/components/left-nav.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import layoutData from '../../../../tests/shared/fake-data/layout-index.json';
 
 describe('Modern: LeftNav.vue', () => {
-
-  const dataProps = loadFakeData('admin-modules.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+    
+  const props = {
+    dataList: JSON.stringify(layoutData.allModules || []),
+    dataHashtagcmsVersion: "1.0.0"
+  };
 
   it('renders correctly with modern high-contrast sidebar', () => {
     const wrapper = shallowMount(LeftNav, { props });

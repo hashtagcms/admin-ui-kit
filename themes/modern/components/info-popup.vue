@@ -1,5 +1,5 @@
 <template>
-  <modal-box ref="infoModal" data-show-footer="true">
+  <modal-box ref="infoModal" data-show-footer="true" data-size="lg">
     <template #title>
       <div class="flex items-center gap-2">
           <i class="fa fa-info-circle text-blue-500"></i>

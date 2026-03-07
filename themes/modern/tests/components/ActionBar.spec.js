@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import ActionBar from '@hashtagcms/theme/modern/components/action-bar.vue';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 import { Toast } from '@hashtagcms/helpers/common';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -24,15 +24,23 @@ vi.mock('@hashtagcms/helpers/humanize', () => ({
 
 describe('Modern: ActionBar.vue', () => {
     
-  const dataProps = loadFakeData('action-bar.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataControllerTitle: String(countryData.controller),
+    dataControllerName: countryData.name, // "Country" as per user requirements
+    dataSelectedParams: JSON.stringify([]),
+    dataFields: JSON.stringify(countryData.dataFields),
+    dataActionFields: JSON.stringify(countryData.actionFields),
+    dataLanguages: JSON.stringify(countryData.supportedLangs),
+    dataSelectedLanguage: "1",
+    dataMoreActions: JSON.stringify([]),
+    dataHasLangMethod: "true",
+    dataCmsModules: JSON.stringify([]),
+    dataLayoutType: "table",
+    dataShowSearch: String(countryData.showSearch),
+    dataShowAdd: "true",
+    dataUserRights: JSON.stringify(countryData.user_rights),
+    dataShowBack: undefined
+  };
 
   it('renders correctly with modern tailwind classes', () => {
     const wrapper = mount(ActionBar, { 
@@ -96,7 +104,7 @@ describe('Modern: ActionBar.vue', () => {
     const buttons = wrapper.findAll('button');
     const addBtn = buttons.find(b => b.text().includes('Add New'));
     await addBtn.trigger('click');
-    expect(window.location.href).toBe('/admin/country/create');
+    expect(window.location.href).toBe('/admin/Country/create');
 
     window.location = originalLocation;
   });

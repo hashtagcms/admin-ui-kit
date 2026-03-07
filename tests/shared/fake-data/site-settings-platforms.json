@@ -1,0 +1,4229 @@
+{
+  "siteInfo": {
+    "id": 1,
+    "name": "Hashtag CMS",
+    "category_id": 1,
+    "theme_id": 1,
+    "platform_id": 1,
+    "lang_id": 1,
+    "country_id": 110,
+    "currency_id": 1,
+    "under_maintenance": 0,
+    "domain": "http://packages.testing:8003",
+    "context": "procms",
+    "favicon": "",
+    "lang_count": 2,
+    "created_at": "2026-02-28T15:34:40.000000Z",
+    "updated_at": "2026-03-01T05:27:46.000000Z",
+    "deleted_at": null,
+    "category": [
+      {
+        "category_id": 1,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Home",
+        "title": "Home",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 2,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Blog",
+        "title": "Find our latest blog",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 3,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Login",
+        "title": "Login",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 4,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Register",
+        "title": "Register",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 5,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Reset Password",
+        "title": "Reset Password",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 6,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Example",
+        "title": "Example",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 7,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Profile",
+        "title": "Profile",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 8,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Contact",
+        "title": "Contact",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 9,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Support",
+        "title": "Support",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 5009,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "Content",
+        "title": "Content",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 5010,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "My Page",
+        "title": "My Page",
+        "laravel_through_key": 1
+      },
+      {
+        "category_id": 5011,
+        "site_id": 1,
+        "lang_id": 1,
+        "name": "shopping",
+        "title": "Shopping",
+        "laravel_through_key": 1
+      }
+    ],
+    "staticmodule": [
+      {
+        "id": 3,
+        "alias": "CONTENT_TEST",
+        "laravel_through_key": 1
+      }
+    ],
+    "theme": [
+      {
+        "id": 1,
+        "site_id": 1,
+        "name": "Basic",
+        "directory": "basic"
+      }
+    ],
+    "platform": [
+      {
+        "id": 1,
+        "name": "Desktop",
+        "pivot": {
+          "site_id": 1,
+          "platform_id": 1
+        }
+      }
+    ],
+    "language": [
+      {
+        "id": 1,
+        "name": "English",
+        "iso_code": "en",
+        "pivot": {
+          "site_id": 1,
+          "lang_id": 1
+        }
+      },
+      {
+        "id": 2,
+        "name": "Hindi",
+        "iso_code": "hi",
+        "pivot": {
+          "site_id": 1,
+          "lang_id": 2
+        }
+      }
+    ],
+    "microsite": [],
+    "country": [
+      {
+        "id": 1,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 1
+        },
+        "lang": {
+          "country_id": 1,
+          "lang_id": 1,
+          "name": "Germany",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 2,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 2
+        },
+        "lang": {
+          "country_id": 2,
+          "lang_id": 1,
+          "name": "Austria",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 3,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 3
+        },
+        "lang": {
+          "country_id": 3,
+          "lang_id": 1,
+          "name": "Belgium",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 4,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 4
+        },
+        "lang": {
+          "country_id": 4,
+          "lang_id": 1,
+          "name": "Canada",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 5,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 5
+        },
+        "lang": {
+          "country_id": 5,
+          "lang_id": 1,
+          "name": "China",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 6,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 6
+        },
+        "lang": {
+          "country_id": 6,
+          "lang_id": 1,
+          "name": "Spain",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 7,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 7
+        },
+        "lang": {
+          "country_id": 7,
+          "lang_id": 1,
+          "name": "Finland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 8,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 8
+        },
+        "lang": {
+          "country_id": 8,
+          "lang_id": 1,
+          "name": "France",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 9,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 9
+        },
+        "lang": {
+          "country_id": 9,
+          "lang_id": 1,
+          "name": "Greece",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 10,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 10
+        },
+        "lang": {
+          "country_id": 10,
+          "lang_id": 1,
+          "name": "Italy",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 11,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 11
+        },
+        "lang": {
+          "country_id": 11,
+          "lang_id": 1,
+          "name": "Japan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 12,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 12
+        },
+        "lang": {
+          "country_id": 12,
+          "lang_id": 1,
+          "name": "Luxemburg",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 13,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 13
+        },
+        "lang": {
+          "country_id": 13,
+          "lang_id": 1,
+          "name": "Netherlands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 14,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 14
+        },
+        "lang": {
+          "country_id": 14,
+          "lang_id": 1,
+          "name": "Poland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 15,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 15
+        },
+        "lang": {
+          "country_id": 15,
+          "lang_id": 1,
+          "name": "Portugal",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 16,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 16
+        },
+        "lang": {
+          "country_id": 16,
+          "lang_id": 1,
+          "name": "Czech Republic",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 17,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 17
+        },
+        "lang": {
+          "country_id": 17,
+          "lang_id": 1,
+          "name": "United Kingdom",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 18,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 18
+        },
+        "lang": {
+          "country_id": 18,
+          "lang_id": 1,
+          "name": "Sweden",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 19,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 19
+        },
+        "lang": {
+          "country_id": 19,
+          "lang_id": 1,
+          "name": "Switzerland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 20,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 20
+        },
+        "lang": {
+          "country_id": 20,
+          "lang_id": 1,
+          "name": "Denmark",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 21,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 21
+        },
+        "lang": {
+          "country_id": 21,
+          "lang_id": 1,
+          "name": "United States",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 22,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 22
+        },
+        "lang": {
+          "country_id": 22,
+          "lang_id": 1,
+          "name": "HongKong",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 23,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 23
+        },
+        "lang": {
+          "country_id": 23,
+          "lang_id": 1,
+          "name": "Norway",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 24,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 24
+        },
+        "lang": {
+          "country_id": 24,
+          "lang_id": 1,
+          "name": "Australia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 25,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 25
+        },
+        "lang": {
+          "country_id": 25,
+          "lang_id": 1,
+          "name": "Singapore",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 26,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 26
+        },
+        "lang": {
+          "country_id": 26,
+          "lang_id": 1,
+          "name": "Ireland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 27,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 27
+        },
+        "lang": {
+          "country_id": 27,
+          "lang_id": 1,
+          "name": "New Zealand",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 28,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 28
+        },
+        "lang": {
+          "country_id": 28,
+          "lang_id": 1,
+          "name": "South Korea",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 29,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 29
+        },
+        "lang": {
+          "country_id": 29,
+          "lang_id": 1,
+          "name": "Israel",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 30,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 30
+        },
+        "lang": {
+          "country_id": 30,
+          "lang_id": 1,
+          "name": "South Africa",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 31,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 31
+        },
+        "lang": {
+          "country_id": 31,
+          "lang_id": 1,
+          "name": "Nigeria",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 32,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 32
+        },
+        "lang": {
+          "country_id": 32,
+          "lang_id": 1,
+          "name": "Ivory Coast",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 33,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 33
+        },
+        "lang": {
+          "country_id": 33,
+          "lang_id": 1,
+          "name": "Togo",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 34,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 34
+        },
+        "lang": {
+          "country_id": 34,
+          "lang_id": 1,
+          "name": "Bolivia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 35,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 35
+        },
+        "lang": {
+          "country_id": 35,
+          "lang_id": 1,
+          "name": "Mauritius",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 36,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 36
+        },
+        "lang": {
+          "country_id": 36,
+          "lang_id": 1,
+          "name": "Romania",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 37,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 37
+        },
+        "lang": {
+          "country_id": 37,
+          "lang_id": 1,
+          "name": "Slovakia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 38,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 38
+        },
+        "lang": {
+          "country_id": 38,
+          "lang_id": 1,
+          "name": "Algeria",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 39,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 39
+        },
+        "lang": {
+          "country_id": 39,
+          "lang_id": 1,
+          "name": "American Samoa",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 40,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 40
+        },
+        "lang": {
+          "country_id": 40,
+          "lang_id": 1,
+          "name": "Andorra",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 41,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 41
+        },
+        "lang": {
+          "country_id": 41,
+          "lang_id": 1,
+          "name": "Angola",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 42,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 42
+        },
+        "lang": {
+          "country_id": 42,
+          "lang_id": 1,
+          "name": "Anguilla",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 43,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 43
+        },
+        "lang": {
+          "country_id": 43,
+          "lang_id": 1,
+          "name": "Antigua and Barbuda",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 44,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 44
+        },
+        "lang": {
+          "country_id": 44,
+          "lang_id": 1,
+          "name": "Argentina",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 45,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 45
+        },
+        "lang": {
+          "country_id": 45,
+          "lang_id": 1,
+          "name": "Armenia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 46,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 46
+        },
+        "lang": {
+          "country_id": 46,
+          "lang_id": 1,
+          "name": "Aruba",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 47,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 47
+        },
+        "lang": {
+          "country_id": 47,
+          "lang_id": 1,
+          "name": "Azerbaijan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 48,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 48
+        },
+        "lang": {
+          "country_id": 48,
+          "lang_id": 1,
+          "name": "Bahamas",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 49,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 49
+        },
+        "lang": {
+          "country_id": 49,
+          "lang_id": 1,
+          "name": "Bahrain",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 50,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 50
+        },
+        "lang": {
+          "country_id": 50,
+          "lang_id": 1,
+          "name": "Bangladesh",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 51,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 51
+        },
+        "lang": {
+          "country_id": 51,
+          "lang_id": 1,
+          "name": "Barbados",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 52,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 52
+        },
+        "lang": {
+          "country_id": 52,
+          "lang_id": 1,
+          "name": "Belarus",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 53,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 53
+        },
+        "lang": {
+          "country_id": 53,
+          "lang_id": 1,
+          "name": "Belize",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 54,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 54
+        },
+        "lang": {
+          "country_id": 54,
+          "lang_id": 1,
+          "name": "Benin",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 55,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 55
+        },
+        "lang": {
+          "country_id": 55,
+          "lang_id": 1,
+          "name": "Bermuda",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 56,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 56
+        },
+        "lang": {
+          "country_id": 56,
+          "lang_id": 1,
+          "name": "Bhutan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 57,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 57
+        },
+        "lang": {
+          "country_id": 57,
+          "lang_id": 1,
+          "name": "Botswana",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 58,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 58
+        },
+        "lang": {
+          "country_id": 58,
+          "lang_id": 1,
+          "name": "Brazil",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 59,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 59
+        },
+        "lang": {
+          "country_id": 59,
+          "lang_id": 1,
+          "name": "Brunei",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 60,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 60
+        },
+        "lang": {
+          "country_id": 60,
+          "lang_id": 1,
+          "name": "Burkina Faso",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 61,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 61
+        },
+        "lang": {
+          "country_id": 61,
+          "lang_id": 1,
+          "name": "Burma (Myanmar]",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 62,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 62
+        },
+        "lang": {
+          "country_id": 62,
+          "lang_id": 1,
+          "name": "Burundi",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 63,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 63
+        },
+        "lang": {
+          "country_id": 63,
+          "lang_id": 1,
+          "name": "Cambodia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 64,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 64
+        },
+        "lang": {
+          "country_id": 64,
+          "lang_id": 1,
+          "name": "Cameroon",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 65,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 65
+        },
+        "lang": {
+          "country_id": 65,
+          "lang_id": 1,
+          "name": "Cape Verde",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 66,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 66
+        },
+        "lang": {
+          "country_id": 66,
+          "lang_id": 1,
+          "name": "Central African Republic",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 67,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 67
+        },
+        "lang": {
+          "country_id": 67,
+          "lang_id": 1,
+          "name": "Chad",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 68,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 68
+        },
+        "lang": {
+          "country_id": 68,
+          "lang_id": 1,
+          "name": "Chile",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 69,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 69
+        },
+        "lang": {
+          "country_id": 69,
+          "lang_id": 1,
+          "name": "Colombia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 70,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 70
+        },
+        "lang": {
+          "country_id": 70,
+          "lang_id": 1,
+          "name": "Comoros",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 71,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 71
+        },
+        "lang": {
+          "country_id": 71,
+          "lang_id": 1,
+          "name": "Congo, Dem. Republic",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 72,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 72
+        },
+        "lang": {
+          "country_id": 72,
+          "lang_id": 1,
+          "name": "Congo, Republic",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 73,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 73
+        },
+        "lang": {
+          "country_id": 73,
+          "lang_id": 1,
+          "name": "Costa Rica",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 74,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 74
+        },
+        "lang": {
+          "country_id": 74,
+          "lang_id": 1,
+          "name": "Croatia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 75,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 75
+        },
+        "lang": {
+          "country_id": 75,
+          "lang_id": 1,
+          "name": "Cuba",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 76,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 76
+        },
+        "lang": {
+          "country_id": 76,
+          "lang_id": 1,
+          "name": "Cyprus",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 77,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 77
+        },
+        "lang": {
+          "country_id": 77,
+          "lang_id": 1,
+          "name": "Djibouti",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 78,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 78
+        },
+        "lang": {
+          "country_id": 78,
+          "lang_id": 1,
+          "name": "Dominica",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 79,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 79
+        },
+        "lang": {
+          "country_id": 79,
+          "lang_id": 1,
+          "name": "Dominican Republic",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 80,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 80
+        },
+        "lang": {
+          "country_id": 80,
+          "lang_id": 1,
+          "name": "East Timor",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 81,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 81
+        },
+        "lang": {
+          "country_id": 81,
+          "lang_id": 1,
+          "name": "Ecuador",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 82,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 82
+        },
+        "lang": {
+          "country_id": 82,
+          "lang_id": 1,
+          "name": "Egypt",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 83,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 83
+        },
+        "lang": {
+          "country_id": 83,
+          "lang_id": 1,
+          "name": "El Salvador",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 84,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 84
+        },
+        "lang": {
+          "country_id": 84,
+          "lang_id": 1,
+          "name": "Equatorial Guinea",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 85,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 85
+        },
+        "lang": {
+          "country_id": 85,
+          "lang_id": 1,
+          "name": "Eritrea",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 86,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 86
+        },
+        "lang": {
+          "country_id": 86,
+          "lang_id": 1,
+          "name": "Estonia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 87,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 87
+        },
+        "lang": {
+          "country_id": 87,
+          "lang_id": 1,
+          "name": "Ethiopia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 88,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 88
+        },
+        "lang": {
+          "country_id": 88,
+          "lang_id": 1,
+          "name": "Falkland Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 89,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 89
+        },
+        "lang": {
+          "country_id": 89,
+          "lang_id": 1,
+          "name": "Faroe Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 90,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 90
+        },
+        "lang": {
+          "country_id": 90,
+          "lang_id": 1,
+          "name": "Fiji",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 91,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 91
+        },
+        "lang": {
+          "country_id": 91,
+          "lang_id": 1,
+          "name": "Gabon",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 92,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 92
+        },
+        "lang": {
+          "country_id": 92,
+          "lang_id": 1,
+          "name": "Gambia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 93,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 93
+        },
+        "lang": {
+          "country_id": 93,
+          "lang_id": 1,
+          "name": "Georgia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 94,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 94
+        },
+        "lang": {
+          "country_id": 94,
+          "lang_id": 1,
+          "name": "Ghana",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 95,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 95
+        },
+        "lang": {
+          "country_id": 95,
+          "lang_id": 1,
+          "name": "Grenada",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 96,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 96
+        },
+        "lang": {
+          "country_id": 96,
+          "lang_id": 1,
+          "name": "Greenland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 97,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 97
+        },
+        "lang": {
+          "country_id": 97,
+          "lang_id": 1,
+          "name": "Gibraltar",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 98,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 98
+        },
+        "lang": {
+          "country_id": 98,
+          "lang_id": 1,
+          "name": "Guadeloupe",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 99,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 99
+        },
+        "lang": {
+          "country_id": 99,
+          "lang_id": 1,
+          "name": "Guam",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 100,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 100
+        },
+        "lang": {
+          "country_id": 100,
+          "lang_id": 1,
+          "name": "Guatemala",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 101,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 101
+        },
+        "lang": {
+          "country_id": 101,
+          "lang_id": 1,
+          "name": "Guernsey",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 102,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 102
+        },
+        "lang": {
+          "country_id": 102,
+          "lang_id": 1,
+          "name": "Guinea",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 103,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 103
+        },
+        "lang": {
+          "country_id": 103,
+          "lang_id": 1,
+          "name": "Guinea-Bissau",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 104,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 104
+        },
+        "lang": {
+          "country_id": 104,
+          "lang_id": 1,
+          "name": "Guyana",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 105,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 105
+        },
+        "lang": {
+          "country_id": 105,
+          "lang_id": 1,
+          "name": "Haiti",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 106,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 106
+        },
+        "lang": {
+          "country_id": 106,
+          "lang_id": 1,
+          "name": "Heard Island and McDonald Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 107,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 107
+        },
+        "lang": {
+          "country_id": 107,
+          "lang_id": 1,
+          "name": "Vatican City State",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 108,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 108
+        },
+        "lang": {
+          "country_id": 108,
+          "lang_id": 1,
+          "name": "Honduras",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 109,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 109
+        },
+        "lang": {
+          "country_id": 109,
+          "lang_id": 1,
+          "name": "Iceland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 110,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 110
+        },
+        "lang": {
+          "country_id": 110,
+          "lang_id": 1,
+          "name": "India",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 111,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 111
+        },
+        "lang": {
+          "country_id": 111,
+          "lang_id": 1,
+          "name": "Indonesia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 112,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 112
+        },
+        "lang": {
+          "country_id": 112,
+          "lang_id": 1,
+          "name": "Iran",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 113,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 113
+        },
+        "lang": {
+          "country_id": 113,
+          "lang_id": 1,
+          "name": "Iraq",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 114,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 114
+        },
+        "lang": {
+          "country_id": 114,
+          "lang_id": 1,
+          "name": "Man Island",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 115,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 115
+        },
+        "lang": {
+          "country_id": 115,
+          "lang_id": 1,
+          "name": "Jamaica",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 116,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 116
+        },
+        "lang": {
+          "country_id": 116,
+          "lang_id": 1,
+          "name": "Jersey",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 117,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 117
+        },
+        "lang": {
+          "country_id": 117,
+          "lang_id": 1,
+          "name": "Jordan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 118,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 118
+        },
+        "lang": {
+          "country_id": 118,
+          "lang_id": 1,
+          "name": "Kazakhstan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 119,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 119
+        },
+        "lang": {
+          "country_id": 119,
+          "lang_id": 1,
+          "name": "Kenya",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 120,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 120
+        },
+        "lang": {
+          "country_id": 120,
+          "lang_id": 1,
+          "name": "Kiribati",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 121,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 121
+        },
+        "lang": {
+          "country_id": 121,
+          "lang_id": 1,
+          "name": "Korea, Dem. Republic of",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 122,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 122
+        },
+        "lang": {
+          "country_id": 122,
+          "lang_id": 1,
+          "name": "Kuwait",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 123,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 123
+        },
+        "lang": {
+          "country_id": 123,
+          "lang_id": 1,
+          "name": "Kyrgyzstan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 124,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 124
+        },
+        "lang": {
+          "country_id": 124,
+          "lang_id": 1,
+          "name": "Laos",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 125,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 125
+        },
+        "lang": {
+          "country_id": 125,
+          "lang_id": 1,
+          "name": "Latvia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 126,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 126
+        },
+        "lang": {
+          "country_id": 126,
+          "lang_id": 1,
+          "name": "Lebanon",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 127,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 127
+        },
+        "lang": {
+          "country_id": 127,
+          "lang_id": 1,
+          "name": "Lesotho",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 128,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 128
+        },
+        "lang": {
+          "country_id": 128,
+          "lang_id": 1,
+          "name": "Liberia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 129,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 129
+        },
+        "lang": {
+          "country_id": 129,
+          "lang_id": 1,
+          "name": "Libya",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 130,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 130
+        },
+        "lang": {
+          "country_id": 130,
+          "lang_id": 1,
+          "name": "Liechtenstein",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 131,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 131
+        },
+        "lang": {
+          "country_id": 131,
+          "lang_id": 1,
+          "name": "Lithuania",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 132,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 132
+        },
+        "lang": {
+          "country_id": 132,
+          "lang_id": 1,
+          "name": "Macau",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 133,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 133
+        },
+        "lang": {
+          "country_id": 133,
+          "lang_id": 1,
+          "name": "Macedonia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 134,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 134
+        },
+        "lang": {
+          "country_id": 134,
+          "lang_id": 1,
+          "name": "Madagascar",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 135,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 135
+        },
+        "lang": {
+          "country_id": 135,
+          "lang_id": 1,
+          "name": "Malawi",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 136,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 136
+        },
+        "lang": {
+          "country_id": 136,
+          "lang_id": 1,
+          "name": "Malaysia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 137,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 137
+        },
+        "lang": {
+          "country_id": 137,
+          "lang_id": 1,
+          "name": "Maldives",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 138,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 138
+        },
+        "lang": {
+          "country_id": 138,
+          "lang_id": 1,
+          "name": "Mali",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 139,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 139
+        },
+        "lang": {
+          "country_id": 139,
+          "lang_id": 1,
+          "name": "Malta",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 140,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 140
+        },
+        "lang": {
+          "country_id": 140,
+          "lang_id": 1,
+          "name": "Marshall Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 141,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 141
+        },
+        "lang": {
+          "country_id": 141,
+          "lang_id": 1,
+          "name": "Martinique",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 142,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 142
+        },
+        "lang": {
+          "country_id": 142,
+          "lang_id": 1,
+          "name": "Mauritania",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 143,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 143
+        },
+        "lang": {
+          "country_id": 143,
+          "lang_id": 1,
+          "name": "Hungary",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 144,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 144
+        },
+        "lang": {
+          "country_id": 144,
+          "lang_id": 1,
+          "name": "Mayotte",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 145,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 145
+        },
+        "lang": {
+          "country_id": 145,
+          "lang_id": 1,
+          "name": "Mexico",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 146,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 146
+        },
+        "lang": {
+          "country_id": 146,
+          "lang_id": 1,
+          "name": "Micronesia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 147,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 147
+        },
+        "lang": {
+          "country_id": 147,
+          "lang_id": 1,
+          "name": "Moldova",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 148,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 148
+        },
+        "lang": {
+          "country_id": 148,
+          "lang_id": 1,
+          "name": "Monaco",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 149,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 149
+        },
+        "lang": {
+          "country_id": 149,
+          "lang_id": 1,
+          "name": "Mongolia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 150,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 150
+        },
+        "lang": {
+          "country_id": 150,
+          "lang_id": 1,
+          "name": "Montenegro",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 151,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 151
+        },
+        "lang": {
+          "country_id": 151,
+          "lang_id": 1,
+          "name": "Montserrat",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 152,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 152
+        },
+        "lang": {
+          "country_id": 152,
+          "lang_id": 1,
+          "name": "Morocco",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 153,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 153
+        },
+        "lang": {
+          "country_id": 153,
+          "lang_id": 1,
+          "name": "Mozambique",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 154,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 154
+        },
+        "lang": {
+          "country_id": 154,
+          "lang_id": 1,
+          "name": "Namibia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 155,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 155
+        },
+        "lang": {
+          "country_id": 155,
+          "lang_id": 1,
+          "name": "Nauru",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 156,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 156
+        },
+        "lang": {
+          "country_id": 156,
+          "lang_id": 1,
+          "name": "Nepal",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 157,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 157
+        },
+        "lang": {
+          "country_id": 157,
+          "lang_id": 1,
+          "name": "Netherlands Antilles",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 158,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 158
+        },
+        "lang": {
+          "country_id": 158,
+          "lang_id": 1,
+          "name": "New Caledonia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 159,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 159
+        },
+        "lang": {
+          "country_id": 159,
+          "lang_id": 1,
+          "name": "Nicaragua",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 160,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 160
+        },
+        "lang": {
+          "country_id": 160,
+          "lang_id": 1,
+          "name": "Niger",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 161,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 161
+        },
+        "lang": {
+          "country_id": 161,
+          "lang_id": 1,
+          "name": "Niue",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 162,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 162
+        },
+        "lang": {
+          "country_id": 162,
+          "lang_id": 1,
+          "name": "Norfolk Island",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 163,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 163
+        },
+        "lang": {
+          "country_id": 163,
+          "lang_id": 1,
+          "name": "Northern Mariana Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 164,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 164
+        },
+        "lang": {
+          "country_id": 164,
+          "lang_id": 1,
+          "name": "Oman",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 165,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 165
+        },
+        "lang": {
+          "country_id": 165,
+          "lang_id": 1,
+          "name": "Pakistan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 166,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 166
+        },
+        "lang": {
+          "country_id": 166,
+          "lang_id": 1,
+          "name": "Palau",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 167,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 167
+        },
+        "lang": {
+          "country_id": 167,
+          "lang_id": 1,
+          "name": "Palestinian Territories",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 168,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 168
+        },
+        "lang": {
+          "country_id": 168,
+          "lang_id": 1,
+          "name": "Panama",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 169,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 169
+        },
+        "lang": {
+          "country_id": 169,
+          "lang_id": 1,
+          "name": "Papua New Guinea",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 170,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 170
+        },
+        "lang": {
+          "country_id": 170,
+          "lang_id": 1,
+          "name": "Paraguay",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 171,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 171
+        },
+        "lang": {
+          "country_id": 171,
+          "lang_id": 1,
+          "name": "Peru",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 172,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 172
+        },
+        "lang": {
+          "country_id": 172,
+          "lang_id": 1,
+          "name": "Philippines",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 173,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 173
+        },
+        "lang": {
+          "country_id": 173,
+          "lang_id": 1,
+          "name": "Pitcairn",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 174,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 174
+        },
+        "lang": {
+          "country_id": 174,
+          "lang_id": 1,
+          "name": "Puerto Rico",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 175,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 175
+        },
+        "lang": {
+          "country_id": 175,
+          "lang_id": 1,
+          "name": "Qatar",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 176,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 176
+        },
+        "lang": {
+          "country_id": 176,
+          "lang_id": 1,
+          "name": "Reunion Island",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 177,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 177
+        },
+        "lang": {
+          "country_id": 177,
+          "lang_id": 1,
+          "name": "Russian Federation",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 178,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 178
+        },
+        "lang": {
+          "country_id": 178,
+          "lang_id": 1,
+          "name": "Rwanda",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 179,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 179
+        },
+        "lang": {
+          "country_id": 179,
+          "lang_id": 1,
+          "name": "Saint Barthelemy",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 180,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 180
+        },
+        "lang": {
+          "country_id": 180,
+          "lang_id": 1,
+          "name": "Saint Kitts and Nevis",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 181,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 181
+        },
+        "lang": {
+          "country_id": 181,
+          "lang_id": 1,
+          "name": "Saint Lucia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 182,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 182
+        },
+        "lang": {
+          "country_id": 182,
+          "lang_id": 1,
+          "name": "Saint Martin",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 183,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 183
+        },
+        "lang": {
+          "country_id": 183,
+          "lang_id": 1,
+          "name": "Saint Pierre and Miquelon",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 184,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 184
+        },
+        "lang": {
+          "country_id": 184,
+          "lang_id": 1,
+          "name": "Saint Vincent and the Grenadines",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 185,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 185
+        },
+        "lang": {
+          "country_id": 185,
+          "lang_id": 1,
+          "name": "Samoa",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 186,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 186
+        },
+        "lang": {
+          "country_id": 186,
+          "lang_id": 1,
+          "name": "San Marino",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 187,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 187
+        },
+        "lang": {
+          "country_id": 187,
+          "lang_id": 1,
+          "name": "S\u00e3o Tom\u00e9 and Pr\u00edncipe",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 188,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 188
+        },
+        "lang": {
+          "country_id": 188,
+          "lang_id": 1,
+          "name": "Saudi Arabia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 189,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 189
+        },
+        "lang": {
+          "country_id": 189,
+          "lang_id": 1,
+          "name": "Senegal",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 190,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 190
+        },
+        "lang": {
+          "country_id": 190,
+          "lang_id": 1,
+          "name": "Serbia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 191,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 191
+        },
+        "lang": {
+          "country_id": 191,
+          "lang_id": 1,
+          "name": "Seychelles",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 192,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 192
+        },
+        "lang": {
+          "country_id": 192,
+          "lang_id": 1,
+          "name": "Sierra Leone",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 193,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 193
+        },
+        "lang": {
+          "country_id": 193,
+          "lang_id": 1,
+          "name": "Slovenia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 194,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 194
+        },
+        "lang": {
+          "country_id": 194,
+          "lang_id": 1,
+          "name": "Solomon Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 195,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 195
+        },
+        "lang": {
+          "country_id": 195,
+          "lang_id": 1,
+          "name": "Somalia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 196,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 196
+        },
+        "lang": {
+          "country_id": 196,
+          "lang_id": 1,
+          "name": "South Georgia and the South Sandwich Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 197,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 197
+        },
+        "lang": {
+          "country_id": 197,
+          "lang_id": 1,
+          "name": "Sri Lanka",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 198,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 198
+        },
+        "lang": {
+          "country_id": 198,
+          "lang_id": 1,
+          "name": "Sudan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 199,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 199
+        },
+        "lang": {
+          "country_id": 199,
+          "lang_id": 1,
+          "name": "Suriname",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 200,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 200
+        },
+        "lang": {
+          "country_id": 200,
+          "lang_id": 1,
+          "name": "Svalbard and Jan Mayen",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 201,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 201
+        },
+        "lang": {
+          "country_id": 201,
+          "lang_id": 1,
+          "name": "Swaziland",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 202,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 202
+        },
+        "lang": {
+          "country_id": 202,
+          "lang_id": 1,
+          "name": "Syria",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 203,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 203
+        },
+        "lang": {
+          "country_id": 203,
+          "lang_id": 1,
+          "name": "Taiwan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 204,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 204
+        },
+        "lang": {
+          "country_id": 204,
+          "lang_id": 1,
+          "name": "Tajikistan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 205,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 205
+        },
+        "lang": {
+          "country_id": 205,
+          "lang_id": 1,
+          "name": "Tanzania",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 206,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 206
+        },
+        "lang": {
+          "country_id": 206,
+          "lang_id": 1,
+          "name": "Thailand",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 207,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 207
+        },
+        "lang": {
+          "country_id": 207,
+          "lang_id": 1,
+          "name": "Tokelau",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 208,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 208
+        },
+        "lang": {
+          "country_id": 208,
+          "lang_id": 1,
+          "name": "Tonga",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 209,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 209
+        },
+        "lang": {
+          "country_id": 209,
+          "lang_id": 1,
+          "name": "Trinidad and Tobago",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 210,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 210
+        },
+        "lang": {
+          "country_id": 210,
+          "lang_id": 1,
+          "name": "Tunisia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 211,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 211
+        },
+        "lang": {
+          "country_id": 211,
+          "lang_id": 1,
+          "name": "Turkey",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 212,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 212
+        },
+        "lang": {
+          "country_id": 212,
+          "lang_id": 1,
+          "name": "Turkmenistan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 213,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 213
+        },
+        "lang": {
+          "country_id": 213,
+          "lang_id": 1,
+          "name": "Turks and Caicos Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 214,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 214
+        },
+        "lang": {
+          "country_id": 214,
+          "lang_id": 1,
+          "name": "Tuvalu",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 215,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 215
+        },
+        "lang": {
+          "country_id": 215,
+          "lang_id": 1,
+          "name": "Uganda",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 216,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 216
+        },
+        "lang": {
+          "country_id": 216,
+          "lang_id": 1,
+          "name": "Ukraine",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 217,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 217
+        },
+        "lang": {
+          "country_id": 217,
+          "lang_id": 1,
+          "name": "United Arab Emirates",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 218,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 218
+        },
+        "lang": {
+          "country_id": 218,
+          "lang_id": 1,
+          "name": "Uruguay",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 219,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 219
+        },
+        "lang": {
+          "country_id": 219,
+          "lang_id": 1,
+          "name": "Uzbekistan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 220,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 220
+        },
+        "lang": {
+          "country_id": 220,
+          "lang_id": 1,
+          "name": "Vanuatu",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 221,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 221
+        },
+        "lang": {
+          "country_id": 221,
+          "lang_id": 1,
+          "name": "Venezuela",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 222,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 222
+        },
+        "lang": {
+          "country_id": 222,
+          "lang_id": 1,
+          "name": "Vietnam",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 223,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 223
+        },
+        "lang": {
+          "country_id": 223,
+          "lang_id": 1,
+          "name": "Virgin Islands (British]",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 224,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 224
+        },
+        "lang": {
+          "country_id": 224,
+          "lang_id": 1,
+          "name": "Virgin Islands (U.S.]",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 225,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 225
+        },
+        "lang": {
+          "country_id": 225,
+          "lang_id": 1,
+          "name": "Wallis and Futuna",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 226,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 226
+        },
+        "lang": {
+          "country_id": 226,
+          "lang_id": 1,
+          "name": "Western Sahara",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 227,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 227
+        },
+        "lang": {
+          "country_id": 227,
+          "lang_id": 1,
+          "name": "Yemen",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 228,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 228
+        },
+        "lang": {
+          "country_id": 228,
+          "lang_id": 1,
+          "name": "Zambia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 229,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 229
+        },
+        "lang": {
+          "country_id": 229,
+          "lang_id": 1,
+          "name": "Zimbabwe",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 230,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 230
+        },
+        "lang": {
+          "country_id": 230,
+          "lang_id": 1,
+          "name": "Albania",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 231,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 231
+        },
+        "lang": {
+          "country_id": 231,
+          "lang_id": 1,
+          "name": "Afghanistan",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 232,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 232
+        },
+        "lang": {
+          "country_id": 232,
+          "lang_id": 1,
+          "name": "Antarctica",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 233,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 233
+        },
+        "lang": {
+          "country_id": 233,
+          "lang_id": 1,
+          "name": "Bosnia and Herzegovina",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 234,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 234
+        },
+        "lang": {
+          "country_id": 234,
+          "lang_id": 1,
+          "name": "Bouvet Island",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 235,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 235
+        },
+        "lang": {
+          "country_id": 235,
+          "lang_id": 1,
+          "name": "British Indian Ocean Territory",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 236,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 236
+        },
+        "lang": {
+          "country_id": 236,
+          "lang_id": 1,
+          "name": "Bulgaria",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 237,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 237
+        },
+        "lang": {
+          "country_id": 237,
+          "lang_id": 1,
+          "name": "Cayman Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 238,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 238
+        },
+        "lang": {
+          "country_id": 238,
+          "lang_id": 1,
+          "name": "Christmas Island",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 239,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 239
+        },
+        "lang": {
+          "country_id": 239,
+          "lang_id": 1,
+          "name": "Cocos (Keeling] Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 240,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 240
+        },
+        "lang": {
+          "country_id": 240,
+          "lang_id": 1,
+          "name": "Cook Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 241,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 241
+        },
+        "lang": {
+          "country_id": 241,
+          "lang_id": 1,
+          "name": "French Guiana",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 242,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 242
+        },
+        "lang": {
+          "country_id": 242,
+          "lang_id": 1,
+          "name": "French Polynesia",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 243,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 243
+        },
+        "lang": {
+          "country_id": 243,
+          "lang_id": 1,
+          "name": "French Southern Territories",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-02-28T15:34:40.000000Z",
+          "deleted_at": null
+        }
+      },
+      {
+        "id": 244,
+        "pivot": {
+          "site_id": 1,
+          "country_id": 244
+        },
+        "lang": {
+          "country_id": 244,
+          "lang_id": 1,
+          "name": "&Aring;land Islands",
+          "created_at": "2026-02-28T15:34:40.000000Z",
+          "updated_at": "2026-03-02T09:10:38.000000Z",
+          "deleted_at": null
+        }
+      }
+    ],
+    "zone": [
+      {
+        "id": 1,
+        "name": "Europe",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 1
+        }
+      },
+      {
+        "id": 2,
+        "name": "North America",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 2
+        }
+      },
+      {
+        "id": 3,
+        "name": "Asia",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 3
+        }
+      },
+      {
+        "id": 4,
+        "name": "Africa",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 4
+        }
+      },
+      {
+        "id": 5,
+        "name": "Oceania",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 5
+        }
+      },
+      {
+        "id": 6,
+        "name": "South America",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 6
+        }
+      },
+      {
+        "id": 7,
+        "name": "Europe (out E.U)",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-03-02T09:10:15.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 7
+        }
+      },
+      {
+        "id": 8,
+        "name": "Central America/Antilla",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-03-02T13:47:11.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "zone_id": 8
+        }
+      }
+    ],
+    "hook": [
+      {
+        "id": 1,
+        "name": "Header",
+        "alias": "HOOK_HEADER",
+        "direction": "vertical",
+        "description": "This is usually on top of the page",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 1
+        }
+      },
+      {
+        "id": 2,
+        "name": "Hero Section",
+        "alias": "HOOK_HERO_SECTION",
+        "direction": "vertical",
+        "description": "Hook for big image or main attraction",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 2
+        }
+      },
+      {
+        "id": 3,
+        "name": "After Hero Section",
+        "alias": "HOOK_AFTER_HERO_SECTION",
+        "direction": "vertical",
+        "description": "Hook for just after the hero section",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 3
+        }
+      },
+      {
+        "id": 4,
+        "name": "Left Section 1",
+        "alias": "HOOK_LEFT_SECTION_ONE",
+        "direction": "vertical",
+        "description": "Left hook for section one",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 4
+        }
+      },
+      {
+        "id": 5,
+        "name": "Left Section 2",
+        "alias": "HOOK_LEFT_SECTION_TWO",
+        "direction": "vertical",
+        "description": "Left hook for section two",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 5
+        }
+      },
+      {
+        "id": 6,
+        "name": "Right",
+        "alias": "HOOK_RIGHT",
+        "direction": "vertical",
+        "description": "Right hook",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 6
+        }
+      },
+      {
+        "id": 7,
+        "name": "Middle",
+        "alias": "HOOK_MIDDLE",
+        "direction": "vertical",
+        "description": "This hook is usually at the middle",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 7
+        }
+      },
+      {
+        "id": 9,
+        "name": "Footer",
+        "alias": "HOOK_FOOTER",
+        "direction": "vertical",
+        "description": "Footer Hook",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 9
+        }
+      },
+      {
+        "id": 10,
+        "name": "One Column",
+        "alias": "HOOK_ONE_COLUMN",
+        "direction": "vertical",
+        "description": "This is usually for one column layout",
+        "created_at": "2026-02-28T15:34:41.000000Z",
+        "updated_at": "2026-02-28T15:34:41.000000Z",
+        "deleted_at": null,
+        "pivot": {
+          "site_id": 1,
+          "hook_id": 10
+        }
+      }
+    ],
+    "prop": [
+      {
+        "id": 7,
+        "site_id": 1,
+        "platform_id": 1,
+        "name": "backgroundColor",
+        "value": "#d10000",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:29:46.000000Z",
+        "updated_at": "2026-03-01T05:29:46.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 3,
+        "site_id": 1,
+        "platform_id": 1,
+        "name": "Facebook",
+        "value": "https://www.facebook.com/hashtagcms.org",
+        "group_name": "SocialLinks",
+        "is_public": 1,
+        "created_at": "2026-02-28T15:34:42.000000Z",
+        "updated_at": "2026-02-28T15:34:42.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 11,
+        "site_id": 1,
+        "platform_id": 1,
+        "name": "fontSize",
+        "value": "12",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:34:04.000000Z",
+        "updated_at": "2026-03-01T05:34:04.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 1,
+        "site_id": 1,
+        "platform_id": 1,
+        "name": "site_installed",
+        "value": "1",
+        "group_name": null,
+        "is_public": 0,
+        "created_at": "2026-02-28T15:34:42.000000Z",
+        "updated_at": "2026-02-28T15:35:14.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 2,
+        "site_id": 1,
+        "platform_id": 1,
+        "name": "Twitter",
+        "value": "https://www.twitter.com/hashtagcms",
+        "group_name": "SocialLinks",
+        "is_public": 1,
+        "created_at": "2026-02-28T15:34:42.000000Z",
+        "updated_at": "2026-02-28T15:34:42.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 8,
+        "site_id": 1,
+        "platform_id": 2,
+        "name": "backgroundColor",
+        "value": "#d10000",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:29:54.000000Z",
+        "updated_at": "2026-03-01T05:29:54.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 12,
+        "site_id": 1,
+        "platform_id": 2,
+        "name": "fontSize",
+        "value": "12",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:34:04.000000Z",
+        "updated_at": "2026-03-01T05:34:04.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 9,
+        "site_id": 1,
+        "platform_id": 3,
+        "name": "backgroundColor",
+        "value": "#d10000",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:30:00.000000Z",
+        "updated_at": "2026-03-01T05:30:00.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 13,
+        "site_id": 1,
+        "platform_id": 3,
+        "name": "fontSize",
+        "value": "12",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:34:04.000000Z",
+        "updated_at": "2026-03-01T05:34:04.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 10,
+        "site_id": 1,
+        "platform_id": 4,
+        "name": "backgroundColor",
+        "value": "#d10000",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:30:07.000000Z",
+        "updated_at": "2026-03-01T05:30:07.000000Z",
+        "deleted_at": null
+      },
+      {
+        "id": 14,
+        "site_id": 1,
+        "platform_id": 4,
+        "name": "fontSize",
+        "value": "12",
+        "group_name": "theme",
+        "is_public": 1,
+        "created_at": "2026-03-01T05:34:04.000000Z",
+        "updated_at": "2026-03-01T05:34:04.000000Z",
+        "deleted_at": null
+      }
+    ]
+  },
+  "tabs": [
+    "Platforms",
+    "Hooks",
+    "Languages",
+    "Zones",
+    "Countries",
+    "Currencies",
+    "Modules",
+    "Static Modules",
+    "Module Properties",
+    "Themes",
+    "Categories",
+    "Site Properties"
+  ],
+  "selectedData": [
+    {
+      "id": 1,
+      "name": "Desktop",
+      "pivot": {
+        "site_id": 1,
+        "platform_id": 1
+      }
+    }
+  ],
+  "activeTab": "platforms",
+  "allData": {
+    "label": "Platforms",
+    "data": [
+      {
+        "id": 1,
+        "name": "Desktop"
+      },
+      {
+        "id": 2,
+        "name": "Android"
+      },
+      {
+        "id": 3,
+        "name": "iOS"
+      },
+      {
+        "id": 4,
+        "name": "PWA"
+      }
+    ]
+  },
+  "backURL": "/admin/site",
+  "backUrl": "/admin/site",
+  "name": "Site Settings (Platforms)",
+  "route": "/admin/site/settings/1/platforms",
+  "controller": "SiteController@platforms"
+}

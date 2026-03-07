@@ -1,146 +1,148 @@
 <template>
-  <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-gray-100 bg-white/50 backdrop-blur-sm sticky top-0 z-40 px-2 pt-2">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-4 py-3 border-b border-slate-100 bg-white/80 backdrop-blur-md sticky top-0 z-40 px-6">
     <div class="flex flex-wrap items-center gap-4">
-        <!-- Selectors Group -->
-        <div v-show="hasMicrosites" class="relative group">
-          <select
-            v-model="microSiteId"
-            class="bg-white border border-gray-200 text-gray-700 text-[11px] font-black uppercase tracking-widest rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block w-full px-5 py-3 outline-none transition-all shadow-sm cursor-pointer hover:border-blue-300"
-            @change="fetchNewData()"
-          >
-            <option value="0">Select a MicroSite</option>
-            <option v-for="microsite in microsites" :key="microsite.id" :value="microsite.id">
-              {{ microsite.name }}
-            </option>
-          </select>
+         <!-- Selectors Group -->
+        <div class="flex items-center gap-2">
+            <div v-show="hasMicrosites" class="relative group">
+              <select
+                v-model="microSiteId"
+                class="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-lg focus:border-indigo-500 block w-full px-4 py-2 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-300"
+                @change="fetchNewData()"
+              >
+                <option value="0">Global Site</option>
+                <option v-for="microsite in microsites" :key="microsite.id" :value="microsite.id">
+                  {{ microsite.name }}
+                </option>
+              </select>
+            </div>
+
+            <div class="relative group">
+              <select
+                v-model="categoryId"
+                class="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-lg focus:border-indigo-500 block w-full px-4 py-2 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-300"
+                @change="fetchNewData()"
+              >
+                <option>Category</option>
+                <option v-for="category in categories" :key="category.category_id" :value="category.category_id">
+                  {{ category.name }}
+                </option>
+              </select>
+            </div>
+
+            <div v-show="hasPlatformMoreThanOne" class="relative group">
+              <select
+                v-model="platformId"
+                class="bg-white border border-slate-200 text-slate-600 text-[10px] font-black uppercase tracking-widest rounded-lg focus:border-indigo-500 block w-full px-4 py-2 outline-none transition-all shadow-sm cursor-pointer hover:border-indigo-300"
+                @change="fetchNewData()"
+              >
+                <option>Platform</option>
+                <option v-for="platform in platforms" :key="platform.id" :value="platform.id">
+                  {{ platform.name }}
+                </option>
+              </select>
+            </div>
         </div>
 
-        <div class="relative group">
-          <select
-            v-model="categoryId"
-            class="bg-white border border-gray-200 text-gray-700 text-[11px] font-black uppercase tracking-widest rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block w-full px-5 py-3 outline-none transition-all shadow-sm cursor-pointer hover:border-blue-300"
-            @change="fetchNewData()"
-          >
-            <option>Select a Category</option>
-            <option v-for="category in categories" :key="category.category_id" :value="category.category_id">
-              {{ category.name }}
-            </option>
-          </select>
-        </div>
-
-        <div v-show="hasPlatformMoreThanOne" class="relative group">
-          <select
-            v-model="platformId"
-            class="bg-white border border-gray-200 text-gray-700 text-[11px] font-black uppercase tracking-widest rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block w-full px-5 py-3 outline-none transition-all shadow-sm cursor-pointer hover:border-blue-300"
-            @change="fetchNewData()"
-          >
-            <option>Select a Platform</option>
-            <option v-for="platform in platforms" :key="platform.id" :value="platform.id">
-              {{ platform.name }}
-            </option>
-          </select>
-        </div>
-
-        <!-- Theme Info -->
-        <div v-show="hasTheme" class="flex items-center gap-2 px-4 py-2 bg-blue-50 rounded-xl border border-blue-100/50">
-            <span class="text-[9px] font-black text-blue-400 uppercase tracking-widest">Active Theme</span>
+        <!-- Theme Info Badge -->
+        <div v-show="hasTheme" class="flex items-center gap-2 px-3 py-1.5 bg-indigo-50 rounded-lg border border-indigo-100/50">
+            <span class="text-[8px] font-black text-indigo-400 uppercase tracking-widest">Theme</span>
             <span
-                class="text-xs font-black text-blue-700 cursor-pointer underline decoration-blue-300/50 decoration-2 underline-offset-4 hover:decoration-blue-500 transition-all"
-                title="Click to see theme info"
+                class="text-[10px] font-black text-indigo-700 cursor-pointer hover:text-indigo-900 transition-colors"
+                title="View theme details"
                 @click="showInfo('theme', themeInfo.id)"
             >{{ themeInfo.name }}</span>
         </div>
     </div>
 
-    <!-- Actions Group -->
-    <div class="flex items-center gap-3">
-        <div v-if="hasTheme" class="flex items-center gap-2 p-1.5 bg-gray-50 rounded-lg border border-gray-100">
-            <button
+    <!-- Actions Area -->
+    <div class="flex items-center gap-2">
+        <div v-if="hasTheme" class="flex items-center gap-1.5 p-1 bg-slate-50 rounded-lg border border-slate-100">
+            <hc-button
               v-if="canDelete"
-              class="w-12 h-12 flex items-center justify-center bg-red-50 text-red-500 hover:bg-red-500 hover:text-white rounded-xl transition-all shadow-sm hover:shadow-red-500/20 active:scale-95 group"
-              title="Delete All Modules form this category"
-              type="button"
+              variant="danger"
+              size="sm"
+              is-square
+              icon="fa fa-trash-o"
+              title="Flush all modules"
               @click="showHideDeleteAlert(true)"
-            >
-              <i class="fa fa-trash-o text-lg"></i>
-            </button>
-            <button
-              class="w-12 h-12 flex items-center justify-center bg-white text-gray-400 hover:bg-blue-600 hover:text-white rounded-xl transition-all shadow-sm hover:shadow-blue-500/20 border border-gray-100 active:scale-95 group"
-              title="Copy Data From"
-              type="button"
+            />
+            <hc-button
+              variant="primary"
+              size="sm"
+              is-square
+              icon="fa fa-copy"
+              title="Clone modules"
               @click="showHideCopyAlert(true)"
-            >
-              <i class="fa fa-copy text-lg"></i>
-            </button>
+            />
         </div>
     </div>
   </div>
-  <div class="py-6" v-if="hasError">
-      <div class="bg-red-50 border border-red-100 p-6 rounded-lg shadow-sm animate-fadeIn">
-        <ul class="space-y-2">
-          <li v-for="(error, idx) in errors" :key="idx" class="flex items-center gap-3 text-red-700 text-xs font-black uppercase tracking-widest">
-              <i class="fa fa-exclamation-circle text-red-500"></i>
+  <div class="px-6 pt-4" v-if="hasError">
+      <hc-alert variant="danger" title="Configuration Errors">
+        <ul class="mt-2 space-y-1">
+          <li v-for="(error, idx) in errors" :key="idx" class="flex items-center gap-2">
               <span v-html="error.message"></span>
           </li>
         </ul>
-      </div>
+      </hc-alert>
   </div>
 
-  <div class="flex flex-row items-start gap-10 mt-8">
-    <!-- Left Column: Hooks Dashboard -->
-    <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 homepage-modules content-start pl-2">
+  <main class="flex flex-row items-start gap-8 mt-6 px-6 max-w-[1800px] mx-auto min-h-[calc(100vh-10rem)]">
+    <!-- Left Column: Hooks Canvas -->
+    <div class="flex-1 min-w-0 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 homepage-modules content-start">
       <div
         v-for="hook in hooks"
         :key="hook.info.id"
         :ref="el => setPanelRef(el, hook.info.id)"
         v-show="onlyMeHookId === null || onlyMeHookId === hook.info.id"
         :class="['flex flex-col transition-all duration-300', onlyMeHookId === hook.info.id ? 'col-span-full sticky top-24 z-30 self-start' : !collapsedHooks.has(hook.info.id.toString()) ? 'h-full' : '']"
-        :style="onlyMeHookId === hook.info.id ? 'height: calc(100vh - 7rem)' : ''"
+        :style="onlyMeHookId === hook.info.id ? 'height: calc(100vh - 10rem)' : ''"
       >
         <div 
-          :class="['non-selectable rounded-2xl border overflow-hidden flex flex-col transition-all group hcms-hook-box', onlyMeHookId === hook.info.id ? 'shadow-2xl shadow-indigo-500/10 ring-2 ring-indigo-400/40 bg-white border-indigo-200 h-full' : !collapsedHooks.has(hook.info.id.toString()) ? 'shadow-lg bg-indigo-50/40 border-indigo-100/50 hover:shadow-xl hover:shadow-indigo-500/10 h-full' : 'shadow-lg bg-indigo-50/40 border-indigo-100/50 hover:shadow-xl hover:shadow-indigo-500/10']"
+          :class="['rounded-xl border overflow-hidden flex flex-col transition-all group hcms-hook-box shadow-sm', 
+                    onlyMeHookId === hook.info.id ? 'shadow-2xl ring-1 ring-indigo-400/40 bg-white border-indigo-200 h-full' : 
+                    !collapsedHooks.has(hook.info.id.toString()) ? 'bg-white border-slate-100 hover:border-indigo-200 hover:shadow-indigo-500/5 h-full' : 
+                    'bg-slate-50 border-slate-100/50 hover:bg-white']"
         >
+          <!-- Hook Card Header -->
           <div
-            class="px-6 py-2 bg-indigo-100/30 border-b border-indigo-100/50 flex items-center justify-between cursor-pointer select-none"
+            class="px-5 py-3 bg-slate-50/50 border-b border-slate-100 flex items-center justify-between cursor-pointer select-none group-hover:bg-white transition-colors"
             @dblclick="showHideHookPanel(hook.info.id)"
           >
             <div class="flex items-center gap-3">
-                <a
-                  href="javascript:void(0)"
-                  class="text-xs font-black text-gray-800 uppercase tracking-widest hover:text-blue-600 transition-colors"
-                  @click="showInfo('hook', hook.info.id)"
-                >
+                <div class="w-6 h-6 rounded-md bg-white border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-500 transition-colors shadow-sm">
+                   <i class="fa fa-anchor text-[9px]"></i>
+                </div>
+                <h4 class="text-[10px] font-black text-slate-700 uppercase tracking-widest leading-none" @click.stop="showInfo('hook', hook.info.id)">
                   {{ hook.info.name }}
-                </a>
+                </h4>
             </div>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                 <button 
-                  @click="onlyMe(hook.info.id)"
-                  :class="['w-8 h-8 flex items-center justify-center rounded-lg transition-all', onlyMeHookId === hook.info.id ? 'bg-blue-600 text-white shadow-lg' : 'text-gray-400 hover:text-blue-600 hover:bg-white']"
-                  :title="onlyMeHookId === hook.info.id ? 'Show all hooks' : 'Only show this hook'"
+                  @click.stop="onlyMe(hook.info.id)"
+                  :class="['w-7 h-7 flex items-center justify-center rounded-lg transition-all', onlyMeHookId === hook.info.id ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-indigo-600 hover:bg-white']"
+                  :title="onlyMeHookId === hook.info.id ? 'Standard View' : 'Focus View'"
                 >
-                  <i :class="['fa text-[10px]', onlyMeHookId === hook.info.id ? 'fa-compress' : 'fa-expand']"></i>
+                  <i :class="['fa text-[9px]', onlyMeHookId === hook.info.id ? 'fa-compress' : 'fa-expand']"></i>
                 </button>
                 <button 
-                  @click="showHideHookPanel(hook.info.id)"
-                  class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-blue-600 hover:bg-white rounded-lg transition-all"
-                  :title="collapsedHooks.has(hook.info.id.toString()) ? 'Expand hook' : 'Collapse hook'"
+                  @click.stop="showHideHookPanel(hook.info.id)"
+                  class="w-7 h-7 flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-white rounded-lg transition-all"
+                  :title="collapsedHooks.has(hook.info.id.toString()) ? 'Expand' : 'Collapse'"
                 >
-                  <i :class="['fa text-[10px]', collapsedHooks.has(hook.info.id.toString()) ? 'fa-plus' : 'fa-minus']"></i>
+                  <i :class="['fa text-[9px]', collapsedHooks.has(hook.info.id.toString()) ? 'fa-plus' : 'fa-minus']"></i>
                 </button>
             </div>
           </div>
 
+          <!-- Module List Area -->
           <div
             :ref="el => setHookPanelRef(el, hook.info.id)"
             v-show="!collapsedHooks.has(hook.info.id.toString())"
-            :class="['flex-1 p-4 bg-white js_modules overflow-y-auto', onlyMeHookId === hook.info.id ? 'min-h-0' : 'min-h-[150px]']"
+            :class="['flex-1 p-4 bg-white js_modules overflow-y-auto', onlyMeHookId === hook.info.id ? 'min-h-0' : 'min-h-[120px]']"
           >
-            <ul
-              :data-hook-id="hook.info.id"
-              class="space-y-2 js_modules js_hook_modules min-h-[100px] border border-blue-100/50 h-full"
-            >
+            <ul :data-hook-id="hook.info.id" class="space-y-2 js_modules js_hook_modules min-h-[80px] h-full">
               <template v-if="hook.modules.length > 0">
                 <li
                   v-for="module in hook.modules"
@@ -148,107 +150,110 @@
                   :data-module-id="module.id"
                   :data-layout-id="module.layoutId"
                   draggable="true"
-                  class="px-4 py-1 bg-gray-50/50 hover:bg-white border border-transparent hover:border-blue-100/50 rounded-xl flex items-center justify-between group/item transition-all js_item cursor-grab active:cursor-grabbing"
+                  class="px-4 py-2 bg-white border rounded-lg flex items-center justify-between group/item transition-all js_item cursor-grab active:cursor-grabbing hover:border-indigo-400 hover:shadow-sm"
+                  style="border-color: #c3c3c3;"
                 >
                   <div class="flex items-center gap-3">
-                      <i class="fa fa-grip-lines text-[10px] text-gray-200 group-hover/item:text-blue-400 transition-colors"></i>
+                      <i class="fa fa-bars text-[10px] text-slate-200 group-hover/item:text-indigo-400 transition-colors"></i>
                       <a
                         href="javascript:void(0)"
                         @click="showInfo('module', module.id)"
-                        class="text-xs font-bold text-gray-600 group-hover/item:text-blue-900 transition-colors"
+                        class="text-[11px] font-bold text-slate-600 group-hover/item:text-slate-900 transition-colors"
                       >{{ module.name }}</a>
-                  </div>
-                  
-                  <button
+                  </div>                                
+                  <hc-button 
                     v-if="canDelete"
                     :data-hook-id="hook.info.id"
-                    class="text-gray-300 hover:text-red-500 transition-colors js_delete"
-                    title="Delete this module from the hook"
+                    variant="soft"                    
+                    size="sm"
+                    is-square 
+                    icon="fa fa-trash-o js_delete text-rose-500" 
+                    class="flex items-center justify-center text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all js_delete opacity-0 group-hover/item:opacity-100" 
+                    title="Remove module"
                     @click.stop="removeModules(module.layoutId, 'module_id', hook.info.id)"
-                  >
-                    <i class="fa fa-trash-o text-xs js_delete"></i>
-                  </button>
+                  />                  
                 </li>
               </template>
-              <li v-else class="h-[120px] border-2 border-dashed border-gray-100 rounded-lg flex items-center justify-center bg-gray-50/30 pointer-events-none">
-                  <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest text-center px-4">Ready for Modules</span>
+              <li v-else class="h-32 border-2 border-dashed border-slate-100 rounded-lg flex items-center justify-center bg-slate-50/20 pointer-events-none">
+                  <span class="text-[9px] font-black text-slate-300 uppercase tracking-widest text-center px-4">Available Point</span>
               </li>
             </ul>
           </div>
           
           <div
-            class="px-6 py-3 bg-gray-50/30 border-t border-gray-50 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity"
+            class="px-5 py-2.5 bg-slate-50/50 border-t border-slate-100 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity"
             v-if="hasAnyModulesInAHook(hook) && canDelete"
           >
             <button
               @click="deleteAllModuleFromHook(hook.info.id)"
-              class="text-[10px] font-black text-red-400 hover:text-red-600 uppercase tracking-widest flex items-center gap-2 js_delete_from_hook"
+              class="text-[9px] font-black text-slate-400 hover:text-red-500 uppercase tracking-widest flex items-center gap-2 js_delete_from_hook"
               :data-hook-id="hook.info.id"
             >
-                <i class="fa fa-trash-o"></i>
-                Flush Hook
+                <i class="fa fa-trash-o"></i> Flush
             </button>
           </div>
         </div>
       </div>
-      <!-- Save button inside the grid but col-span-full -->
-      <div v-if="hasTheme" ref="savePanel" class="col-span-full pt-12 flex justify-center pb-20">
+
+      <!-- Save Button Integration -->
+      <div v-if="hasTheme" ref="savePanel" class="col-span-full py-12 flex justify-center pb-20">
         <button 
-          :class="[saveButtonCss, 'px-20 py-5 bg-blue-600 hover:bg-blue-700 text-white font-black rounded-lg shadow-lg shadow-blue-500/30 transition-all hover:-translate-y-1 active:scale-95 text-lg uppercase tracking-widest']" 
+          :class="[saveButtonCss, 'px-16 py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-lg shadow-lg shadow-indigo-500/30 transition-all hover:-translate-y-1 active:scale-95 text-[11px] uppercase tracking-widest flex items-center gap-3']" 
           type="button" 
           @click="saveModules()"
         >
-          Save Configuration
+          <span>Save Configuration</span>
+          <i class="fa fa-save opacity-60"></i>
         </button>
       </div>
     </div>
     
-    <!-- Right Column: Module Browser (Pool) -->
-    <div class="w-80 shrink-0 flex flex-col gap-6" v-if="!hasError">
-      <div class="bg-white rounded-lg shadow-lg border border-gray-100 p-6 space-y-6 sticky top-24 self-start">
+    <!-- Right Column: Sidebar -->
+    <aside class="shrink-0 flex flex-col gap-6" v-if="!hasError">
+      <div class="bg-white rounded-xl shadow-lg shadow-slate-200/50 border border-slate-200 p-6 space-y-6 sticky top-24 self-start">
           <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-sm">
-                  <i class="fa fa-cube"></i>
+              <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center text-indigo-600 border border-indigo-100 shadow-sm">
+                  <i class="fa fa-cubes text-sm"></i>
               </div>
               <div>
-                  <h3 class="text-[10px] font-black text-gray-400 uppercase tracking-widest leading-none mb-1">Module Pool</h3>
-                  <p class="text-xs text-gray-500 font-bold">Drag to Hooks</p>
+                  <h3 class="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Module Library</h3>
+                  <p class="text-[11px] text-slate-800 font-black uppercase tracking-tight">Components</p>
               </div>
           </div>
 
           <div class="relative group">
-            <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 text-xs transition-colors group-focus-within:text-blue-500"></i>
+            <i class="fa fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-[10px] transition-colors group-focus-within:text-indigo-500"></i>
             <input
               v-model="searchKey"
-              class="w-full bg-gray-50 border border-gray-100 rounded-xl pl-10 pr-4 py-3 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all shadow-inner"
-              placeholder="Search components..."
+              class="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-2.5 text-[11px] font-bold outline-none focus:border-indigo-400 transition-all placeholder:text-slate-300"
+              placeholder="Search..."
               type="text"
             />
           </div>
 
-          <ul id="draggableModules" class="space-y-2 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
+          <ul id="draggableModules" class="space-y-2 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
             <li
               v-for="module in filterModules"
               :key="module.id"
               :data-module-id="module.id"
               draggable="true"
-              class="px-4 py-3 bg-white border border-gray-100 rounded-xl flex items-center justify-between group/pool hover:border-blue-200 hover:shadow-md transition-all cursor-grab active:cursor-grabbing js_item"
+              class="px-4 py-3 bg-white border border-slate-100 rounded-lg flex items-center justify-between group/pool hover:border-indigo-200 hover:shadow-md transition-all cursor-grab active:cursor-grabbing js_item"
             >
               <div class="flex items-center gap-3">
-                  <i class="fa fa-grip-vertical text-gray-200 group-hover/pool:text-blue-400 transition-colors"></i>
-                  <span class="text-xs font-bold text-gray-600 group-hover/pool:text-blue-900 transition-colors" v-html="module.name"></span>
+                  <i class="fa fa-th text-[10px] text-slate-200 group-hover/pool:text-indigo-400 transition-colors"></i>
+                  <span class="text-[11px] font-bold text-slate-600 group-hover/pool:text-slate-900 transition-colors" v-html="module.name"></span>
               </div>
-              <span class="delete opacity-0 group-hover/pool:opacity-100 transition-opacity text-red-300 hover:text-red-500 fa fa-trash-o cursor-pointer"></span>
+              <i class="fa fa-info-circle text-[10px] text-slate-200 opacity-0 group-hover/pool:opacity-100 transition-opacity hover:text-indigo-500 cursor-pointer" @click="showInfo('module', module.id)"></i>
             </li>
           </ul>
       </div>
-    </div>
-  </div>
+    </aside>
+  </main>
 
-  <modal-box ref="copyBox" data-show-footer="true" :data-modal-css="modalCss">
+  <modal-box ref="copyBox" data-show-footer="true" :data-modal-css="modalCss" data-size="xl">
     <template #title>
         <div class="flex items-center gap-3">
-            <i class="fa fa-copy text-blue-500"></i>
+            <i class="fa fa-copy text-indigo-500"></i>
             <span class="font-black text-gray-800 tracking-tight uppercase text-sm">Clone Category Data</span>
         </div>
     </template>
@@ -263,7 +268,7 @@
               <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-gray-50/50 p-6 rounded-lg border border-gray-100 shadow-inner">
                 <div v-if="hasSiteMoreThanOne" class="space-y-1">
                   <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Site</label>
-                  <select v-model="fromData.site_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                  <select v-model="fromData.site_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a MicroSite</option>
                     <option v-for="site in allSites" :key="site.id" :value="site.id">
                       {{ site.name }}
@@ -272,7 +277,7 @@
                 </div>
                 <div v-if="hasMicrosites" class="space-y-1">
                   <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Microsite</label>
-                  <select v-model="fromData.microsite_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                  <select v-model="fromData.microsite_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a Microsite</option>
                     <option v-for="microsite in microsites" :key="microsite.id" :value="microsite.id">
                       {{ microsite.name }}
@@ -281,7 +286,7 @@
                 </div>
                 <div v-if="hasPlatformMoreThanOne" class="space-y-1">
                    <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Platform</label>
-                  <select v-model="fromData.platform_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                  <select v-model="fromData.platform_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a Platform</option>
                     <option v-for="platform in platforms" :key="platform.id" :value="platform.id">
                       {{ platform.name }}
@@ -290,7 +295,7 @@
                 </div>
                 <div class="space-y-1">
                   <label class="text-[9px] font-black text-gray-400 uppercase tracking-widest ml-1">Category</label>
-                  <select v-model="fromData.category_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                  <select v-model="fromData.category_id" class="w-full bg-white border border-gray-200 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a Category</option>
                     <option
                       v-for="category in fromCategories"
@@ -307,13 +312,13 @@
           <!-- To Section -->
           <div class="space-y-4">
               <div class="flex items-center gap-3">
-                  <span class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-[10px] font-black text-blue-400 uppercase font-black">2</span>
+                  <span class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-[10px] font-black text-indigo-400 uppercase font-black">2</span>
                   <h4 class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Target Configuration</h4>
               </div>
-              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-blue-50/20 p-6 rounded-lg border border-blue-100/50 shadow-inner">
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 bg-indigo-50/20 p-6 rounded-lg border border-indigo-100/50 shadow-inner">
                 <div v-if="hasSiteMoreThanOne" class="space-y-1">
-                  <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest ml-1">Site</label>
-                  <select v-model="toData.site_id" class="w-full bg-white border border-blue-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                  <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest ml-1">Site</label>
+                  <select v-model="toData.site_id" class="w-full bg-white border border-indigo-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a MicroSite</option>
                     <option v-for="site in allSites" :key="site.id" :value="site.id">
                       {{ site.name }}
@@ -321,8 +326,8 @@
                   </select>
                 </div>
                 <div v-if="hasMicrosites" class="space-y-1">
-                   <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest ml-1">Microsite</label>
-                  <select v-model="toData.microsite_id" class="w-full bg-white border border-blue-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                   <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest ml-1">Microsite</label>
+                  <select v-model="toData.microsite_id" class="w-full bg-white border border-indigo-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a MicroSite</option>
                     <option v-for="microsite in microsites" :key="microsite.id" :value="microsite.id">
                       {{ microsite.name }}
@@ -330,8 +335,8 @@
                   </select>
                 </div>
                 <div v-if="hasPlatformMoreThanOne" class="space-y-1">
-                   <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest ml-1">Platform</label>
-                  <select v-model="toData.platform_id" class="w-full bg-white border border-blue-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                   <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest ml-1">Platform</label>
+                  <select v-model="toData.platform_id" class="w-full bg-white border border-indigo-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a Platform</option>
                     <option v-for="platform in platforms" :key="platform.id" :value="platform.id">
                       {{ platform.name }}
@@ -339,8 +344,8 @@
                   </select>
                 </div>
                 <div class="space-y-1">
-                   <label class="text-[9px] font-black text-blue-400 uppercase tracking-widest ml-1">Category</label>
-                  <select v-model="toData.category_id" class="w-full bg-white border border-blue-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 transition-all shadow-sm">
+                   <label class="text-[9px] font-black text-indigo-400 uppercase tracking-widest ml-1">Category</label>
+                  <select v-model="toData.category_id" class="w-full bg-white border border-indigo-100 rounded-xl px-4 py-2.5 text-xs font-bold outline-none focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all shadow-sm">
                     <option value="0">Select a Category</option>
                     <option
                       v-for="category in toCategories"
@@ -366,21 +371,21 @@
     </template>
     <template #footer>
       <div class="flex items-center gap-4">
-          <div v-show="isWorking" class="flex items-center gap-2 text-[10px] font-black text-blue-600 uppercase tracking-widest animate-pulse">
+          <div v-show="isWorking" class="flex items-center gap-2 text-[10px] font-black text-indigo-600 uppercase tracking-widest animate-pulse">
             <i class="fa fa-spinner fa-spin"></i>
             Cloning Data...
-          </div>
-          <button
-            class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-blue-500/20 transition-all active:scale-95"
-            @click="copyDataFromCategory()"
-          >
-            Start Cloning
-          </button>
+          </div>          
           <button
             class="px-8 py-3 border border-gray-200 hover:bg-gray-50 text-gray-400 hover:text-gray-900 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-sm"
             @click="showHideCopyAlert(false)"
           >
             Cancel
+          </button>
+          <button
+            class="px-8 py-3 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95"
+            @click="copyDataFromCategory()"
+          >
+            Start Cloning
           </button>
       </div>
     </template>
@@ -409,8 +414,8 @@
               class="flex items-center cursor-pointer group leading-none"
               title="Delete from other platforms too"
             >
-              <input v-model="applicableForAllPlatforms" type="checkbox" class="w-5 h-5 rounded-lg border-gray-300 text-red-600 focus:ring-red-500 transition-all cursor-pointer shadow-sm" /> 
-              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-red-600 transition-colors" :style="checkBoxAlignment">Apply deletion across all platforms</span>
+              <input v-model="applicableForAllPlatforms" type="checkbox" class="w-5 h-5 rounded-lg border-gray-300 text-red-600 focus:ring-red-500 transition-all cursor-pointer shadow-sm mr-2" /> 
+              <span class="text-[10px] font-black text-gray-500 uppercase tracking-widest group-hover:text-red-600 transition-colors">Apply deletion across all platforms</span>
             </label>
           </div>
       </div>
@@ -430,7 +435,7 @@
     </template>
   </modal-box>
 
-  <info-popup ref="infoPopup"></info-popup>
+  <info-popup ref="infoPopup" data-width="modal-lg"></info-popup>
 </template>
 
 <script setup>
@@ -441,6 +446,8 @@ import { Toast, Modal, Loader, SafeErrorData, SafeJsonParse, CheckBoxAlignment }
 import HcmsSortable from "../../../helpers/hCmsSortable.js";
 import InfoPopup from "./info-popup.vue";
 import ModalBox from "./library/modal-box.vue";
+import HcButton from "../ui-kit/HcButton.vue";
+import HcAlert from "../ui-kit/HcAlert.vue";
 
 const checkBoxAlignment = CheckBoxAlignment;
 
@@ -887,7 +894,7 @@ const init = () => {
     } else {
         let path = AdminConfig.admin_path("category/settings", { platform_id: platformId.value });
         addErrorMessage(`This category/platform/theme is not available in category_site table.
-                         You need to drag and drop in <a href='${path}'>category settings</a>.`);
+                         You need to drag and drop in <a href='${path}' class="text-indigo-600 hover:text-indigo-700 underline">category settings</a>.`);
         addErrorMessage(`Dont' forget the set the theme there.`);
     }
 };

@@ -13,7 +13,7 @@
     </div>
 
     <nav class="flex-1 px-4 space-y-1 mt-3">
-      <template v-for="current in filteredData">
+      <template v-for="current in allData">
         <div 
           v-if="current.parent_id === 0" 
           :key="current.id"
@@ -25,8 +25,7 @@
             :href="getHref(current)"
             @mouseenter="handleLinkHover($event, current.name)"
             @mouseleave="handleLinkLeave"
-            :class="[
-               'relative group flex items-center rounded-lg transition-all duration-300',
+            :class="['relative group flex items-center rounded-lg transition-all duration-300',
                isCollapsed ? 'px-3 py-3 justify-center' : 'px-5 py-3.5 text-xs font-black tracking-widest',
                isActive(current.controller_name, current) ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:bg-white/5 hover:text-white'
             ]"
@@ -46,8 +45,7 @@
             <!-- Arrow -->
             <i
               v-if="hasChild(current) && !isCollapsed"
-              :class="[
-                  'js_more fa fa-chevron-down text-[10px] transition-transform duration-300 ml-2',
+              :class="['js_more fa fa-chevron-down text-[10px] transition-transform duration-300 ml-2',
                   expandedMenus.includes(current.id) ? 'rotate-180 text-white' : 'text-gray-500 group-hover:text-gray-300'
               ]"
               @click.stop="toggleSubmenu(current.id, $event)"
@@ -65,8 +63,7 @@
           <!-- Submenus - Only show if not collapsed -->
           <template v-if="hasChild(current) && !isCollapsed">
             <ul
-              :class="[
-                'js_child space-y-2 mt-2 py-2 border-l border-white/5 ml-9 transition-all duration-500',
+              :class="['js_child space-y-2 mt-2 py-2 border-l border-white/5 ml-9 transition-all duration-500',
                 expandedMenus.includes(current.id) ? 'block opacity-100 translate-x-0' : 'hidden opacity-0 -translate-x-2'
               ]"
             >
@@ -74,8 +71,7 @@
                 <a
                   :title="child.sub_title || child.name"
                   :href="getHref(child)"
-                  :class="[
-                    'group flex items-center px-4 py-2 text-[10px] font-black tracking-widest rounded-xl transition-all duration-200',
+                  :class="['group flex items-center px-4 py-2 text-[10px] font-black tracking-widest rounded-xl transition-all duration-200',
                     isActive(child.controller_name, child) ? 'bg-white/10 text-blue-400' : 'text-gray-500 hover:text-white hover:bg-white/5'
                   ]"
                 >
@@ -139,12 +135,11 @@
               <li v-for="child in activeHoveredMenu.child" :key="child.id">
                 <a
                   :href="getHref(child)"
-                  :class="[
-                    'flex items-center px-4 py-2.5 text-[10px] font-black tracking-widest rounded-lg transition-all',
+                  :class="['flex items-center px-4 py-2.5 text-[10px] font-black tracking-widest rounded-lg transition-all',
                     isActive(child.controller_name, child) ? 'bg-blue-600 text-white shadow-lg shadow-blue-500/20' : 'text-gray-400 hover:text-white hover:bg-white/5'
                   ]"
                 >
-                  <i v-if="child.icon_css" :class="[getIconClasses(child.icon_css, true), 'mr-3 opacity-70']"></i>
+                  <i v-if="child.icon_css" :class="[getIconClasses(child.icon_css, true),'mr-3 opacity-70']"></i>
                   <span v-else class="mr-3 opacity-70 text-[8px] font-black">#</span>
                   {{ child.name }}
                 </a>
@@ -165,44 +160,10 @@ import { EventBus } from "../../../helpers/event-bus";
 const props = defineProps([
   "dataList",
   "dataControllerName",
-  "dataModulesAllowed",
-  "dataIsAdmin",
   "dataHashtagcmsVersion",
 ]);
 
 const allData = ref(SafeJsonParse(props.dataList, []));
-const modulesAllowed = ref(SafeJsonParse(props.dataModulesAllowed, []));
-
-const isAdmin = computed(() => String(props.dataIsAdmin) === '1' || props.dataIsAdmin === true);
-
-const filteredData = computed(() => {
-  if (isAdmin.value) {
-    return allData.value;
-  }
-  
-  const allowed = modulesAllowed.value || [];
-  
-  return allData.value.reduce((acc, current) => {
-    // Check if the parent module is allowed OR if any of its children are allowed
-    const isParentAllowed = allowed.some(m => m.module_id === current.id);
-    
-    let newItem = { ...current };
-    
-    // Check and filter children separately
-    if (newItem.child && newItem.child.length > 0) {
-       newItem.child = newItem.child.filter(child => {
-          return allowed.some(m => m.module_id === child.id);
-       });
-    }
-    
-    // Parent is visible if explicitly allowed or if any child is allowed (so users can navigate via folder)
-    if (isParentAllowed || (newItem.child && newItem.child.length > 0)) {
-       acc.push(newItem);
-    }
-    
-    return acc;
-  }, []);
-});
 const expandedMenus = ref([]);
 const isCollapsed = ref(false);
 const hoveredMenu = ref(null);
@@ -220,7 +181,7 @@ const linkForHashtag = computed(() => {
 
 const activeHoveredMenu = computed(() => {
   if (!hoveredMenu.value) return null;
-  return filteredData.value.find((m) => m.id === hoveredMenu.value);
+  return allData.value.find((m) => m.id === hoveredMenu.value);
 });
 
 const updateTooltipPosition = (e) => {
@@ -337,7 +298,7 @@ onMounted(() => {
 
   // Auto-expand menus that have active children on page load (only if not collapsed)
   if (!isCollapsed.value) {
-    filteredData.value.forEach((current) => {
+    allData.value.forEach((current) => {
       if (isActive(current.controller_name, current)) {
         expandedMenus.value.push(current.id);
       }

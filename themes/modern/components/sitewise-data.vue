@@ -32,7 +32,7 @@
                 <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-300 text-xs"></i>
                 <input
                   type="text"
-                  placeholder="Filter available..."
+                  placeholder="Search by id or label..."
                   class="w-full bg-gray-50 border border-gray-100 rounded-lg pl-9 pr-3 py-2 text-xs outline-none focus:ring-4 focus:ring-blue-500/5 focus:border-blue-500 transition-all"
                   v-model="searchKey"
                 />

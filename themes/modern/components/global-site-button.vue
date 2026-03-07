@@ -1,25 +1,21 @@
 <template>
   <div class="relative min-w-[180px]">
-    <select
+    <hc-select
       @click="init(true)"
       name="site_combo"
       id="site_combo"
       @change="setSite"
       v-model="currentSite"
-      class="bg-white border border-gray-200 text-gray-700 text-[11px] font-black uppercase tracking-widest rounded-xl focus:ring-4 focus:ring-blue-500/10 focus:border-blue-500 block w-full px-4 py-2.5 outline-none transition-all shadow-sm cursor-pointer hover:border-blue-300"
-    >
-      <option v-for="site in sites" :key="site.id" :value="site.id">
-        {{ site.name }}
-      </option>
-    </select>
+      :options="parsedSites"
+    />
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
-import SplitButton from "./library/split-button.vue";
+import HcSelect from "../ui-kit/HcSelect.vue";
 import SecureLS from "secure-ls";
 
 const props = defineProps(["dataSites", "dataCurrentSite", "dataSupportedSites", "dataIsAdmin"]);
@@ -31,6 +27,13 @@ const currentSite = ref(
     : parseInt(props.dataCurrentSite)
 );
 const supportedSite = ref(SafeJsonParse(props.dataSupportedSites, []));
+
+const parsedSites = computed(() => {
+  return sites.value.map(site => ({
+    value: site.id,
+    label: site.name
+  }));
+});
 
 const init = (force = false) => {
   let ls = new SecureLS();

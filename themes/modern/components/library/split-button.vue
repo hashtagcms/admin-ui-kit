@@ -3,14 +3,14 @@
     <div>
       <button
         type="button"
-        :class="['inline-flex items-center justify-between w-full rounded-lg border border-gray-200 shadow-sm px-6 h-10 bg-white text-xs font-black uppercase tracking-widest text-gray-700 hover:text-blue-600 hover:border-blue-100 transition-all active:scale-95 outline-none focus:ring-4 focus:ring-blue-500/5', btnCss]"
+        :class="['inline-flex items-center justify-between w-full rounded-lg border border-gray-200 shadow-sm px-6 h-10 bg-white text-xs font-black uppercase tracking-widest text-gray-700 hover:border-blue-100 transition-all active:scale-95 outline-none focus:ring-4 focus:ring-blue-500/5', btnCss]"
         id="menu-button"
         aria-expanded="true"
         aria-haspopup="true"
         @click="toggleMenu()"
       >
         <slot>
-            {{ current.label }}
+          {{ current.label }}
         </slot>
         <!-- Heroicon: chevron-down -->
         <svg :class="['ml-2 h-4 w-4 transition-transform duration-300', display !== '' ? 'rotate-180' : '']" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -72,7 +72,7 @@ const emit = defineEmits(["change"]);
 const dropdownMenu = ref(null);
 const display = ref("");
 const formatter = ref(props.dataParser);
-const lists = ref(SafeJsonParse(props.dataOptions, []));
+const lists = ref(typeof props.dataOptions === 'string' ? SafeJsonParse(props.dataOptions, []) : props.dataOptions || []);
 const current = ref({});
 const selectedIndex = ref(
     typeof props.dataSelected == "undefined"
@@ -80,6 +80,16 @@ const selectedIndex = ref(
         : parseInt(props.dataSelected)
 );
 const btnCss = ref(typeof props.dataBtnCss == "undefined" ? "" : props.dataBtnCss);
+
+import { watch } from "vue";
+watch(() => props.dataOptions, (newValue) => {
+    lists.value = typeof newValue === 'string' ? SafeJsonParse(newValue, []) : newValue || [];
+    normalizeData();
+});
+watch(() => props.dataSelected, (newValue) => {
+    selectedIndex.value = typeof newValue == "undefined" ? 0 : parseInt(newValue);
+    normalizeData();
+});
 
 const onChange = computed(() => {
     let method = typeof props.dataOnChange == "undefined" ? null : props.dataOnChange;

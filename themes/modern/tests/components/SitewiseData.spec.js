@@ -1,19 +1,23 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import SiteWiseData from '@hashtagcms/theme/modern/components/sitewise-data.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 
 describe('Modern: SiteWiseData.vue', () => {
 
-  const dataProps = loadFakeData('site-wise.txt');
-
-  it('renders correctly with modern dual-column shadow layout', () => {
+  it('filters data using high-contrast search field', async () => {
     // Correct prop mapping for this specific test
     const finalProps = {
-        dataAllData: JSON.stringify(dataProps.dataAllData),
-        dataSiteData: JSON.stringify(dataProps.dataSiteData),
-        dataCurrentKey: 'city',
-        dataSiteId: '1'
+        dataAllData: JSON.stringify({
+            label: 'Languages',
+            data: [
+                ...siteData.siteInfo.language, 
+                ...Array(12).fill(0).map((_, i) => ({ id: 100 + i, name: `Dummy ${i}`, iso_code: `d${i}` }))
+            ]
+        }),
+        dataSiteData: JSON.stringify(siteData.siteInfo.language),
+        dataCurrentKey: 'language',
+        dataSiteId: String(siteData.siteInfo.id)
     };
 
     const wrapper = shallowMount(SiteWiseData, { props: finalProps });
@@ -48,7 +52,7 @@ describe('Modern: SiteWiseData.vue', () => {
     const wrapper = shallowMount(SiteWiseData, { props: finalProps });
     
     // Search input should now be visible
-    const searchInput = wrapper.find('input[placeholder="Filter available..."]');
+    const searchInput = wrapper.find('input[placeholder="Search by id or label..."]');
     expect(searchInput.exists()).toBe(true);
     expect(searchInput.classes()).toContain('bg-gray-50');
     expect(searchInput.classes()).toContain('focus:ring-blue-500/5');

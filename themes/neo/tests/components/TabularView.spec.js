@@ -3,7 +3,7 @@ import { describe, it, expect, vi } from 'vitest';
 import TabularView from '@hashtagcms/theme/neo/components/tabular-view.vue';
 import axios from 'axios';
 import { EventBus } from '@hashtagcms/helpers/event-bus';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import countryData from '../../../../tests/shared/fake-data/country-index.json';
 
 // Mock window.Laravel
 window.Laravel = {
@@ -37,33 +37,18 @@ vi.mock('@hashtagcms/helpers/fx', () => ({
 
 describe('TabularView.vue', () => {
 
-  const dataProps = loadFakeData('table-view.txt');
-  // dataProps values are Objects/Arrays if JSON.parse worked, or Strings.
-  // TabularView expects Strings for most props and does JSON.parse internally?
-  // Let's check TabularView.vue: 
-  // props: ["dataHeaders", ...]
-  // data() { return { headings: JSON.parse(this.dataHeaders) ... } }
-  // So we must pass Strings if the component parses them, OR Objects if vue-test-utils/Vue allows props to be passed as objects even if propType isn't strictly defined but logic parses it?
-  // Actually, JSON.parse(object) will throw "[object Object]".
-  // So we must stringify them back if test-utils parsed them? 
-  // OR we adjust test-utils NOT to parse JSON?
-  
-  // My test-utils parses JSON. TabularView expects strings.
-  // I should re-stringify for the props that adhere to this pattern.
-  
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataHeaders: JSON.stringify([...countryData.dataFields, 'action']),
+    dataList: JSON.stringify(countryData.paginator.data),
+    dataActionFields: JSON.stringify(countryData.actionFields),
+    dataUserRights: JSON.stringify(countryData.actionFields),
+    dataControllerName: "country"
+  };
 
   it('renders table rows from fake data', () => {
     const wrapper = shallowMount(TabularView, { props });
     
-    // table-view.txt has 20 items.
+    // Verify row count
     expect(wrapper.findAll('tr.list-table-row').length).toBe(20); 
     // Check for a specific country from the file: Åland Islands
     expect(wrapper.text()).toContain('Åland Islands');

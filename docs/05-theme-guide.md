@@ -1,142 +1,89 @@
-# Theme Development & Contribution Guide
+# Theme Development & Contribution
 
-This document explains how to contribute to existing themes or create new themes in the `@hashtagcms/admin-ui-kit` monorepo.
+This guide outlines the technical architecture of the `@hashtagcms/admin-ui-kit` monorepo and explains how to contribute to existing themes or develop new ones.
+
+## Table of Contents
+1. [Architecture Overview](#architecture-overview)
+2. [Shared vs Theme-Specific Assets](#shared-vs-theme-specific-assets)
+3. [Component Development](#component-development)
+4. [Testing & Validation](#testing-and-validation)
+5. [Creating a New Theme](#creating-a-new-theme)
 
 ---
 
 ## 🏗️ Architecture Overview
 
-The UI Kit uses a **Theme-First Monorepo Architecture**. Every theme is a self-contained unit located in `packages/themes/{theme_name}/`.
+The UI Kit utilizes a **Theme-First Monorepo Architecture**. Each theme is a self-contained unit capable of overriding global components and styles while leveraging shared helpers.
 
-### Standard Directory Structure
+### Directory Structure
 ```text
-packages/themes/{theme_name}/
-├── package.json          # Theme-specific dependencies
+themes/{theme_name}/
+├── package.json          # Theme dependencies
 ├── src/
-│   ├── components/       # Vue 3 components
-│   ├── scss/             # Theme styles (Sass)
-│   └── js/               # Theme entry point (app.js)
-├── static/               # Static assets (images, third-party libs)
-├── views/                # Blade templates for Laravel integration
-└── tests/                # Vitest spec files
-    └── components/       # Component-level tests (logic only)
+│   ├── components/       # Theme-specific Vue 3 components
+│   ├── scss/             # Theme stylesheet entry points
+│   └── js/               # Theme build entry (app.js)
+├── static/               # Theme-unique assets
+└── views/                # Laravel Blade layout templates
 ```
 
-### Shared Testing Infrastructure
-To ensure consistency, shared assets are located at the project root:
-- **`tests/shared/fake-data/`**: Central repository for component attributes.
-- **`tests/shared/test-utils.js`**: Shared logic for hydrating components.
+---
+
+## 📦 Shared vs Theme-Specific Assets
+
+A critical aspect of our architecture is the relationship between `common` assets and the active theme.
+
+### 1. Common Assets
+Assets placed in the `common/` directory are automatically distributed to the `/dist/{theme}/` folder of **every** theme during the build process. This ensures that essential utilities (like TinyMCE editors or global fonts) are always available.
+
+### 2. Modern vs Neo Themes
+- **Modern Theme**: Built on **Tailwind CSS v4**. It prioritizes high-fidelity aesthetics, glassmorphism, and rapid layout development.
+- **Neo Theme**: Built on **Bootstrap 5**. It is designed for high accessibility and legacy system compatibility.
 
 ---
 
-## 📦 Static Assets
+## 🎨 Component Development
 
-The build system automatically manages static assets, distributing them to the final `dist/{theme}/` folder.
+When creating components, adhere to the following standards:
 
-### 1. Common Assets (Global)
-Assets placed in `packages/common/` are automatically copied to **every** theme's output directory.
-- `packages/common/js/`  → `dist/{theme}/js/` (e.g. vendors like TinyMCE)
-- `packages/common/css/` → `dist/{theme}/css/`
-- `packages/common/img/` → `dist/{theme}/img/`
-- `packages/common/fonts/` → `dist/{theme}/fonts/`
-
-**Example:**
-Files in `packages/common/js/vendors/tinymce` will be available at imports/URLs like:
-`/assets/hashtagcms/be/{theme}/js/vendors/tinymce/tinymce.min.js`
-
-### 2. Theme-Specific Assets
-For assets unique to a single theme, place them in `packages/themes/{theme_name}/static/`.
-These contents are copied directly to the theme's root output `dist/{theme}/`.
-
-**Example:**
-`packages/themes/modern/static/img/hero.png` will be output to `dist/modern/img/hero.png`.
+1. **Self-Containment**: Use props for all data inputs. Avoid direct store access inside library components.
+2. **Logic Sharing**: Import standard logic from `@hashtagcms/helpers` to ensure identical behavior across themes.
+3. **Styling**: 
+   - Components in the `Modern` theme should use utility classes exclusively.
+   - Use CSS variables for tokens like `--primary-color` to allow for easy runtime adjustments.
 
 ---
 
-## 🎨 Developing Components
+## 🧪 Testing & Validation
 
-### 1. Component Design
-- **Self-Containment**: Components should rely on props for data. Use `@hashtagcms/helpers` for shared logic.
-- **Styling**:
-  - **Modern Theme**: Use Tailwind v4 utility classes.
-  - **Neo Theme**: Use Bootstrap 5 classes.
-- **Naming**: Use PascalCase for Vue files and kebab-case for CSS classes.
-
-### 2. Styles
-Styles are located in `src/scss/app.scss`. 
-- **Tailwind v4**: If contributing to the Modern theme, use the `@reference` directive to keep the bundle lean.
-- **Shared Variables**: Use CSS variables for tokens like colors and spacing.
-
----
-
-## 📂 The `views` Directory
-The `views/` folder contains Laravel Blade templates that act as the entry points for the CMS. 
-- These templates are intended to be published to the `resources/views/vendor/hashtagcms/be/{theme_name}` directory in a Laravel app.
-- Ensure the HTML structure in Blade matches the expectations of the Vue components.
-
----
-
-## 🧪 Testing Process
-
-Every new component or major change **must** have a corresponding test case.
-
-### 1. Structure
-Place your tests in `packages/themes/{theme_name}/tests/components/{ComponentName}.spec.js`.
-
-### 2. Running Tests
-Tests are organized via Vitest Workspaces.
+### Unit Testing
+We use **Vitest** for component logic validation. Tests are organized via workspaces.
 ```bash
-# Run all tests (Neo and Modern)
-npm run test
-
-# Run tests for a specific theme
-npx vitest --project neo
+# Test a specific theme implementation
 npx vitest --project modern
 ```
 
-### 3. Guidelines
-- Use `@vue/test-utils` for mounting.
-- Utilize the `loadFakeData` utility to hydrate props from `fake-data/*.txt` files.
-- Verify both the logic (events/props) and the visual indicators (CSS classes like `bg-blue-600` or Bootstrap classes).
-
----
-
-## 🕹️ Visual Testing (Playground)
-
-The Playground is the fastest way to see your changes live in both themes.
-
-### 1. Start the Playground
+### Visual Testing (Playground)
+The Playground allows for real-time visual inspection of components across multiple themes simultaneously.
 ```bash
 npm run playground
 ```
-This launches a Vite server at `http://localhost:3000`.
-
-### 2. Testing Your Component
-- Open `playground/App.vue`.
-- Add your component to the `availableViews` array.
-- Use the **Theme Selector** in the header to toggle between Neo and Modern.
-- Ensure your component renders correctly and responds layout shifts.
 
 ---
 
 ## 🚀 Creating a New Theme
 
-The UI Kit uses **Dynamic Discovery**, meaning the build system and test runner automatically detect new subdirectories in the `themes/` folder.
+The build system utilizes **Dynamic Discovery**. To create a new theme:
 
-To create a new theme:
-
-1. **Scaffold**: Copy an existing theme folder (e.g., `themes/neo/`) to a new directory (e.g., `themes/material/`).
-2. **Metadata**: Update the `package.json` inside your new theme folder with the new theme name and version.
-3. **Styles**: Modify `styles/app.scss`. If using Tailwind, ensure your configuration matches the directory structure.
-4. **Playground Registration**: Open `playground/App.vue` and add your theme to the `currentTheme` dropdown list and `switchTheme` logic if necessary to ensure it renders correctly in the preview.
-5. **Build & Test**:
-   - Run `npm run test` to see the new theme's test project (automatically created).
-   - Run `npm run build` to generate the `dist/{theme_name}/` assets.
+1. **Scaffold**: Duplicate the `modern` folder into a new directory (e.g. `material`).
+2. **Metadata**: Update the `package.json` with your new theme name.
+3. **Styles**: Modify the SCSS entry points.
+4. **Register**: Add your theme to the `playground/App.vue` theme selector for visual testing.
 
 ---
 
-## 🤝 Contribution Rules
-- **No Cross-Imports**: A theme should never import from another theme's directory.
-- **Branding**: Always use "HashtagCms" casing.
-- **Terminology**: Use "Extended Features" instead of "Premium Features".
-- **Build First**: Always run `npm run build` before submitting a PR to verify bundle integrity.
+## 🔗 Related Documentation
+
+- **[Getting Started](./01-getting-started.md)**: Basic installation and usage guide.
+- **[Component Catalog](./02-components.md)**: List of all available UI and functional components.
+- **[API Reference](./04-api-reference.md)**: Technical overview of exported classes and methods.

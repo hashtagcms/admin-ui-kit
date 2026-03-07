@@ -130,15 +130,7 @@
         <div v-if="errorMessage !== ''" class="w-full max-w-md bg-red-50 text-red-700 px-4 py-3 rounded-xl border border-red-100 text-sm font-bold flex items-center gap-3 animate-shake">
            <i class="fa fa-exclamation-triangle text-lg"></i> {{ errorMessage }}
         </div>
-        <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
-          <button
-            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-12 py-4 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 text-white font-black rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-1 active:scale-95 text-lg tracking-wide"
-            name="submit"
-            type="submit"
-          >
-            <i class="fa fa-save text-base"></i>
-            Update Permissions
-          </button>
+        <div class="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">          
           <button
             type="button"
             @click="goBack()"
@@ -146,6 +138,14 @@
           >
             <i class="fa fa-arrow-left text-sm"></i>
             Go Back
+          </button>
+          <button
+            class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-12 py-4 bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300 text-white font-black rounded-lg shadow-lg shadow-blue-500/20 transition-all hover:-translate-y-1 active:scale-95 text-lg tracking-wide"
+            name="submit"
+            type="submit"
+          >
+            <i class="fa fa-save text-base"></i>
+            Update Permissions
           </button>
         </div>
       </div>

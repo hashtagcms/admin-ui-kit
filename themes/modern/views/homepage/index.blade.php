@@ -15,7 +15,7 @@
         $platforms = isset($siteInfo->platform) ? $siteInfo->platform : [];
 
     @endphp
-    <title-bar data-title="{!! htcms_get_module_name(request()->module_info) !!}" data-show-copy="false" data-show-paste="false" data-show-back="false" data-show-expand="true"></title-bar>
+    <title-bar data-title="{!! htcms_get_module_name(request()->module_info) !!}" data-show-copy="false" data-show-paste="false" data-show-back="false"></title-bar>
     <page-manager
             data-site-id="{{$site_id}}"
             data-microsite-id="{{$microsite_id}}"

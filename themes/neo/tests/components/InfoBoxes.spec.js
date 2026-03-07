@@ -1,7 +1,7 @@
 import { shallowMount, mount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import InfoBoxes from '@hashtagcms/theme/neo/components/info-boxes.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import layoutData from '../../../../tests/shared/fake-data/layout-index.json';
 import AdminConfig from '@hashtagcms/helpers/admin-config';
 
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -12,15 +12,11 @@ vi.mock('@hashtagcms/helpers/admin-config', () => ({
 
 describe('InfoBoxes.vue', () => {
 
-  const dataProps = loadFakeData('info-boxes.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataModules: JSON.stringify(layoutData.allModules[3]), // Localization
+    dataModulesAllowed: JSON.stringify([]),
+    dataIsAdmin: "1"
+  };
 
   it('renders info boxes for child modules', () => {
     const wrapper = shallowMount(InfoBoxes, { 
@@ -35,7 +31,7 @@ describe('InfoBoxes.vue', () => {
         }
     });
 
-    // File info-boxes.txt (Localization module) has children: Zones, Countries, Cities, Language, Currencies.
+    // Verify child modules presence
     const stubs = wrapper.findAll('.info-box-stub');
     expect(stubs.length).toBe(5);
     expect(wrapper.text()).toContain('Zones');

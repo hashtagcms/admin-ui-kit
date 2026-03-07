@@ -48,7 +48,7 @@
                     <div v-for="(msg, idx) in successMsg" :key="idx" class="px-6 py-4 text-[10px] flex items-center gap-4 transition-colors hover:bg-white">
                         <i v-if="msg.success !== false" class="fa fa-check-circle text-green-500 text-base"></i>
                         <i v-else class="fa fa-times-circle text-red-500 text-base"></i>
-                        <span :class="msg.success === false ? 'text-red-600 font-black' : 'text-gray-600 font-bold'">{{ msg.message }}</span>
+                        <span :class="msg.success === false ?'text-red-600 font-black' : 'text-gray-600 font-bold'">{{ msg.message }}</span>
                     </div>
                 </div>
             </div>

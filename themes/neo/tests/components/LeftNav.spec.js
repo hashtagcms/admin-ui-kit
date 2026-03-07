@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import LeftNav from '@hashtagcms/theme/neo/components/left-nav.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import layoutData from '../../../../tests/shared/fake-data/layout-index.json';
 
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
   default: {
@@ -11,24 +11,20 @@ vi.mock('@hashtagcms/helpers/admin-config', () => ({
 
 describe('LeftNav.vue', () => {
 
-  const dataProps = loadFakeData('admin-modules.txt');
-  const props = {};
-  for (const key in dataProps) {
-      if (typeof dataProps[key] === 'object' && dataProps[key] !== null) {
-          props[key] = JSON.stringify(dataProps[key]);
-      } else {
-          props[key] = String(dataProps[key]);
-      }
-  }
+  const props = {
+    dataList: JSON.stringify(layoutData.allModules || []),
+    dataControllerName: 'dashboard',
+    dataHashtagcmsVersion: '2.0.5'
+  };
 
   it('renders menu items correctly', () => {
     const wrapper = shallowMount(LeftNav, { props });
 
-    // Based on admin-modules.txt
+    // Verify structure
     // Has "Dashboard", "Localization", "Sites", "Settings" etc.
     expect(wrapper.text()).toContain('Dashboard');
     expect(wrapper.text()).toContain('Settings');
-    expect(wrapper.text()).toContain('CMS Modules'); // Child of Settings
+    expect(wrapper.text()).toContain('Modules'); // In layout-index.json under settings
   });
 
   it('highlights active menu', () => {
@@ -38,7 +34,7 @@ describe('LeftNav.vue', () => {
     // Dashboard controller name is "dashboard"
     // active css logic: if dataControllerName === controller_name
     
-    // In admin-modules.txt: data-controller-name="dashboard"
+    // Verify active controller
     // And Dashboard item: controller_name="dashboard"
     
     const dashboardLink = wrapper.find('a[href="/admin/dashboard"]');

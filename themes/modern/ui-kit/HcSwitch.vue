@@ -15,16 +15,16 @@ import RawComponent from '../../../common/js/ui-kit/HcSwitch.vue';
 defineOptions({ name: 'ModernHcSwitch' });
 
 const uiStyle = {
-  container: "inline-flex items-center cursor-pointer user-select-none white-space-nowrap relative",
+  container: "inline-flex items-center cursor-pointer select-none whitespace-nowrap relative group",
   disabledContainer: "opacity-50 cursor-not-allowed",
-  inputWrapper: "inline-block vertical-align-middle relative flex-shrink-0",
-  srOnly: "absolute width-[1px] height-[1px] p-0 -m-[1px] overflow-hidden clip-[rect(0,0,0,0)] white-space-nowrap border-0",
+  inputWrapper: "inline-block align-middle relative flex-shrink-0",
+  srOnly: "sr-only",
   track: "transition-all duration-300 rounded-full shadow-inner",
   inactiveTrack: "bg-gray-200 group-hover:bg-gray-300",
-  thumb: "absolute bg-white rounded-full shadow-md transition-all duration-300 transform flex items-center justify-center top-1/2 -translate-y-1/2",
-  thumbInactivePosition: "left-1",
+  thumb: "absolute left-1 bg-white rounded-full shadow-md transition-all duration-300 transform flex items-center justify-center top-1/2 -translate-y-1/2",
+  thumbInactivePosition: "",
   icon: "text-[8px] text-blue-600 animate-in zoom-in duration-300",
-  label: "inline-block vertical-align-middle relative -top-[2px] ml-3 text-[10px] font-black uppercase tracking-widest leading-none text-gray-700",
+  label: "inline-block align-middle relative -top-[1px] ml-3 text-[10px] font-black uppercase tracking-widest leading-none text-gray-700",
   trackSizes: { 
     'sm': 'w-8 h-4', 
     'md': 'w-11 h-6', 

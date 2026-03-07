@@ -1,7 +1,7 @@
 import { shallowMount } from '@vue/test-utils';
 import { describe, it, expect, vi } from 'vitest';
 import SiteWiseCopier from '@hashtagcms/theme/modern/components/sitewise-copier.vue';
-import { loadFakeData } from '@hashtagcms/testing/test-utils';
+import siteData from '../../../../tests/shared/fake-data/site-settings-platforms.json';
 
 // Mock dependencies
 vi.mock('@hashtagcms/helpers/admin-config', () => ({
@@ -20,13 +20,12 @@ vi.mock('@hashtagcms/helpers/common', () => ({
 describe('Modern: SiteWiseCopier.vue', () => {
 
   it('renders correctly with modern glassmorphism and icons', () => {
-    const dataProps = loadFakeData('site-wise.txt'); // Reusing site-wise data for allData
     const props = {
-        dataAllSites: JSON.stringify([{id:1, name: 'Main Site'}, {id:2, name: 'Other Site'}]),
-        dataAllData: JSON.stringify(dataProps.dataAllData),
-        dataSiteData: JSON.stringify(dataProps.dataSiteData),
-        dataCurrentKey: 'city',
-        dataSiteId: '1'
+        dataAllSites: JSON.stringify([{id: siteData.siteInfo.id, name: siteData.siteInfo.name}]),
+        dataAllData: JSON.stringify({ label: 'Platforms', data: siteData.siteInfo.platform }),
+        dataSiteData: JSON.stringify(siteData.siteInfo.platform),
+        dataCurrentKey: 'platform',
+        dataSiteId: String(siteData.siteInfo.id)
     };
 
     const wrapper = shallowMount(SiteWiseCopier, { 

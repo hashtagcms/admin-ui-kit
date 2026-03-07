@@ -1,5 +1,5 @@
 <template>
-  <RawComponent v-bind="$attrs" :ui="uiStyle">
+  <RawComponent ref="raw" v-bind="$attrs" :ui="uiStyle">
     <template v-for="slot in Object.keys($slots)" #[slot]="scope">
       <slot :name="slot" v-bind="scope" />
     </template>
@@ -11,8 +11,26 @@
  * Modern Theme Wrapper for HcPopover
  * Injects Tailwind styles into the theme-blind common component.
  */
+import { ref } from 'vue';
 import RawComponent from '../../../common/js/ui-kit/HcPopover.vue';
 defineOptions({ name: 'ModernHcPopover' });
+
+const raw = ref(null);
+
+const toggle = () => raw.value?.toggle();
+const open = () => raw.value?.open();
+const close = () => raw.value?.close();
+const checkOverflow = () => raw.value?.checkOverflow();
+
+defineExpose({
+  toggle,
+  open,
+  close,
+  checkOverflow,
+  // Proxy isOpen for historical/direct access compatibility
+  get isOpen() { return raw.value?.isOpen },
+  set isOpen(val) { if (raw.value) raw.value.isOpen = val }
+});
 
 const uiStyle = {
   wrapper: "relative inline-block",

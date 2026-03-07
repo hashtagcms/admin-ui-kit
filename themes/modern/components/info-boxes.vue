@@ -6,7 +6,7 @@
         :key="module.name + index"
         :href="getLink(module)"
         class="group block transition-all duration-300 hover:-translate-y-2"        
-        :title="module.name"
+        :title="module.name + ' : ' + module.sub_title"
       >
         <info-box
           :data-title="module.name"
@@ -46,7 +46,7 @@ const hasAccess = (module_id) => {
   }
   for (let i = 0; i < modulesAllowed.value.length; i++) {
     let current = modulesAllowed.value[i];
-    if (current.module_id == module_id) {
+    if (current.id == module_id) {
       return true;
     }
   }
