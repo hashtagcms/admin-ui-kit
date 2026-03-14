@@ -1,6 +1,10 @@
 <template>
   <div class="relative min-w-[180px]">
+    <div v-if="setupError" style="font-size:16px; color:red; padding: 20px; background:white; z-index:999999; position:fixed; top:0; left:0; width:100%;">
+        SETUP ERROR: {{ setupError }}
+    </div>
     <hc-select
+      v-else
       @click="init(true)"
       name="site_combo"
       id="site_combo"
@@ -17,23 +21,37 @@ import AdminConfig from "../../../helpers/admin-config";
 import { SafeJsonParse } from "../../../helpers/common";
 import HcSelect from "../ui-kit/HcSelect.vue";
 import SecureLS from "secure-ls";
+import axios from "axios";
 
 const props = defineProps(["dataSites", "dataCurrentSite", "dataSupportedSites", "dataIsAdmin"]);
 
-const sites = ref(SafeJsonParse(props.dataSites, []));
-const currentSite = ref(
-  props.dataCurrentSite == "undefined"
-    ? 1
-    : parseInt(props.dataCurrentSite)
-);
-const supportedSite = ref(SafeJsonParse(props.dataSupportedSites, []));
+const setupError = ref("");
+let sites = ref([]);
+let currentSite = ref(1);
+let supportedSite = ref([]);
+let parsedSites = computed(() => []);
+let hasSites = () => false;
 
-const parsedSites = computed(() => {
-  return sites.value.map(site => ({
-    value: site.id,
-    label: site.name
-  }));
-});
+try {
+  sites.value = SafeJsonParse(props.dataSites, []);
+  currentSite.value = props.dataCurrentSite == "undefined" ? 1 : parseInt(props.dataCurrentSite);
+  supportedSite.value = SafeJsonParse(props.dataSupportedSites, []);
+
+  parsedSites = computed(() => {
+    let s = sites.value;
+    if (!Array.isArray(s)) s = [];
+    return s.map(site => ({
+      value: site.id,
+      label: site.name
+    }));
+  });
+
+  hasSites = () => {
+      return Array.isArray(sites.value) && sites.value.length > 1;
+  };
+} catch (e) {
+  setupError.value = e.toString() + "\n" + e.stack;
+}
 
 const init = (force = false) => {
   let ls = new SecureLS();
@@ -45,7 +63,6 @@ const init = (force = false) => {
       .get(siteController, { withCredentials: false })
       .then(function (response) {
         sites.value = response.data;
-
         ls.set("allSites", JSON.stringify(sites.value));
       })
       .catch(function (error) {
@@ -54,10 +71,6 @@ const init = (force = false) => {
   } else {
     sites.value = SafeJsonParse(allSites, []);
   }
-};
-
-const hasSites = () => {
-    return sites.value != null && sites.value.length > 1;
 };
 
 const parseSite = (row) => {

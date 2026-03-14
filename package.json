@@ -1,9 +1,19 @@
 {
   "name": "@hashtagcms/admin-ui-kit",
-  "version": "1.0.9",
-  "description": "The official Admin UI Kit for HashtagCms, bundled with essential UI components, utility helpers, and design system styles.",
-  "author": "HashtagCms",
+  "version": "2.0.0",
+  "description": "The official Admin UI Kit for HashtagCMS, bundled with essential UI components, utility helpers, and design system styles.",
+  "author": "HashtagCMS",
   "license": "MIT",
+  "keywords": [
+    "HashtagCMS",
+    "Admin UI Kit",
+    "UI Components",
+    "Design System",
+    "VueJS",
+    "TailwindCSS",
+    "CMS Admin",
+    "Dashboard Components"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -35,7 +45,7 @@
     "autoprefixer": "^10.4.24",
     "babel-loader": "^9.1.0",
     "bootstrap": "^5.3.3",
-    "copy-webpack-plugin": "^13.0.1",
+    "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^6.8.0",
     "jsdom": "^27.0.1",
     "mini-css-extract-plugin": "^2.7.0",
@@ -57,7 +67,7 @@
     "./themes/*": "./themes/*"
   },
   "dependencies": {
-    "@hashtagcms/admin-sdk": "^1.0.3",
+    "@hashtagcms/admin-sdk": "^2.0.0",
     "axios": "^1.6.0",
     "mitt": "^3.0.1",
     "motion": "^10.16.4",

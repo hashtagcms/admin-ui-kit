@@ -6,13 +6,16 @@
             <div class="w-1.5 h-10 bg-blue-600 rounded-full shadow-lg shadow-blue-500/20"></div>
             <div>
                 <h4 class="text-2xl font-black text-gray-900 tracking-tight uppercase leading-none">{{ getTitle(controllerTitle) }}</h4>
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1.5 opacity-70">{{cmsModules.sub_title || 'Resource Management Instance'}}</p>
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mt-1.5 opacity-70">{{cmsModules.sub_title || 'Manage CMS modules'}}</p>
             </div>
         </div>
         
         <!-- Actions Toolbar -->
-        <div class="flex flex-wrap items-center gap-3 bg-gray-50/50 p-2 rounded-lg border border-gray-100 shadow-inner w-full lg:w-auto">
-            <cms-module-dropdown :data-modules="cmsModules" :data-current-module="controllerName"></cms-module-dropdown>
+        <div class="flex flex-wrap items-center gap-3 bg-gray-50/50 p-2 rounded-lg border border-gray-100 shadow-inner w-auto">
+            <div class="inline-block">
+                <cms-module-dropdown :data-modules="cmsModules" :data-current-module="controllerName"></cms-module-dropdown>
+            </div>
+            
             <language-button
               v-if="hasLangMethod"
               :data-languages="dataLanguages"
@@ -21,60 +24,53 @@
               >English</language-button
             >
 
-            <hc-button
-              v-if="showAdd && showAddButtonBasedOnAction"
-               variant="primary"
-               @click="addNew"
-               icon="fa fa-plus"
+            <button 
+                v-if="showAdd && showAddButtonBasedOnAction"
+                type="button" 
+                class="inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group border border-transparent bg-blue-600 text-white shadow-lg shadow-blue-500/20 hover:bg-blue-700 hover:shadow-blue-500/30 px-6 h-10 text-xs rounded-lg"
+                @click="addNew"
             >
-              Add New
-            </hc-button>
+                <span class="inline-flex transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12 mr-2"><i class="fa fa-plus"></i></span>
+                <span class=""> Add New </span>
+            </button>
 
-            <hc-button
+            <a
               v-for="actionButton in filteredMoreActionButtons"
               :key="actionButton.action"
-              variant="secondary"
-              outline
               :href="getAction(actionButton.action)"
-              :icon="actionButton.icon_css"
-              :is-square="getButtonType(actionButton) !== 'button'"
-              as="a"
+              class="inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group border border-transparent bg-slate-600 text-white shadow-lg shadow-slate-500/20 hover:bg-slate-700 hover:shadow-slate-500/30 w-10 h-10 text-xs rounded-lg p-0"
             >
-              <template #default v-if="getButtonType(actionButton) == 'button'">
-                <span>{{ actionButton.label }}</span>
-              </template>
-            </hc-button>
+                <span class="inline-flex transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12" :class="getButtonType(actionButton) === 'button' ? 'mr-2' : ''"><i :class="actionButton.icon_css"></i></span>
+                <span v-if="getButtonType(actionButton) == 'button'">{{ actionButton.label }}</span>
+            </a>
 
-            <hc-button
-              v-if="showSearchButton"
-              variant="soft"
-              outline
-              @click="showHideSearch"
-              icon="fa fa-search"
-              :active="showSearchPanel"
-              is-square
-              size="md"
-            />
+            <button 
+                v-if="showSearchButton"
+                type="button" 
+                :class="showSearchPanel ? 'border-transparent bg-emerald-600 text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700' : 'bg-white border-gray-200 text-gray-400 hover:text-emerald-600 hover:border-emerald-500'"
+                class="inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group border w-10 h-10 text-xs rounded-lg p-0"
+                @click="showHideSearch"
+            >
+                <span class="inline-flex transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"><i class="fa fa-search"></i></span>
+            </button>
 
-            <hc-button
-              v-if="fields.length > 0"
-              variant="secondary"
-              outline
-              @click="changeLayout"
-              :icon="layoutIcon"
-              :active="layoutType !== 'table'"
-              is-square
-              size="md"
-            />
+            <button 
+                v-if="fields.length > 0"
+                type="button" 
+                :class="layoutType !== 'table' ? 'bg-slate-600 text-white border-transparent shadow-lg shadow-slate-500/20 hover:bg-slate-700 hover:shadow-slate-500/30' : 'bg-white border-gray-200 text-gray-400 hover:text-blue-600 hover:border-blue-500'"
+                class="inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group border w-10 h-10 text-xs rounded-lg p-0"
+                @click="changeLayout"
+            >
+                <span class="inline-flex transition-transform duration-300 group-hover:scale-110 group-hover:rotate-12"><i :class="layoutIcon"></i></span>
+            </button>
 
-            <hc-button
+            <a
                v-if="showBack"
-               variant="dark"
                :href="backURL"
-               as="a"
+               class="inline-flex items-center justify-center font-black uppercase tracking-widest transition-all duration-300 shadow-sm hover:-translate-y-0.5 active:scale-95 active:translate-y-0 disabled:opacity-50 disabled:cursor-not-allowed group border border-transparent bg-gray-800 text-white shadow-lg shadow-gray-500/20 hover:bg-gray-900 hover:shadow-gray-500/30 px-6 h-10 text-xs rounded-lg"
             >
               Back
-            </hc-button>
+            </a>
         </div>
     </div>
     

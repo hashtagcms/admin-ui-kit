@@ -15,8 +15,8 @@
                 data-controller-name="{{request()->module_info->controller_name}}"
                 data-back-url="{{$backURL}}"
                 data-action-performed="{{$actionPerformed}}"
-                data-data-types="{{json_encode($dataTypes)}}"
-                data-data-types-info="{{json_encode($dataTypesInfo)}}"
+                data-module-types="{{json_encode($moduleTypes)}}"
+                data-method-types="{{json_encode($methodTypes)}}"
                 data-site-id="{{htcms_get_siteId_for_admin()}}"
         >
         </front-module-creator>

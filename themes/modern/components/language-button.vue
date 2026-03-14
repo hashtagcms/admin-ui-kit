@@ -1,7 +1,6 @@
 <template>
-  <div class="inline-block relative min-w-[150px]">
+  <div v-if="hasLanguage()" class="inline-block relative min-w-[150px]">
     <hc-select
-      v-if="hasLanguage()"
       :options="parsedLanguages"
       v-model="currentLang"
       @update:modelValue="setLanguage"
